@@ -11,10 +11,26 @@ overall_status=0
 
 check_running_service() {
     local container_name=$1
-    local health_status=$(docker inspect --format='{{.State.Health.Status}}' "$container_name" 2>/dev/null || echo "not_found")
-
+    local exists=$(docker inspect --format='{{.Name}}' "$container_name" 2>/dev/null | sed 's/\///' || echo "")
+    
+    if [ -z "$exists" ]; then
+        echo -e "${YELLOW}⚠️  $container_name - not found${NC}"
+        return 0
+    fi
+    
+    local state=$(docker inspect --format='{{.State.Status}}' "$container_name" 2>/dev/null || echo "unknown")
+    if [ "$state" != "running" ]; then
+        echo -e "${RED}❌ $container_name - $state${NC}"
+        return 1
+    fi
+    
+    local health_status=$(docker inspect --format='{{.State.Health.Status}}' "$container_name" 2>/dev/null || echo "none")
+    
     if [ "$health_status" = "healthy" ]; then
         echo -e "${GREEN}✅ $container_name - healthy${NC}"
+        return 0
+    elif [ "$health_status" = "none" ]; then
+        echo -e "${GREEN}✅ $container_name - running${NC}"
         return 0
     else
         echo -e "${RED}❌ $container_name - $health_status${NC}"
@@ -24,6 +40,13 @@ check_running_service() {
 
 check_completed_job() {
     local container_name=$1
+    local exists=$(docker inspect --format='{{.Name}}' "$container_name" 2>/dev/null | sed 's/\///' || echo "")
+    
+    if [ -z "$exists" ]; then
+        echo -e "${YELLOW}⚠️  $container_name - not found${NC}"
+        return 0
+    fi
+    
     local state=$(docker inspect --format='{{.State.Status}}' "$container_name" 2>/dev/null || echo "not_found")
     local exit_code=$(docker inspect --format='{{.State.ExitCode}}' "$container_name" 2>/dev/null || echo "255")
 
@@ -36,23 +59,35 @@ check_completed_job() {
     fi
 }
 
-echo "=== Checking containers ==="
-
+echo "=== Infrastructure ==="
 check_running_service "mysql" || overall_status=1
 check_running_service "minio" || overall_status=1
 check_running_service "redpanda" || overall_status=1
-check_running_service "entitybase-backend" || overall_status=1
-check_running_service "idworker" || overall_status=1
-check_running_service "entitybase-sse-backend" || overall_status=1
-check_running_service "entitybase-sse-frontend" || overall_status=1
 
+echo ""
+echo "=== Setup Jobs ==="
 check_completed_job "create-buckets" || overall_status=1
 check_completed_job "create-tables" || overall_status=1
 check_completed_job "create-topics" || overall_status=1
 
 echo ""
-echo "=== Checking images ==="
-docker images | grep -E "entitybase-" || echo -e "${YELLOW}⚠️  No entitybase images found${NC}"
+echo "=== Core Services ==="
+check_running_service "entitybase-backend" || overall_status=1
+check_running_service "idworker" || overall_status=1
+check_running_service "entitybase-sse-backend" || overall_status=1
+check_running_service "entitybase-sse-frontend" || overall_status=1
+
+echo ""
+echo "=== Workers ==="
+check_running_service "json-dump-worker" || overall_status=1
+check_running_service "ttl-dump-worker" || overall_status=1
+check_running_service "backlink-stats-worker" || overall_status=1
+check_running_service "general-stats-worker" || overall_status=1
+check_running_service "user-stats-worker" || overall_status=1
+
+echo ""
+echo "=== Images ==="
+docker images | grep -E "entitybase-" | head -20 || echo -e "${YELLOW}⚠️  No entitybase images found${NC}"
 
 echo ""
 if [ $overall_status -eq 0 ]; then
