@@ -2,6 +2,47 @@
 
 Docker orchestration for Entitybase services.
 
+## Architecture
+
+```mermaid
+flowchart TB
+    subgraph Infrastructure
+        MySQL[(MySQL<br/>3306)]
+        Minio[MinIO<br/>9000/9001]
+        Redpanda[Redpanda<br/>9092]
+    end
+
+    subgraph Backend
+        API[entitybase-backend<br/>8080]
+        ID[idworker<br/>8001]
+        Workers[Workers<br/>8002-8006]
+    end
+
+    subgraph SSE
+        SSE_BE[entitybase-sse-backend<br/>8081]
+        SSE_FE[entitybase-sse-frontend<br/>8082]
+    end
+
+    Users((Users))
+
+    Users -->|HTTP| API
+    Users -->|HTTP| SSE_BE
+    Users -->|HTTP| SSE_FE
+
+    API --> MySQL
+    API --> Minio
+    API --> Redpanda
+    API --> ID
+
+    ID --> MySQL
+
+    Workers --> MySQL
+    Workers --> Minio
+
+    SSE_BE --> Redpanda
+    SSE_FE --> Redpanda
+```
+
 ## Quick Start
 
 ```bash
