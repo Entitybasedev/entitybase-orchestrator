@@ -8,7 +8,7 @@ help:
 	@echo "  make remove  - Stop services and remove containers/volumes"
 
 build:
-	./build-images.sh
+	./scripts/build-images.sh
 
 run: build
 	docker compose up -d
