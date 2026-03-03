@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/.."
 
 echo "Building entitybase-backend:latest..."
 docker build -t entitybase-backend:latest -f entitybase-backend/docker/containers/Dockerfile.api entitybase-backend/
