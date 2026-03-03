@@ -72,7 +72,7 @@ check_completed_job "create-topics" || overall_status=1
 
 echo ""
 echo "=== Core Services ==="
-check_running_service "entitybase-backend" || overall_status=1
+check_running_service "entitybase-backend-api" || overall_status=1
 check_running_service "idworker" || overall_status=1
 check_running_service "entitybase-sse-backend" || overall_status=1
 check_running_service "entitybase-sse-frontend" || overall_status=1
