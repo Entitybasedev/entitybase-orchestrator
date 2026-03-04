@@ -85,7 +85,3 @@ check_running_service "ttl-dump-worker" || overall_status=1
 check_running_service "backlink-stats-worker" || overall_status=1
 check_running_service "general-stats-worker" || overall_status=1
 check_running_service "user-stats-worker" || overall_status=1
-
-echo ""
-echo "=== Images ==="
-docker images | grep -E "entitybase-" | head -20 || echo -e "${YELLOW}⚠️  No entitybase images found${NC}"
