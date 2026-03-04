@@ -295,7 +295,6 @@ services:
 
   entitybase-orchestrator-frontend:
     container_name: entitybase-orchestrator-frontend
-    image: entitybase-orchestrator-frontend:latest
     build:
       context: ./frontend
     ports:
