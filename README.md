@@ -61,6 +61,7 @@ make run
 | `make run` | Build images and start all services |
 | `make stop` | Stop all running services |
 | `make remove` | Stop services and remove containers/volumes |
+| `make clean` | Prune Docker system (containers, images, networks, build cache) |
 
 ## Manual Commands
 
