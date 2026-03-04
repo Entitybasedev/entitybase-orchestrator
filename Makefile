@@ -1,4 +1,4 @@
-.PHONY: help clone build build-no-cache check run_core run_workers run-build-no-cache stop remove clean release show-images
+.PHONY: help clone build build-no-cache check run_core run_workers run-build-no-cache stop remove clean release show-images settings
 
 help:
 	@echo "Available targets:"
@@ -14,6 +14,7 @@ help:
 	@echo "  make clean         - Remove stopped containers, unused images, and build cache"
 	@echo "  make release       - Create release: update version, commit, and tag (e.g., v2026.3.4)"
 	@echo "  make show-images  - Show all entitybase Docker images"
+	@echo "  make settings      - Query the /settings endpoint on localhost:8083"
 
 release:
 	./scripts/run-release.sh
@@ -61,3 +62,6 @@ reset:
 
 show-images:
 	./scripts/show-images.sh
+
+settings:
+	curl -s http://localhost:8083/settings | python3 -m json.tool
