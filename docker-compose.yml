@@ -274,6 +274,12 @@ services:
       - "8080:8083"
     profiles:
       - core
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8083/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     mem_limit: 256m
     cpus: 0.25
     networks:

@@ -76,6 +76,7 @@ check_running_service "entitybase-backend-api" || overall_status=1
 check_running_service "idworker" || overall_status=1
 check_running_service "entitybase-sse-backend" || overall_status=1
 check_running_service "entitybase-sse-frontend" || overall_status=1
+check_running_service "entitybase-orchestrator-frontend" || overall_status=1
 
 echo ""
 echo "=== Workers ==="
@@ -88,12 +89,3 @@ check_running_service "user-stats-worker" || overall_status=1
 echo ""
 echo "=== Images ==="
 docker images | grep -E "entitybase-" | head -20 || echo -e "${YELLOW}⚠️  No entitybase images found${NC}"
-
-echo ""
-if [ $overall_status -eq 0 ]; then
-    echo -e "${GREEN}✅ All services healthy${NC}"
-else
-    echo -e "${RED}❌ Some services are not healthy${NC}"
-fi
-
-exit $overall_status
