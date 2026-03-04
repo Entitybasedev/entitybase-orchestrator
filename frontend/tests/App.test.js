@@ -11,13 +11,13 @@ describe('App.vue', () => {
   it('renders all services', () => {
     const wrapper = mount(App)
     const cards = wrapper.findAll('.card')
-    expect(cards.length).toBe(11)
+    expect(cards.length).toBe(14)
   })
 
   it('renders services section with correct links', () => {
     const wrapper = mount(App)
     const serviceCards = wrapper.findAll('.card:not(.worker)')
-    expect(serviceCards.length).toBe(5)
+    expect(serviceCards.length).toBe(8)
   })
 
   it('renders workers section with correct links', () => {
