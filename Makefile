@@ -1,4 +1,4 @@
-.PHONY: help clone build check run stop remove clean
+.PHONY: help clone build check run stop remove clean release
 
 help:
 	@echo "Available targets:"
@@ -9,6 +9,10 @@ help:
 	@echo "  make stop    - Stop all running services"
 	@echo "  make remove  - Stop services and remove containers/volumes"
 	@echo "  make clean   - Remove stopped containers, unused images, and build cache"
+	@echo "  make release - Create release: update version, commit, and tag (e.g., v2026.3.4)"
+
+release:
+	./scripts/run-release.sh
 
 clone:
 	./scripts/clone-repos.sh
