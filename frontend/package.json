@@ -13,6 +13,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "serve": "^14.2.6",
     "vue": "^3.5.25"
   },
   "devDependencies": {
@@ -23,7 +24,6 @@
     "eslint-plugin-vue": "^10.0.0",
     "globals": "^15.14.0",
     "jsdom": "^28.1.0",
-    "serve": "^14.2.6",
     "vite": "^7.3.1",
     "vitest": "^3.0.0"
   }

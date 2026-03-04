@@ -268,6 +268,7 @@ services:
 
   entitybase-orchestrator-frontend:
     container_name: entitybase-orchestrator-frontend
+    image: entitybase-orchestrator-frontend:latest
     build:
       context: ./frontend
     ports:
@@ -275,7 +276,7 @@ services:
     profiles:
       - core
     healthcheck:
-      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8083/health"]
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8083/health.html"]
       interval: 10s
       timeout: 5s
       retries: 5
