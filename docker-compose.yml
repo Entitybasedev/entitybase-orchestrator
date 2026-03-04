@@ -219,7 +219,7 @@ services:
       VITESS_USER: root
       VITESS_PASSWORD: "${MYSQL_ROOT_PASSWORD:-}"
       STREAMING_ENABLED: "true"
-      KAFKA_BROKERS: redpanda:9092
+      KAFKA_BOOTSTRAP_SERVERS: redpanda:9092
       KAFKA_ENTITY_CHANGE_TOPIC: entitybase.entity_change
       KAFKA_ENTITY_DIFF_TOPIC: entitybase.entity_diff
     depends_on:
