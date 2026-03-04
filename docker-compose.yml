@@ -162,8 +162,8 @@ services:
     command: python -m models.workers.dev topics setup
     environment:
       KAFKA_BOOTSTRAP_SERVERS: redpanda:9092
-      KAFKA_ENTITY_CHANGE_TOPIC: entitybase.entity_change
-      KAFKA_ENTITY_DIFF_TOPIC: entitybase.entity_diff
+      KAFKA_ENTITY_CHANGE_TOPIC: entity_change
+      KAFKA_ENTITY_DIFF_TOPIC: entity_diff
     profiles:
       - core
     mem_limit: 512m
@@ -220,8 +220,8 @@ services:
       VITESS_PASSWORD: "${MYSQL_ROOT_PASSWORD:-}"
       STREAMING_ENABLED: "true"
       KAFKA_BOOTSTRAP_SERVERS: redpanda:9092
-      KAFKA_ENTITY_CHANGE_TOPIC: entitybase.entity_change
-      KAFKA_ENTITY_DIFF_TOPIC: entitybase.entity_diff
+      KAFKA_ENTITY_CHANGE_TOPIC: entity_change
+      KAFKA_ENTITY_DIFF_TOPIC: entity_diff
     depends_on:
       create-tables:
         condition: service_completed_successfully
