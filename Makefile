@@ -1,11 +1,12 @@
-.PHONY: help clone build check run stop remove clean release show-images
+.PHONY: help clone build check run_core run_workers stop remove clean release show-images
 
 help:
 	@echo "Available targets:"
 	@echo "  make clone        - Clone required repositories"
 	@echo "  make build        - Build all Docker images for docker-compose"
 	@echo "  make check        - Check service health status"
-	@echo "  make run          - Build images and start all services"
+	@echo "  make run_core     - Build images and start core services"
+	@echo "  make run_workers  - Build images and start all services (core + workers)"
 	@echo "  make stop         - Stop all running services"
 	@echo "  make remove       - Stop services and remove containers/volumes"
 	@echo "  make clean        - Remove stopped containers, unused images, and build cache"
@@ -28,19 +29,24 @@ stop:
 	docker compose stop
 
 remove: stop
-	docker compose down -v
+	docker compose down -v --remove-orphans
 
 clean:
 	docker compose down --remove-orphans || true
 	# Clean network
-	docker network rm entitybase-network 2>/dev/null || true
+	# docker network rm entitybase-network 2>/dev/null || true
 	# Clean containers so they are rebuilt with new changes
 	docker container prune -f
 	# docker image prune -a -f
 	# docker builder prune -f
 
-run: stop clean build
-	docker compose up -d
+run: run_core
+
+run_core: stop clean build
+	docker compose --profile core up -d
+
+run_workers: stop clean build
+	docker compose --profile workers up -d
 
 reset:
 	./scripts/reset.sh
