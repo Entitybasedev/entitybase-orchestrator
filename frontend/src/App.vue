@@ -1,20 +1,58 @@
 <script setup>
+import { ref, onMounted } from 'vue'
+
 const services = [
-  { name: 'Backend API', url: 'http://localhost:8083', description: 'Main API server' },
-  { name: 'SSE Frontend', url: 'http://localhost:8889', description: 'Server-Sent Events UI' },
-  { name: 'SSE Backend', url: 'http://localhost:8888', description: 'SSE API' },
-  { name: 'MinIO Console', url: 'http://localhost:9001', description: 'S3-compatible storage' },
-  { name: 'Redpanda Console', url: 'http://localhost:9644', description: 'Kafka messaging' },
+  { name: 'Backend API', url: 'http://localhost:8083', description: 'Main API server', healthPath: '/health' },
+  { name: 'Server-Sent Events Frontend', url: 'http://localhost:8889', description: 'Server-Sent Events UI', healthPath: '/health' },
+  { name: 'Server-Sent Events Backend', url: 'http://localhost:8888', description: 'Server-Sent Events API', healthPath: '/health' },
+  { name: 'MinIO Console', url: 'http://localhost:9001', description: 'S3-compatible storage', healthPath: '/minio/health/live' },
+  { name: 'Redpanda Console', url: 'http://localhost:9644', description: 'Kafka messaging', healthPath: '' },
 ]
 
 const workers = [
-  { name: 'ID Worker', url: 'http://localhost:8001' },
-  { name: 'JSON Dump Worker', url: 'http://localhost:8002' },
-  { name: 'TTL Dump Worker', url: 'http://localhost:8003' },
-  { name: 'Backlink Stats Worker', url: 'http://localhost:8004' },
-  { name: 'General Stats Worker', url: 'http://localhost:8005' },
-  { name: 'User Stats Worker', url: 'http://localhost:8006' },
+  { name: 'ID Worker', url: 'http://localhost:8001', healthPath: '/health' },
+  { name: 'JSON Dump Worker', url: 'http://localhost:8002', healthPath: '/health' },
+  { name: 'TTL Dump Worker', url: 'http://localhost:8003', healthPath: '/health' },
+  { name: 'Backlink Stats Worker', url: 'http://localhost:8004', healthPath: '/health' },
+  { name: 'General Stats Worker', url: 'http://localhost:8005', healthPath: '/health' },
+  { name: 'User Stats Worker', url: 'http://localhost:8006', healthPath: '/health' },
 ]
+
+const healthStatus = ref({})
+
+async function checkHealth(item) {
+  if (!item.healthPath) {
+    healthStatus.value[item.url] = 'unknown'
+    return
+  }
+  try {
+    const res = await fetch(`${item.url}${item.healthPath}`, { method: 'GET', mode: 'no-cors' })
+    healthStatus.value[item.url] = 'healthy'
+  } catch {
+    healthStatus.value[item.url] = 'unhealthy'
+  }
+}
+
+function getStatus(item) {
+  return healthStatus.value[item.url] || 'unknown'
+}
+
+onMounted(async () => {
+  for (const service of services) {
+    await checkHealth(service)
+  }
+  for (const worker of workers) {
+    await checkHealth(worker)
+  }
+  setInterval(async () => {
+    for (const service of services) {
+      await checkHealth(service)
+    }
+    for (const worker of workers) {
+      await checkHealth(worker)
+    }
+  }, 30000)
+})
 </script>
 
 <template>
@@ -28,7 +66,10 @@ const workers = [
       <h2>Services</h2>
       <div class="grid">
         <a v-for="service in services" :key="service.url" :href="service.url" class="card" target="_blank">
-          <h3>{{ service.name }}</h3>
+          <div class="card-header">
+            <h3>{{ service.name }}</h3>
+            <span class="status" :class="getStatus(service)"></span>
+          </div>
           <p>{{ service.description }}</p>
           <span class="url">{{ service.url }}</span>
         </a>
@@ -39,7 +80,10 @@ const workers = [
       <h2>Workers</h2>
       <div class="grid">
         <a v-for="worker in workers" :key="worker.url" :href="worker.url" class="card worker" target="_blank">
-          <h3>{{ worker.name }}</h3>
+          <div class="card-header">
+            <h3>{{ worker.name }}</h3>
+            <span class="status" :class="getStatus(worker)"></span>
+          </div>
           <span class="url">{{ worker.url }}</span>
         </a>
       </div>
@@ -105,6 +149,31 @@ h2 {
 .card h3 {
   margin: 0 0 0.5rem 0;
   font-size: 1.1rem;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.status {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status.healthy {
+  background: #22c55e;
+}
+
+.status.unhealthy {
+  background: #ef4444;
+}
+
+.status.unknown {
+  background: #f59e0b;
 }
 
 .card p {
