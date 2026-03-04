@@ -38,3 +38,6 @@ clean:
 
 run: stop clean build
 	docker compose up -d
+
+reset:
+	./scripts/reset.sh
