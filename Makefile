@@ -1,10 +1,11 @@
-.PHONY: help clone build build-no-cache check run_core run_workers stop remove clean release show-images
+.PHONY: help clone build build-no-cache check run_core run_workers run-build-no-cache stop remove clean release show-images
 
 help:
 	@echo "Available targets:"
 	@echo "  make clone          - Clone required repositories"
 	@echo "  make build         - Build all Docker images for docker-compose"
-	@echo "  make build-no-cache - Build all Docker images without using cache"
+	@echo "  make build-no-cache  - Build all Docker images without using cache"
+	@echo "  make run-build-no-cache - Build without cache and start core services"
 	@echo "  make check         - Check service health status"
 	@echo "  make run_core       - Build images and start core services"
 	@echo "  make run_workers   - Build images and start all services (core + workers)"
@@ -25,6 +26,9 @@ build:
 
 build-no-cache:
 	./scripts/build-images.sh --no-cache
+
+run-build-no-cache: stop clean build-no-cache
+	docker compose --profile core up -d
 
 check:
 	./scripts/check-services.sh
