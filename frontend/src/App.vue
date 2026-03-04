@@ -1,6 +1,12 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 
+const infrastructure = [
+  { name: 'MySQL', url: 'http://localhost:3307', description: 'Database', healthPath: '/' },
+  { name: 'MinIO', url: 'http://localhost:9000', description: 'S3 storage', healthPath: '/minio/health/live' },
+  { name: 'Redpanda', url: 'http://localhost:9644', description: 'Kafka messaging', healthPath: '/status' },
+]
+
 const services = [
   { name: 'Backend API', url: 'http://localhost:8083', description: 'Main API server', healthPath: '/health' },
   { name: 'Server-Sent Events Frontend', url: 'http://localhost:8889', description: 'Server-Sent Events UI', healthPath: '/health' },
@@ -38,6 +44,9 @@ function getStatus(item) {
 }
 
 onMounted(async () => {
+  for (const item of infrastructure) {
+    await checkHealth(item)
+  }
   for (const service of services) {
     await checkHealth(service)
   }
@@ -45,6 +54,9 @@ onMounted(async () => {
     await checkHealth(worker)
   }
   setInterval(async () => {
+    for (const item of infrastructure) {
+      await checkHealth(item)
+    }
     for (const service of services) {
       await checkHealth(service)
     }
@@ -61,6 +73,20 @@ onMounted(async () => {
       <img src="/entitybase-logo.png" alt="Entitybase" class="logo" />
       <h1>Entitybase Orchestrator</h1>
     </header>
+
+    <section>
+      <h2>Infrastructure</h2>
+      <div class="grid">
+        <a v-for="item in infrastructure" :key="item.url" :href="item.url" class="card infrastructure" target="_blank">
+          <div class="card-header">
+            <h3>{{ item.name }}</h3>
+            <span class="status" :class="getStatus(item)"></span>
+          </div>
+          <p>{{ item.description }}</p>
+          <span class="url">{{ item.url }}</span>
+        </a>
+      </div>
+    </section>
 
     <section>
       <h2>Services</h2>
@@ -190,5 +216,9 @@ h2 {
 
 .worker {
   background: #f9f9f9;
+}
+
+.infrastructure {
+  background: #fef3c7;
 }
 </style>

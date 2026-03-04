@@ -36,6 +36,18 @@ services:
     networks:
       - entitybase-network
 
+  mysql-health:
+    image: alpine:latest
+    container_name: mysql-health
+    command: ["/bin/sh", "-c", "apk add --no-cache bash mysql-client ncftp > /dev/null 2>&1; while true; do mysql -h mysql -uroot -e 'SELECT 1' > /dev/null 2>&1 && echo -e 'HTTP/1.1 200 OK\\nContent-Type: text/plain\\n\\nhealthy' | nc -l -p 8080 -q1 || echo -e 'HTTP/1.1 503\\n\\nunhealthy' | nc -l -p 8080 -q1; done"]
+    ports:
+      - "3307:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - entitybase-network
+
   minio:
     image: minio/minio:latest
     container_name: minio
