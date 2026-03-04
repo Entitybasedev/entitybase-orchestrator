@@ -187,9 +187,9 @@ h2 {
   color: #555;
   margin-bottom: 1rem;
   margin-top: 2rem;
+  padding-bottom: 0.5rem;
   text-align: center;
-  text-decoration: underline;
-  text-underline-offset: 4px;
+  border-bottom: 1px solid #eee;
 }
 
 .grid {
