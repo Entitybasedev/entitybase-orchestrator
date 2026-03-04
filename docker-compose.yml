@@ -288,7 +288,7 @@ services:
   # Workers (optional)
   json-dump-worker:
     container_name: json-dump-worker
-    image: entitybase-backend-json-dump-worker:latest
+    image: entitybase-backend-json-worker:latest
     ports:
       - "8002:8002"
     environment:
@@ -327,7 +327,7 @@ services:
 
   ttl-dump-worker:
     container_name: ttl-dump-worker
-    image: entitybase-backend-ttl-dump-worker:latest
+    image: entitybase-backend-ttl-worker:latest
     ports:
       - "8003:8003"
     environment:
@@ -366,7 +366,7 @@ services:
 
   backlink-stats-worker:
     container_name: backlink-stats-worker
-    image: entitybase-backend-backlink-stats-worker:latest
+    image: entitybase-backend-stats-worker:latest
     ports:
       - "8004:8004"
     environment:
@@ -398,7 +398,7 @@ services:
 
   general-stats-worker:
     container_name: general-stats-worker
-    image: entitybase-backend-general-stats-worker:latest
+    image: entitybase-backend-stats-worker:latest
     ports:
       - "8005:8005"
     environment:
@@ -429,7 +429,7 @@ services:
 
   user-stats-worker:
     container_name: user-stats-worker
-    image: entitybase-backend-user-stats-worker:latest
+    image: entitybase-backend-stats-worker:latest
     ports:
       - "8006:8006"
     environment:
