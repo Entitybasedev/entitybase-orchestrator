@@ -6,7 +6,7 @@ const services = [
   { name: 'Server-Sent Events Frontend', url: 'http://localhost:8889', description: 'Server-Sent Events UI', healthPath: '/health' },
   { name: 'Server-Sent Events Backend', url: 'http://localhost:8888', description: 'Server-Sent Events API', healthPath: '/health' },
   { name: 'MinIO Console', url: 'http://localhost:9001', description: 'S3-compatible storage', healthPath: '/minio/health/live' },
-  { name: 'Redpanda Console', url: 'http://localhost:9644', description: 'Kafka messaging', healthPath: '' },
+  { name: 'Redpanda Console', url: 'http://localhost:8084', description: 'Kafka messaging', healthPath: '' },
 ]
 
 const workers = [

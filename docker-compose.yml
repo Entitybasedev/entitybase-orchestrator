@@ -88,6 +88,18 @@ services:
     volumes:
       - redpanda-data:/var/lib/redpanda/data
 
+  redpanda-console:
+    image: docker.redpanda.com/redpandadata/console:latest
+    container_name: redpanda-console
+    ports:
+      - "8084:8080"
+    environment:
+      KAFKA_BROKERS: redpanda:9092
+    depends_on:
+      - redpanda
+    networks:
+      - entitybase-network
+
   # Setup jobs (run once, then exit)
   create-buckets:
     container_name: create-buckets

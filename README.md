@@ -87,6 +87,7 @@ docker compose stop
 | mysql | 3306 | Database |
 | minio | 9000, 9001 | S3 storage (API + console) |
 | redpanda | 9092, 9644 | Kafka broker |
+| redpanda-console | 8084 | Redpanda Console (Kafka UI) |
 | entitybase-backend | 8080 | REST API |
 | entitybase-sse-backend | 8888 | SSE API |
 | entitybase-sse-frontend | 8889 | SSE Frontend |
