@@ -19,9 +19,6 @@ build:
 check:
 	./scripts/check-services.sh
 
-run: build
-	docker compose up -d
-
 stop:
 	docker compose stop
 
@@ -29,6 +26,11 @@ remove: stop
 	docker compose down -v
 
 clean:
+	docker compose down --remove-orphans || true
+	docker network rm entitybase-network 2>/dev/null || true
 	docker container prune -f
 	docker image prune -a -f
 	docker builder prune -f
+
+run: stop clean build
+	docker compose up -d
