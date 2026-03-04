@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue'
 
 const infrastructure = [
   { name: 'MinIO', url: 'http://localhost:9001', description: 'S3 storage + console', healthPath: '/minio/health/live', linkUrl: 'http://localhost:9001' },
-  { name: 'MySQL', url: 'http://localhost:3307', description: 'Database (no HTTP interface)', healthPath: '' },
+  { name: 'MySQL', url: 'http://localhost:3307', description: 'Database (no HTTP interface)', healthPath: '/' },
   { name: 'Redpanda', url: 'http://localhost:8084', description: 'Kafka messaging + console', healthPath: '', linkUrl: 'http://localhost:8084', brokerUrl: 'http://localhost:9644', brokerHealthPath: '/status' },
 ]
 
@@ -29,7 +29,7 @@ async function checkHealth(item) {
   const healthPath = item.brokerHealthPath || item.healthPath
   
   if (!healthPath) {
-    healthStatus.value[item.url] = 'unknown'
+    healthStatus.value[item.url] = 'unhealthy'
     return
   }
   try {
@@ -41,7 +41,7 @@ async function checkHealth(item) {
 }
 
 function getStatus(item) {
-  return healthStatus.value[item.url] || 'unknown'
+  return healthStatus.value[item.url] || 'unhealthy'
 }
 
 onMounted(async () => {
@@ -129,14 +129,13 @@ onMounted(async () => {
     <footer class="legend">
       <span class="legend-item"><span class="dot healthy"></span> Healthy</span>
       <span class="legend-item"><span class="dot unhealthy"></span> Unhealthy</span>
-      <span class="legend-item"><span class="dot unknown"></span> Unknown</span>
     </footer>
   </div>
 </template>
 
 <style scoped>
 .container {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 2rem;
 }
@@ -182,18 +181,20 @@ h1 {
 
 .dot.healthy { background: #22c55e; }
 .dot.unhealthy { background: #ef4444; }
-.dot.unknown { background: #f59e0b; }
 
 h2 {
   font-size: 1.5rem;
   color: #555;
   margin-bottom: 1rem;
   margin-top: 2rem;
+  text-align: center;
+  text-decoration: underline;
+  text-underline-offset: 4px;
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
 }
 
@@ -238,10 +239,6 @@ h2 {
 
 .status.unhealthy {
   background: #ef4444;
-}
-
-.status.unknown {
-  background: #f59e0b;
 }
 
 .card p {
@@ -289,5 +286,4 @@ footer {
 
 .dot.healthy { background: #22c55e; }
 .dot.unhealthy { background: #ef4444; }
-.dot.unknown { background: #f59e0b; }
 </style>
