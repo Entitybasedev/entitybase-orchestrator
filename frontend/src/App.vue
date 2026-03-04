@@ -2,17 +2,15 @@
 import { ref, onMounted } from 'vue'
 
 const infrastructure = [
-  { name: 'MySQL', url: 'http://localhost:3307', description: 'Database', healthPath: '/' },
-  { name: 'MinIO', url: 'http://localhost:9000', description: 'S3 storage', healthPath: '/minio/health/live' },
-  { name: 'Redpanda', url: 'http://localhost:9644', description: 'Kafka messaging', healthPath: '/status' },
+  { name: 'MinIO', url: 'http://localhost:9001', description: 'S3 storage + console', healthPath: '/minio/health/live', linkUrl: 'http://localhost:9001' },
+  { name: 'MySQL', url: 'http://localhost:3307', description: 'Database (no HTTP interface)', healthPath: '' },
+  { name: 'Redpanda', url: 'http://localhost:8084', description: 'Kafka messaging + console', healthPath: '', linkUrl: 'http://localhost:8084', brokerUrl: 'http://localhost:9644', brokerHealthPath: '/status' },
 ]
 
 const services = [
   { name: 'Backend API', url: 'http://localhost:8083', description: 'Main API server', healthPath: '/health' },
   { name: 'Server-Sent Events Frontend', url: 'http://localhost:8889', description: 'Server-Sent Events UI', healthPath: '/health' },
   { name: 'Server-Sent Events Backend', url: 'http://localhost:8888', description: 'Server-Sent Events API', healthPath: '/health' },
-  { name: 'MinIO Console', url: 'http://localhost:9001', description: 'S3-compatible storage', healthPath: '/minio/health/live' },
-  { name: 'Redpanda Console', url: 'http://localhost:8084', description: 'Kafka messaging', healthPath: '' },
 ]
 
 const workers = [
@@ -27,12 +25,15 @@ const workers = [
 const healthStatus = ref({})
 
 async function checkHealth(item) {
-  if (!item.healthPath) {
+  const urlToCheck = item.brokerUrl || item.url
+  const healthPath = item.brokerHealthPath || item.healthPath
+  
+  if (!healthPath) {
     healthStatus.value[item.url] = 'unknown'
     return
   }
   try {
-    await fetch(`${item.url}${item.healthPath}`, { method: 'GET', mode: 'no-cors' })
+    await fetch(`${urlToCheck}${healthPath}`, { method: 'GET', mode: 'no-cors' })
     healthStatus.value[item.url] = 'healthy'
   } catch {
     healthStatus.value[item.url] = 'unhealthy'
@@ -77,14 +78,24 @@ onMounted(async () => {
     <section>
       <h2>Infrastructure</h2>
       <div class="grid">
-        <a v-for="item in infrastructure" :key="item.url" :href="item.url" class="card infrastructure" target="_blank">
-          <div class="card-header">
-            <h3>{{ item.name }}</h3>
-            <span class="status" :class="getStatus(item)"></span>
+        <template v-for="item in infrastructure" :key="item.url">
+          <a v-if="item.linkUrl" :href="item.linkUrl" class="card infrastructure" target="_blank">
+            <div class="card-header">
+              <h3>{{ item.name }}</h3>
+              <span class="status" :class="getStatus(item)"></span>
+            </div>
+            <p>{{ item.description }}</p>
+            <span class="url">{{ item.url }}</span>
+          </a>
+          <div v-else class="card infrastructure">
+            <div class="card-header">
+              <h3>{{ item.name }}</h3>
+              <span class="status" :class="getStatus(item)"></span>
+            </div>
+            <p>{{ item.description }}</p>
+            <span class="url">{{ item.url }}</span>
           </div>
-          <p>{{ item.description }}</p>
-          <span class="url">{{ item.url }}</span>
-        </a>
+        </template>
       </div>
     </section>
 
@@ -114,6 +125,12 @@ onMounted(async () => {
         </a>
       </div>
     </section>
+
+    <footer class="legend">
+      <span class="legend-item"><span class="dot healthy"></span> Healthy</span>
+      <span class="legend-item"><span class="dot unhealthy"></span> Unhealthy</span>
+      <span class="legend-item"><span class="dot unknown"></span> Unknown</span>
+    </footer>
   </div>
 </template>
 
@@ -141,6 +158,31 @@ h1 {
   color: #333;
   margin: 0;
 }
+
+.legend {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.dot.healthy { background: #22c55e; }
+.dot.unhealthy { background: #ef4444; }
+.dot.unknown { background: #f59e0b; }
 
 h2 {
   font-size: 1.5rem;
@@ -218,7 +260,34 @@ h2 {
   background: #f9f9f9;
 }
 
-.infrastructure {
-  background: #fef3c7;
+footer {
+  text-align: center;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid #eee;
 }
+
+.legend {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.dot.healthy { background: #22c55e; }
+.dot.unhealthy { background: #ef4444; }
+.dot.unknown { background: #f59e0b; }
 </style>
