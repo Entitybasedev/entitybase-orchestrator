@@ -1,4 +1,4 @@
-# Entitybase Docker
+# Entitybase Orchestrator
 
 Docker orchestration for Entitybase services.
 
@@ -19,8 +19,8 @@ flowchart TB
     end
 
     subgraph SSE
-        SSE_BE[entitybase-sse-backend<br/>8081]
-        SSE_FE[entitybase-sse-frontend<br/>8082]
+        SSE_BE[entitybase-sse-backend<br/>8888]
+        SSE_FE[entitybase-sse-frontend<br/>8889]
     end
 
     Users((Users))
@@ -86,8 +86,8 @@ docker compose stop
 | minio | 9000, 9001 | S3 storage (API + console) |
 | redpanda | 9092, 9644 | Kafka broker |
 | entitybase-backend | 8080 | REST API |
-| entitybase-sse-backend | 8081 | SSE API |
-| entitybase-sse-frontend | 8082 | SSE Frontend |
+| entitybase-sse-backend | 8888 | SSE API |
+| entitybase-sse-frontend | 8889 | SSE Frontend |
 | idworker | 8001 | ID generation |
 
 ## Profiles
@@ -109,6 +109,10 @@ The following custom images must be built before running:
 - `entitybase-sse-frontend:latest` - from `entitybase-sse/frontend/Dockerfile`
 
 Run `make build` to build all images.
+
+## License
+
+This project is licensed under the [GNU General Public License v3.0 or later](LICENSE).
 
 ## Environment Variables
 
