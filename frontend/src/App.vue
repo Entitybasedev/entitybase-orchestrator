@@ -26,7 +26,7 @@ async function checkHealth(item) {
     return
   }
   try {
-    const res = await fetch(`${item.url}${item.healthPath}`, { method: 'GET', mode: 'no-cors' })
+    await fetch(`${item.url}${item.healthPath}`, { method: 'GET', mode: 'no-cors' })
     healthStatus.value[item.url] = 'healthy'
   } catch {
     healthStatus.value[item.url] = 'unhealthy'
