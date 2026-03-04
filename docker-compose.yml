@@ -248,14 +248,15 @@ services:
     container_name: entitybase-sse-backend
     image: entitybase-sse-backend:latest
     ports:
-      - "8888:8081"
+      - "8888:8888"
     environment:
       KAFKA_BROKERS: redpanda:9092
+      LOG_LEVEL: debug
     depends_on:
       redpanda:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8081/health"]
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8888/health"]
       interval: 10s
       timeout: 5s
       retries: 5
