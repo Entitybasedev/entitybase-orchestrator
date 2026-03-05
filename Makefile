@@ -1,4 +1,4 @@
-.PHONY: help clone build build-no-cache check run_core run_workers run-build-no-cache stop remove clean release show-images settings
+.PHONY: help clone build build-no-cache check run_core run_workers run-build-no-cache stop remove clean clean-all release show-images settings
 
 help:
 	@echo "Available targets:"
@@ -12,6 +12,7 @@ help:
 	@echo "  make stop          - Stop all running services"
 	@echo "  make remove        - Stop services and remove containers/volumes"
 	@echo "  make clean         - Remove stopped containers, unused images, and build cache"
+	@echo "  make clean-all     - Remove all containers, images, volumes, and build cache"
 	@echo "  make release       - Create release: update version, commit, and tag (e.g., v2026.3.4)"
 	@echo "  make show-images  - Show all entitybase Docker images"
 	@echo "  make settings      - Query the /settings endpoint on localhost:8083"
@@ -48,6 +49,13 @@ clean:
 	docker container prune -f
 	# docker image prune -a -f
 	# docker builder prune -f
+
+clean-all: stop
+	docker compose down -v --remove-orphans || true
+	docker container prune -f
+	docker image prune -a -f
+	docker builder prune -f
+	docker volume prune -f
 
 run: run_core
 
