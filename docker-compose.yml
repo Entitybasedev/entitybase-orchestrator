@@ -246,52 +246,52 @@ services:
     networks:
       - entitybase-network
 
-  entitybase-sse-backend:
-    container_name: entitybase-sse-backend
-    image: entitybase-sse-backend:latest
-    ports:
-      - "8888:8888"
-    environment:
-      KAFKA_BROKERS: redpanda:9092
-      LOG_LEVEL: debug
-    depends_on:
-      redpanda:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8888/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
-    profiles:
-      - core
-    mem_limit: 512m
-    cpus: 0.5
-    networks:
-      - entitybase-network
+  # entitybase-sse-backend:
+  #   container_name: entitybase-sse-backend
+  #   image: entitybase-sse-backend:latest
+  #   ports:
+  #     - "8888:8888"
+  #   environment:
+  #     KAFKA_BROKERS: redpanda:9092
+  #     LOG_LEVEL: debug
+  #   depends_on:
+  #     redpanda:
+  #       condition: service_healthy
+  #   healthcheck:
+  #     test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8888/health"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+  #     start_period: 30s
+  #   profiles:
+  #     - core
+  #   mem_limit: 512m
+  #   cpus: 0.5
+  #   networks:
+  #     - entitybase-network
 
-  entitybase-sse-frontend:
-    container_name: entitybase-sse-frontend
-    image: entitybase-sse-frontend:latest
-    ports:
-      - "8889:8082"
-    environment:
-      KAFKA_BROKERS: redpanda:9092
-    depends_on:
-      redpanda:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8082/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
-    profiles:
-      - core
-    mem_limit: 512m
-    cpus: 0.5
-    networks:
-      - entitybase-network
+  # entitybase-sse-frontend:
+  #   container_name: entitybase-sse-frontend
+  #   image: entitybase-sse-frontend:latest
+  #   ports:
+  #     - "8889:8082"
+  #   environment:
+  #     KAFKA_BROKERS: redpanda:9092
+  #   depends_on:
+  #     redpanda:
+  #       condition: service_healthy
+  #   healthcheck:
+  #     test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8082/health"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+  #     start_period: 30s
+  #   profiles:
+  #     - core
+  #   mem_limit: 512m
+  #   cpus: 0.5
+  #   networks:
+  #     - entitybase-network
 
   entitybase-orchestrator-frontend:
     container_name: entitybase-orchestrator-frontend
