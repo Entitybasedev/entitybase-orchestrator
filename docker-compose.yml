@@ -5,8 +5,8 @@
 #   minio:     9000 (API), 9001 (console)
 #   redpanda:  9092 (Kafka), 9644 (admin)
 #   backend:   8080
-#   sse-be:    8888
-#   sse-fe:    8889
+#   kafka2sse-be:  8888
+#   kafka2sse-fe:  8889
 #   orchestrator-fe: 8080
 #   backend: 8083
 #
@@ -246,52 +246,52 @@ services:
     networks:
       - entitybase-network
 
-  # entitybase-sse-backend:
-  #   container_name: entitybase-sse-backend
-  #   image: entitybase-sse-backend:latest
-  #   ports:
-  #     - "8888:8888"
-  #   environment:
-  #     KAFKA_BROKERS: redpanda:9092
-  #     LOG_LEVEL: debug
-  #   depends_on:
-  #     redpanda:
-  #       condition: service_healthy
-  #   healthcheck:
-  #     test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8888/health"]
-  #     interval: 10s
-  #     timeout: 5s
-  #     retries: 5
-  #     start_period: 30s
-  #   profiles:
-  #     - core
-  #   mem_limit: 512m
-  #   cpus: 0.5
-  #   networks:
-  #     - entitybase-network
+  kafka2sse-backend:
+    container_name: kafka2sse-backend
+    image: kafka2sse-backend:latest
+    ports:
+      - "8888:8888"
+    environment:
+      KAFKA_BROKERS: redpanda:9092
+      LOG_LEVEL: debug
+    depends_on:
+      redpanda:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8888/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    profiles:
+      - core
+    mem_limit: 512m
+    cpus: 0.5
+    networks:
+      - entitybase-network
 
-  # entitybase-sse-frontend:
-  #   container_name: entitybase-sse-frontend
-  #   image: entitybase-sse-frontend:latest
-  #   ports:
-  #     - "8889:8082"
-  #   environment:
-  #     KAFKA_BROKERS: redpanda:9092
-  #   depends_on:
-  #     redpanda:
-  #       condition: service_healthy
-  #   healthcheck:
-  #     test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8082/health"]
-  #     interval: 10s
-  #     timeout: 5s
-  #     retries: 5
-  #     start_period: 30s
-  #   profiles:
-  #     - core
-  #   mem_limit: 512m
-  #   cpus: 0.5
-  #   networks:
-  #     - entitybase-network
+  kafka2sse-frontend:
+    container_name: kafka2sse-frontend
+    image: kafka2sse-frontend:latest
+    ports:
+      - "8889:8889"
+    environment:
+      KAFKA_BROKERS: redpanda:9092
+    depends_on:
+      redpanda:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8889/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    profiles:
+      - core
+    mem_limit: 512m
+    cpus: 0.5
+    networks:
+      - entitybase-network
 
   entitybase-orchestrator-frontend:
     container_name: entitybase-orchestrator-frontend
@@ -301,6 +301,21 @@ services:
       - "8080:8083"
     profiles:
       - core
+    depends_on:
+      mysql:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      redpanda:
+        condition: service_healthy
+      idworker:
+        condition: service_healthy
+      entitybase-backend:
+        condition: service_healthy
+      kafka2sse-backend:
+        condition: service_healthy
+      kafka2sse-frontend:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8083/health.html"]
       interval: 10s
