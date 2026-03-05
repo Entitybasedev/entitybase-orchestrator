@@ -1,25 +1,27 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 
+const HOST = import.meta.env.VITE_HOST || 'localhost'
+
 const infrastructure = [
-  { name: 'MinIO', url: 'http://localhost:9001', description: 'S3 storage + console', healthPath: '/minio/health/live', linkUrl: 'http://localhost:9001' },
-  { name: 'MySQL', url: 'http://localhost:3307', description: 'Database (no HTTP interface)', healthPath: '/' },
-  { name: 'Redpanda', url: 'http://localhost:8084', description: 'Kafka messaging + console', healthPath: '', linkUrl: 'http://localhost:8084', brokerUrl: 'http://localhost:9644', brokerHealthPath: '/status' },
+  { name: 'MinIO', url: `http://${HOST}:9001`, description: 'S3 storage + console', healthPath: '/minio/health/live', linkUrl: `http://${HOST}:9001` },
+  { name: 'MySQL', url: `http://${HOST}:3307`, description: 'Database (no HTTP interface)', healthPath: '/' },
+  { name: 'Redpanda', url: `http://${HOST}:8084`, description: 'Kafka messaging + console', healthPath: '', linkUrl: `http://${HOST}:8084`, brokerUrl: `http://${HOST}:9644`, brokerHealthPath: '/status' },
 ]
 
 const services = [
-  { name: 'Backend API', url: 'http://localhost:8083', description: 'Main API server', healthPath: '/health' },
-  { name: 'Server-Sent Events Frontend', url: 'http://localhost:8889', description: 'Server-Sent Events UI', healthPath: '/health' },
-  { name: 'Server-Sent Events Backend', url: 'http://localhost:8888', description: 'Server-Sent Events API', healthPath: '/health' },
+  { name: 'Backend API', url: `http://${HOST}:8083`, description: 'Main API server', healthPath: '/health' },
+  { name: 'Server-Sent Events Frontend', url: `http://${HOST}:8889`, description: 'Server-Sent Events UI', healthPath: '/health' },
+  { name: 'Server-Sent Events Backend', url: `http://${HOST}:8888`, description: 'Server-Sent Events API', healthPath: '/health' },
 ]
 
 const workers = [
-  { name: 'ID Worker', url: 'http://localhost:8001', healthPath: '/health' },
-  { name: 'JSON Dump Worker', url: 'http://localhost:8002', healthPath: '/health' },
-  { name: 'TTL Dump Worker', url: 'http://localhost:8003', healthPath: '/health' },
-  { name: 'Backlink Stats Worker', url: 'http://localhost:8004', healthPath: '/health' },
-  { name: 'General Stats Worker', url: 'http://localhost:8005', healthPath: '/health' },
-  { name: 'User Stats Worker', url: 'http://localhost:8006', healthPath: '/health' },
+  { name: 'ID Worker', url: `http://${HOST}:8001`, healthPath: '/health' },
+  { name: 'JSON Dump Worker', url: `http://${HOST}:8002`, healthPath: '/health' },
+  { name: 'TTL Dump Worker', url: `http://${HOST}:8003`, healthPath: '/health' },
+  { name: 'Backlink Stats Worker', url: `http://${HOST}:8004`, healthPath: '/health' },
+  { name: 'General Stats Worker', url: `http://${HOST}:8005`, healthPath: '/health' },
+  { name: 'User Stats Worker', url: `http://${HOST}:8006`, healthPath: '/health' },
 ]
 
 const healthStatus = ref({})

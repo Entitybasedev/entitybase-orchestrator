@@ -2,3 +2,5 @@ entitybase-backend/
 entitybase-frontend/
 entitybase-sse/
 entitybase-artwork/
+deprecated/
+kafka2sse/
