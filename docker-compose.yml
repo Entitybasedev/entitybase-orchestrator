@@ -257,6 +257,7 @@ services:
     depends_on:
       redpanda:
         condition: service_healthy
+    restart: on-failure
     healthcheck:
       test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8888/health"]
       interval: 10s
