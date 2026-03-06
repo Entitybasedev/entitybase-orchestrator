@@ -272,11 +272,15 @@ services:
 
   kafka2sse-frontend:
     container_name: kafka2sse-frontend
-    image: kafka2sse-frontend:latest
+    build:
+      context: ./libs/kafka2sse-frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_BACKEND_URL=http://kafka2sse-backend:8888
     ports:
       - "8889:8889"
     environment:
-      KAFKA_BROKERS: redpanda:9092
+      - VITE_BACKEND_URL=http://kafka2sse-backend:8888
     depends_on:
       redpanda:
         condition: service_healthy
