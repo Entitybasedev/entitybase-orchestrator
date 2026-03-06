@@ -1,4 +1,4 @@
-.PHONY: help clone build build-no-cache check run_core run_workers run-build-no-cache stop remove clean clean-all release show-images settings
+.PHONY: help clone build build-no-cache check check-diskspace run_core run_workers run-build-no-cache stop remove clean clean-all release show-images settings
 
 help:
 	@echo "Available targets:"
@@ -7,6 +7,7 @@ help:
 	@echo "  make build-no-cache  - Build all Docker images without using cache"
 	@echo "  make run-build-no-cache - Build without cache and start core services"
 	@echo "  make check         - Check service health status"
+	@echo "  make check-diskspace - Check available disk space (requires 2GB minimum)"
 	@echo "  make run_core       - Build images and start core services"
 	@echo "  make run_workers   - Build images and start all services (core + workers)"
 	@echo "  make stop          - Stop all running services"
@@ -35,6 +36,22 @@ run-build-no-cache: stop clean build-no-cache
 check:
 	./scripts/check-services.sh
 
+check-diskspace:
+	@AVAILABLE=$$(df -h /dev/mapper/arch | tail -1 | awk '{print $$4}'); \
+	echo "Available space: $$AVAILABLE"; \
+	case $$AVAILABLE in \
+		*[0-9]G) \
+			SIZE=$${AVAILABLE%G}; \
+			if [ "$$(echo "$$SIZE >= 2" | awk '{if ($$1 >= 2) print 1; else print 0}')" -eq 1 ]; then exit 0; fi \
+			;; \
+		*[0-9]M) \
+			echo "Error: Less than 2GB available"; \
+			exit 1; \
+		;; \
+	esac; \
+	echo "Error: Less than 2GB available"; \
+	exit 1
+
 stop:
 	docker compose stop
 
@@ -59,10 +76,10 @@ clean-all: stop
 
 run: run_core
 
-run_core: stop clean build
+run_core: check-diskspace stop clean build
 	docker compose --profile core up -d
 
-run_workers: stop clean build
+run_workers: check-diskspace stop clean build
 	docker compose --profile workers up -d
 
 reset:
