@@ -1,4 +1,4 @@
-.PHONY: help clone build build-no-cache check check-diskspace run_core run_workers run-build-no-cache stop remove clean clean-all release show-images settings
+.PHONY: help clone build build-no-cache check check-diskspace run_core run_workers run-build-no-cache stop remove clean clean-all reclaim release show-images settings
 
 help:
 	@echo "Available targets:"
@@ -14,6 +14,7 @@ help:
 	@echo "  make remove        - Stop services and remove containers/volumes"
 	@echo "  make clean         - Remove stopped containers, volumes, and unused images"
 	@echo "  make clean-all     - Remove all containers, images, volumes, and build cache"
+	@echo "  make reclaim      - Reclaim disk space (prune unused images, volumes, build cache)"
 	@echo "  make release       - Create release: update version, commit, and tag (e.g., v2026.3.4)"
 	@echo "  make show-images  - Show all entitybase Docker images"
 	@echo "  make settings      - Query the /settings endpoint on localhost:8083"
@@ -68,6 +69,12 @@ clean-all: stop
 	docker image prune -a -f
 	docker builder prune -f
 	docker volume prune -f
+
+reclaim:
+	docker image prune -a -f
+	docker volume prune -f
+	docker builder prune -f
+	@echo "Disk space reclaimed. Run 'docker system df' to check."
 
 run: run_core
 
