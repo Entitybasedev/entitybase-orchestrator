@@ -8,7 +8,7 @@ echo "Creating $COUNT items with $SLEEP_SECONDS second(s) sleep between each..."
 
 for i in $(seq 1 "$COUNT"); do
     echo "Creating item $i..."
-    response=$(curl -s -X GET "$API_URL/v1/entitybase/entities/items" \
+    response=$(curl -s -X POST "$API_URL/v1/entitybase/entities/items" \
         -H "X-User-ID: 1" \
         -H "X-Edit-Summary: Test item $i for change stream")
     
