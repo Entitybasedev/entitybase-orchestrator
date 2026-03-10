@@ -73,6 +73,19 @@ services:
     networks:
       - entitybase-network
 
+  valkey:
+    image: valkey/valkey:latest
+    container_name: valkey
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - entitybase-network
+
   redpanda:
     image: docker.redpanda.com/redpandadata/redpanda:v25.3.6
     container_name: redpanda
@@ -253,9 +266,12 @@ services:
       - "8888:8888"
     environment:
       KAFKA_BROKERS: redpanda:9092
+      VALKEY_HOST: valkey
       LOG_LEVEL: debug
     depends_on:
       redpanda:
+        condition: service_healthy
+      valkey:
         condition: service_healthy
     restart: on-failure
     healthcheck:
