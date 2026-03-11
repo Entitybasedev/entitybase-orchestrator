@@ -1,4 +1,4 @@
-# Entitybase Orchestrator
+9# Entitybase Orchestrator
 
 Docker orchestration for Entitybase services.
 
@@ -121,3 +121,6 @@ This project is licensed under the [GNU General Public License v3.0 or later](LI
 | MYSQL_ROOT_PASSWORD | (empty) | MySQL root password |
 | MINIO_ROOT_USER | fakekey | MinIO access key |
 | MINIO_ROOT_PASSWORD | fakesecret | MinIO secret key |
+
+## External links
+* https://www.wikidata.org/wiki/Wikidata:Tools/Entitybase
