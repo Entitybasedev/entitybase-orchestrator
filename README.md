@@ -1,4 +1,4 @@
-9# Entitybase Orchestrator
+# Entitybase Orchestrator
 
 Docker orchestration for Entitybase services.
 
