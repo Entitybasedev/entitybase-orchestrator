@@ -38,11 +38,15 @@ check:
 	./scripts/check-services.sh
 
 check-diskspace:
-	@if ! df /dev/mapper/arch >/dev/null 2>&1; then \
-		echo "Disk check skipped: /dev/mapper/arch not found"; \
+	@if df /dev/mapper/arch >/dev/null 2>&1; then \
+		DEVICE="/dev/mapper/arch"; \
+	elif df /dev/sda1 >/dev/null 2>&1; then \
+		DEVICE="/dev/sda1"; \
+	else \
+		echo "Disk check skipped: no known device found"; \
 		exit 0; \
 	fi; \
-	AVAILABLE=$$(df -h /dev/mapper/arch | tail -1 | awk '{print $$4}'); \
+	AVAILABLE=$$(df -h $$DEVICE | tail -1 | awk '{print $$4}'); \
 	echo "Available space: $$AVAILABLE"; \
 	case $$AVAILABLE in \
 		*[0-9]G) \
