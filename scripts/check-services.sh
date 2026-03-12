@@ -63,6 +63,7 @@ echo "=== Infrastructure ==="
 check_running_service "mysql" || overall_status=1
 check_running_service "minio" || overall_status=1
 check_running_service "redpanda" || overall_status=1
+check_running_service "valkey" || overall_status=1
 
 echo ""
 echo "=== Setup Jobs ==="
@@ -72,7 +73,7 @@ check_completed_job "create-topics" || overall_status=1
 
 echo ""
 echo "=== Core Services ==="
-check_running_service "entitybase-backend-api" || overall_status=1
+check_running_service "entitybase-api" || overall_status=1
 check_running_service "idworker" || overall_status=1
 check_running_service "kafka2sse-backend" || overall_status=1
 check_running_service "kafka2sse-frontend" || overall_status=1
