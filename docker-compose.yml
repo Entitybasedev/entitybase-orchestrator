@@ -130,7 +130,7 @@ services:
   # Setup jobs (run once, then exit)
   create-buckets:
     container_name: create-buckets
-    image: entitybase-api-create-buckets:latest
+    image: entitybase-backend-create-buckets:latest
     environment:
       MINIO_ENDPOINT: http://minio:9000
       MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-fakekey}
@@ -148,7 +148,7 @@ services:
 
   create-tables:
     container_name: create-tables
-    image: entitybase-api-create-tables:latest
+    image: entitybase-backend-create-tables:latest
     depends_on:
       mysql:
         condition: service_healthy
@@ -168,7 +168,7 @@ services:
 
   create-topics:
     container_name: create-topics
-    image: entitybase-api-create-topics:latest
+    image: entitybase-backend-create-topics:latest
     depends_on:
       redpanda:
         condition: service_healthy
@@ -189,7 +189,7 @@ services:
   # Core services
   idworker:
     container_name: idworker
-    image: entitybase-api-idworker:latest
+    image: entitybase-backend-idworker:latest
     ports:
       - "8001:8001"
     environment:
@@ -220,7 +220,7 @@ services:
 
   entitybase-api:
     container_name: entitybase-api
-    image: entitybase-api-api:latest
+    image: entitybase-api:latest
     ports:
       - "8083:8080"
     environment:
@@ -356,7 +356,7 @@ services:
   # Workers (optional)
   json-dump-worker:
     container_name: json-dump-worker
-    image: entitybase-api-json-worker:latest
+    image: entitybase-backend-json-worker:latest
     ports:
       - "8002:8002"
     environment:
@@ -395,7 +395,7 @@ services:
 
   ttl-dump-worker:
     container_name: ttl-dump-worker
-    image: entitybase-api-ttl-worker:latest
+    image: entitybase-backend-ttl-worker:latest
     ports:
       - "8003:8003"
     environment:
@@ -434,7 +434,7 @@ services:
 
   backlink-stats-worker:
     container_name: backlink-stats-worker
-    image: entitybase-api-stats-worker:latest
+    image: entitybase-backend-stats-worker:latest
     ports:
       - "8004:8004"
     environment:
@@ -466,7 +466,7 @@ services:
 
   general-stats-worker:
     container_name: general-stats-worker
-    image: entitybase-api-stats-worker:latest
+    image: entitybase-backend-stats-worker:latest
     ports:
       - "8005:8005"
     environment:
@@ -497,7 +497,7 @@ services:
 
   user-stats-worker:
     container_name: user-stats-worker
-    image: entitybase-api-stats-worker:latest
+    image: entitybase-backend-stats-worker:latest
     ports:
       - "8006:8006"
     environment:
