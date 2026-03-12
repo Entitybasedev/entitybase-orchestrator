@@ -1,4 +1,4 @@
-.PHONY: help clone build build-no-cache check check-diskspace run_core run_workers run-build-no-cache stop remove clean clean-all reclaim release show-images settings
+.PHONY: help clone build build-no-cache check check-diskspace run_core run_workers run-build-no-cache stop stop-all remove clean clean-all reclaim release show-images settings
 
 help:
 	@echo "Available targets:"
@@ -10,7 +10,8 @@ help:
 	@echo "  make check-diskspace - Check available disk space (requires 2GB minimum)"
 	@echo "  make run_core       - Build images and start core services"
 	@echo "  make run_workers   - Build images and start all services (core + workers)"
-	@echo "  make stop          - Stop all running services"
+	@echo "  make stop          - Stop all running services (docker compose only)"
+	@echo "  make stop-all      - Stop and remove ALL Docker containers"
 	@echo "  make remove        - Stop services and remove containers/volumes"
 	@echo "  make clean         - Remove stopped containers, volumes, and unused images"
 	@echo "  make clean-all     - Remove all containers, images, volumes, and build cache"
@@ -63,6 +64,10 @@ check-diskspace:
 
 stop:
 	docker compose stop
+
+stop-all:
+	docker stop $$(docker ps -q) || true
+	docker rm $$(docker ps -aq) || true
 
 remove: stop
 	docker compose down -v --remove-orphans
