@@ -8,8 +8,8 @@ fi
 
 cd "$(dirname "$0")/.."
 
-echo "Building entitybase-backend-api:latest..."
-docker build $NO_CACHE -t entitybase-backend-api:latest -f libs/entitybase-backend/docker/containers/Dockerfile.api libs/entitybase-backend/
+echo "Building entitybase-api:latest..."
+docker build $NO_CACHE -t entitybase-api:latest -f libs/entitybase-backend/docker/containers/Dockerfile.api libs/entitybase-backend/
 
 echo "Building entitybase-backend-idworker:latest..."
 docker build $NO_CACHE -t entitybase-backend-idworker:latest -f libs/entitybase-backend/docker/containers/Dockerfile.idworker libs/entitybase-backend/
