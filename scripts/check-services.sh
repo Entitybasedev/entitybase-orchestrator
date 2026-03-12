@@ -24,12 +24,12 @@ check_running_service() {
         return 1
     fi
     
-    local health_status=$(docker inspect --format='{{.State.Health.Status}}' "$container_name" 2>/dev/null || echo "none")
+    local health_status=$(docker inspect --format='{{.State.Health.Status}}' "$container_name" 2>/dev/null || echo "")
     
     if [ "$health_status" = "healthy" ]; then
         echo -e "${GREEN}✅ $container_name - healthy${NC}"
         return 0
-    elif [ "$health_status" = "none" ]; then
+    elif [ -z "$health_status" ]; then
         echo -e "${GREEN}✅ $container_name - running${NC}"
         return 0
     else
