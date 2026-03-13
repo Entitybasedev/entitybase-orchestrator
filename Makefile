@@ -1,4 +1,4 @@
-.PHONY: help clone build build-no-cache check check-diskspace run_core run_workers run-build-no-cache stop stop-all remove clean clean-all reclaim release show-images settings
+.PHONY: help clone build build-no-cache check check-diskspace run_core run_workers run-build-no-cache stop stop-all remove clean clean-all reclaim release show-images settings elastic
 
 help:
 	@echo "Available targets:"
@@ -19,6 +19,10 @@ help:
 	@echo "  make release       - Create release: update version, commit, and tag (e.g., v2026.3.4)"
 	@echo "  make show-images  - Show all entitybase Docker images"
 	@echo "  make settings      - Query the /settings endpoint on localhost:8083"
+	@echo "  make elastic       - Start Elasticsearch and elasticsearch-indexer worker"
+	@echo "  make run-with-elastic       - Build and run core + workers + elasticsearch"
+	@echo "  make run-clean-all-with-elastic - Clean all and run with elasticsearch"
+	@echo "  make test-elastic-integration - Run Elasticsearch integration tests"
 
 release:
 	./scripts/run-release.sh
@@ -105,3 +109,15 @@ show-images:
 
 settings:
 	curl -s http://localhost:8083/settings | python3 -m json.tool
+
+elastic:
+	docker compose --profile elastic up -d
+
+run-with-elastic: stop clean build check-diskspace
+	docker compose --profile core --profile elastic up -d
+
+run-clean-all-with-elastic: clean-all build check-diskspace
+	docker compose --profile core --profile elastic up -d
+
+test-elastic-integration:
+	cd libs/entitybase-backend && ELASTICSEARCH_HOST=elasticsearch poetry run pytest tests/integration/models/workers/test_elasticsearch_indexer_integration.py -v

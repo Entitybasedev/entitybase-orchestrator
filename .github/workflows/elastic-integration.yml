@@ -1,0 +1,92 @@
+name: Elasticsearch Integration Tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'libs/entitybase-backend/**'
+      - '.github/workflows/elastic-integration.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'libs/entitybase-backend/**'
+      - '.github/workflows/elastic-integration.yml'
+
+jobs:
+  test-elasticsearch-integration:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Start services with Docker Compose
+        run: |
+          docker compose --profile core --profile elastic up -d
+          docker compose ps
+
+      - name: Wait for services to be healthy
+        run: |
+          echo "Waiting for Elasticsearch..."
+          timeout 120 bash -c 'until curl -sf http://localhost:9200/_cluster/health; do sleep 2; done'
+          echo "Waiting for MySQL..."
+          timeout 120 bash -c 'until docker exec mysql mysql -uroot -e "SELECT 1"; do sleep 2; done'
+          echo "Waiting for MinIO..."
+          timeout 60 bash -c 'until curl -sf http://localhost:9000/minio/health/live; do sleep 2; done'
+          echo "Waiting for Redpanda..."
+          timeout 60 bash -c 'until docker exec redpanda rpk cluster health; do sleep 2; done'
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Set up Poetry
+        uses: snok/install-poetry@v1
+
+      - name: Install dependencies
+        working-directory: libs/entitybase-backend
+        run: poetry install
+
+      - name: Create S3 buckets
+        working-directory: libs/entitybase-backend
+        run: |
+          poetry run python -m models.workers.dev buckets setup
+
+      - name: Create database tables
+        working-directory: libs/entitybase-backend
+        run: |
+          poetry run python -m models.workers.dev tables setup
+
+      - name: Create Kafka topics
+        working-directory: libs/entitybase-backend
+        run: |
+          poetry run python -m models.workers.dev topics setup
+
+      - name: Run Elasticsearch integration tests
+        working-directory: libs/entitybase-backend
+        env:
+          ELASTICSEARCH_HOST: localhost
+          ELASTICSEARCH_PORT: 9200
+          ELASTICSEARCH_INDEX: entitybase
+          VITESS_HOST: localhost
+          VITESS_PORT: 3306
+          VITESS_DATABASE: entitybase
+          VITESS_USER: root
+          VITESS_PASSWORD: ""
+          S3_ENDPOINT: http://localhost:9000
+          S3_ACCESS_KEY: fakekey
+          S3_SECRET_KEY: fakesecret
+          KAFKA_BOOTSTRAP_SERVERS: localhost:9092
+          KAFKA_TOPIC: wikibase.entity_change
+        run: |
+          poetry run pytest tests/integration/models/workers/test_elasticsearch_indexer_integration.py -v
+
+      - name: Upload logs on failure
+        if: failure()
+        run: |
+          docker compose logs --tail=100 > elastic-logs.txt
+          cat elastic-logs.txt
+
+      - name: Stop services
+        if: always()
+        run: docker compose --profile core --profile elastic down

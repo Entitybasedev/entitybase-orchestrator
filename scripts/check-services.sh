@@ -86,3 +86,8 @@ check_running_service "ttl-dump-worker" || overall_status=1
 check_running_service "backlink-stats-worker" || overall_status=1
 check_running_service "general-stats-worker" || overall_status=1
 check_running_service "user-stats-worker" || overall_status=1
+
+echo ""
+echo "=== Elasticsearch ==="
+check_running_service "elasticsearch" || overall_status=1
+check_running_service "elasticsearch-indexer-worker" || overall_status=1

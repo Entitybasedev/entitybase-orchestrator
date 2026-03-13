@@ -32,6 +32,9 @@ docker build $NO_CACHE -t entitybase-backend-create-tables:latest -f libs/entity
 echo "Building entitybase-backend-create-topics:latest..."
 docker build $NO_CACHE -t entitybase-backend-create-topics:latest -f libs/entitybase-backend/docker/containers/Dockerfile.api libs/entitybase-backend/
 
+echo "Building entitybase-backend-elasticsearch-worker:latest..."
+docker build $NO_CACHE -t entitybase-backend-elasticsearch-worker:latest -f libs/entitybase-backend/docker/containers/Dockerfile.api libs/entitybase-backend/
+
 echo "Building kafka2sse-backend:latest..."
 docker build $NO_CACHE -t kafka2sse-backend:latest -f libs/kafka2sse-backend/Dockerfile libs/kafka2sse-backend/
 
