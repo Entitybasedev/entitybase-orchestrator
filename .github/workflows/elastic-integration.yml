@@ -44,6 +44,8 @@ jobs:
           timeout 60 bash -c 'until curl -sf http://localhost:9000/minio/health/live; do sleep 2; done'
           echo "Waiting for Redpanda to be ready..."
           timeout 120 bash -c 'until docker exec redpanda rpk cluster health; do sleep 3; done'
+          echo "Checking if Kafka port is accessible from host..."
+          timeout 30 bash -c 'until nc -z localhost 9092; do sleep 2; done'
           echo "Waiting for Redpanda broker to be writable..."
           timeout 60 bash -c 'until docker exec redpanda rpk topic list; do sleep 2; done'
 
