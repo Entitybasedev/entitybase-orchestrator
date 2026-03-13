@@ -19,10 +19,10 @@ help:
 	@echo "  make release       - Create release: update version, commit, and tag (e.g., v2026.3.4)"
 	@echo "  make show-images  - Show all entitybase Docker images"
 	@echo "  make settings      - Query the /settings endpoint on localhost:8083"
-  @echo "  make elastic       - Start Elasticsearch and elasticsearch-indexer worker"
-  @echo "  make run-with-elastic       - Build and run core + workers + elasticsearch"
-  @echo "  make run-clean-all-with-elastic - Clean all and run with elasticsearch"
-  @echo "  make test-integration        - Run integration tests in container (requires docker)"
+	@echo "  make elastic       - Start Elasticsearch and elasticsearch-indexer worker"
+	@echo "  make run-with-elastic       - Build and run core + workers + elasticsearch"
+	@echo "  make run-clean-all-with-elastic - Clean all and run with elasticsearch"
+	@echo "  make test-integration        - Run integration tests in container (requires docker)"
 
 release:
 	./scripts/run-release.sh
