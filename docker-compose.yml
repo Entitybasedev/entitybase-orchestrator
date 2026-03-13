@@ -166,6 +166,7 @@ services:
     command: python -m models.workers.dev buckets setup
     profiles:
       - core
+      - test
     mem_limit: 512m
     cpus: 0.5
     networks:
@@ -186,6 +187,7 @@ services:
       VITESS_PASSWORD: "${MYSQL_ROOT_PASSWORD:-}"
     profiles:
       - core
+      - test
     mem_limit: 512m
     cpus: 0.5
     networks:
@@ -206,12 +208,12 @@ services:
       KAFKA_THANKS_TOPIC: thanks
     profiles:
       - core
+      - test
     mem_limit: 512m
     cpus: 0.5
     networks:
       - entitybase-network
 
-  # Core services
   idworker:
     container_name: idworker
     image: entitybase-backend-idworker:latest
@@ -611,6 +613,10 @@ services:
         condition: service_healthy
       redpanda:
         condition: service_healthy
+      create-tables:
+        condition: service_completed_successfully
+      create-buckets:
+        condition: service_completed_successfully
     environment:
       VITESS_HOST: mysql
       VITESS_PORT: 3306
