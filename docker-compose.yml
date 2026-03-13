@@ -173,6 +173,7 @@ services:
       - elasticsearch-data:/usr/share/elasticsearch/data
     profiles:
       - elastic
+      - test
 
   create-buckets:
     container_name: create-buckets
