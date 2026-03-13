@@ -35,6 +35,9 @@ services:
     cpus: 0.5
     networks:
       - entitybase-network
+    profiles:
+      - elastic
+      - test
 
   mysql-health:
     image: alpine:latest
@@ -49,6 +52,10 @@ services:
         condition: service_healthy
     networks:
       - entitybase-network
+    profiles:
+      - core
+      - elastic
+      - test
 
   minio:
     image: minio/minio:latest
@@ -72,6 +79,9 @@ services:
     cpus: 0.5
     networks:
       - entitybase-network
+    profiles:
+      - elastic
+      - test
 
   valkey:
     image: valkey/valkey:latest
@@ -85,6 +95,9 @@ services:
       retries: 5
     networks:
       - entitybase-network
+    profiles:
+      - elastic
+      - test
 
   redpanda:
     image: docker.redpanda.com/redpandadata/redpanda:v25.3.6
@@ -114,6 +127,10 @@ services:
       - entitybase-network
     volumes:
       - redpanda-data:/var/lib/redpanda/data
+    profiles:
+      - core
+      - elastic
+      - test
 
   redpanda-console:
     image: docker.redpanda.com/redpandadata/console:latest
@@ -126,6 +143,10 @@ services:
       - redpanda
     networks:
       - entitybase-network
+    profiles:
+      - core
+      - elastic
+      - test
 
   # Setup jobs (run once, then exit)
   elasticsearch:
@@ -167,6 +188,7 @@ services:
     profiles:
       - core
       - test
+      - elastic
     mem_limit: 512m
     cpus: 0.5
     networks:
@@ -188,6 +210,7 @@ services:
     profiles:
       - core
       - test
+      - elastic
     mem_limit: 512m
     cpus: 0.5
     networks:
@@ -209,6 +232,7 @@ services:
     profiles:
       - core
       - test
+      - elastic
     mem_limit: 512m
     cpus: 0.5
     networks:
@@ -414,6 +438,7 @@ services:
       start_period: 30s
     profiles:
       - workers
+      - core
     command: ["python", "-m", "models.workers.json_dumps.json_dump_worker"]
     mem_limit: 1g
     cpus: 0.5
@@ -453,6 +478,7 @@ services:
       start_period: 30s
     profiles:
       - workers
+      - core
     command: ["python", "-m", "models.workers.ttl_dumps.ttl_dump_worker"]
     mem_limit: 1g
     cpus: 0.5
@@ -485,6 +511,7 @@ services:
       start_period: 30s
     profiles:
       - workers
+      - core
     command: ["python", "-m", "models.workers.backlink_statistics.backlink_statistics_worker"]
     mem_limit: 512m
     cpus: 0.25
@@ -516,6 +543,7 @@ services:
       start_period: 30s
     profiles:
       - workers
+      - core
     command: ["python", "-m", "models.workers.general_stats.general_stats_worker"]
     mem_limit: 512m
     cpus: 0.25
@@ -547,6 +575,7 @@ services:
       start_period: 30s
     profiles:
       - workers
+      - core
     command: ["python", "-m", "models.workers.user_stats.user_stats_worker"]
     mem_limit: 512m
     cpus: 0.25
@@ -592,7 +621,9 @@ services:
       start_period: 30s
     profiles:
       - workers
+      - core
       - elastic
+      - test
     command: ["python", "-m", "models.workers.elasticsearch_indexer"]
     mem_limit: 1g
     cpus: 0.5
@@ -634,6 +665,7 @@ services:
       STREAMING_ENABLED: "true"
     profiles:
       - test
+      - elastic
     working_dir: /app
     command: ["poetry", "run", "pytest", "tests/integration/models/workers/test_elasticsearch_indexer_integration.py", "-v"]
     networks:

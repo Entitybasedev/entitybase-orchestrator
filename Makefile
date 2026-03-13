@@ -37,7 +37,7 @@ build-no-cache:
 	./scripts/build-images.sh --no-cache
 
 run-build-no-cache: stop clean build-no-cache
-	docker compose --profile core up -d
+	docker compose up -d
 
 check:
 	./scripts/check-services.sh
@@ -96,7 +96,7 @@ reclaim:
 run: run_core
 
 run_core: check-diskspace stop clean build
-	docker compose --profile core up -d
+	docker compose up -d
 
 run_workers: check-diskspace stop clean build
 	docker compose --profile workers up -d
@@ -114,13 +114,13 @@ elastic:
 	docker compose --profile elastic up -d
 
 run-with-elastic: stop clean build check-diskspace
-	docker compose --profile core --profile elastic up -d
+	docker compose --profile elastic up -d
 
 run-clean-all-with-elastic: clean-all build check-diskspace
-	docker compose --profile core --profile elastic up -d
+	docker compose --profile elastic up -d
 
 test-integration: stop clean build
-	docker compose --profile core --profile elastic --profile test up -d
+	docker compose --profile test up -d
 	docker compose logs test-runner || true
 	@echo ""
 	@echo "Tests done. Run 'make stop' to stop services."
