@@ -125,4 +125,4 @@ test-integration: stop clean build
 	@sleep 30
 	docker compose --profile test up test-runner
 	docker compose logs test-runner || true
-	docker compose --profile core --profile elastic --profile test down
+	@echo "Tests done. Run 'docker compose --profile core --profile elastic down' when done."
