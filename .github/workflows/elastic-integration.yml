@@ -89,15 +89,8 @@ jobs:
           S3_ACCESS_KEY: fakekey
           S3_SECRET_KEY: fakesecret
           KAFKA_BOOTSTRAP_SERVERS: localhost:9092
-          KAFKA_TOPIC: wikibase.entity_change
         run: |
-          echo "=== CI env vars ==="
-          echo "KAFKA_BOOTSTRAP_SERVERS=$KAFKA_BOOTSTRAP_SERVERS"
-          echo "KAFKA_TOPIC=$KAFKA_TOPIC"
-          echo "=== Running pytest ==="
-          poetry run python -c "import os; print('PYTEST KAFKA:', os.getenv('KAFKA_BOOTSTRAP_SERVERS'))"
-          # Skip ES integration tests that require direct Kafka connectivity (they run in CI's docker network)
-          poetry run pytest tests/integration/models/workers/test_elasticsearch_indexer_integration.py -v --skip=".*elasticsearch.*"
+          poetry run pytest tests/integration/models/workers/test_elasticsearch_indexer_integration.py -v
 
       - name: Upload logs on failure
         if: failure()
