@@ -72,6 +72,11 @@ jobs:
           MINIO_ENDPOINT: http://localhost:9000
           MINIO_ACCESS_KEY: fakekey
           MINIO_SECRET_KEY: fakesecret
+          VITESS_HOST: localhost
+          VITESS_PORT: 3306
+          VITESS_DATABASE: entitybase
+          VITESS_USER: root
+          VITESS_PASSWORD: ""
         run: |
           poetry run python -m models.workers.dev tables setup
 
@@ -81,6 +86,12 @@ jobs:
           MINIO_ENDPOINT: http://localhost:9000
           MINIO_ACCESS_KEY: fakekey
           MINIO_SECRET_KEY: fakesecret
+          VITESS_HOST: localhost
+          VITESS_PORT: 3306
+          VITESS_DATABASE: entitybase
+          VITESS_USER: root
+          VITESS_PASSWORD: ""
+          KAFKA_BOOTSTRAP_SERVERS: localhost:9092
         run: |
           poetry run python -m models.workers.dev topics setup
 
