@@ -60,27 +60,27 @@ jobs:
       - name: Create S3 buckets
         working-directory: libs/entitybase-backend
         env:
-          S3_ENDPOINT: http://localhost:9000
-          S3_ACCESS_KEY: fakekey
-          S3_SECRET_KEY: fakesecret
+          MINIO_ENDPOINT: http://localhost:9000
+          MINIO_ACCESS_KEY: fakekey
+          MINIO_SECRET_KEY: fakesecret
         run: |
           poetry run python -m models.workers.dev buckets setup
 
       - name: Create database tables
         working-directory: libs/entitybase-backend
         env:
-          S3_ENDPOINT: http://localhost:9000
-          S3_ACCESS_KEY: fakekey
-          S3_SECRET_KEY: fakesecret
+          MINIO_ENDPOINT: http://localhost:9000
+          MINIO_ACCESS_KEY: fakekey
+          MINIO_SECRET_KEY: fakesecret
         run: |
           poetry run python -m models.workers.dev tables setup
 
       - name: Create Kafka topics
         working-directory: libs/entitybase-backend
         env:
-          S3_ENDPOINT: http://localhost:9000
-          S3_ACCESS_KEY: fakekey
-          S3_SECRET_KEY: fakesecret
+          MINIO_ENDPOINT: http://localhost:9000
+          MINIO_ACCESS_KEY: fakekey
+          MINIO_SECRET_KEY: fakesecret
         run: |
           poetry run python -m models.workers.dev topics setup
 
