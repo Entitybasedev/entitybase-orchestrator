@@ -119,12 +119,10 @@ run-with-elastic: stop clean build check-diskspace
 run-clean-all-with-elastic: clean-all build check-diskspace
 	docker compose --profile core --profile elastic up -d
 
-test-elastic-integration:
-	cd libs/entitybase-backend && ELASTICSEARCH_HOST=elasticsearch poetry run pytest tests/integration/models/workers/test_elasticsearch_indexer_integration.py -v
-
-test-integration: check-diskspace stop clean build
-	docker compose --profile core --profile elastic --profile test up -d
-	sleep 5
+test-integration: stop clean build
+	docker compose --profile core --profile elastic up -d
+	@echo "Waiting for services to be healthy..."
+	@sleep 30
 	docker compose --profile test up test-runner
 	docker compose logs test-runner || true
 	docker compose --profile core --profile elastic --profile test down
