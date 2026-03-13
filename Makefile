@@ -121,6 +121,8 @@ run-clean-all-with-elastic: clean-all build check-diskspace
 
 test-integration: stop clean build
 	docker compose --profile test up -d
-	docker compose logs test-runner || true
+	@if docker compose logs test-runner | grep -q "FAILED\|ERROR\|passed"; then \
+		docker compose logs test-runner; \
+	fi
 	@echo ""
 	@echo "Tests done. Run 'make stop' to stop services."
