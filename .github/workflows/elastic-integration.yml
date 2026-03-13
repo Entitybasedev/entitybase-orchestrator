@@ -76,7 +76,7 @@ jobs:
 
       - name: Run Elasticsearch integration tests via container
         run: |
-          docker compose --profile test up test-runner
+          docker compose --profile core --profile elastic --profile test up test-runner
           docker compose logs test-runner || true
 
       - name: Upload logs on failure
