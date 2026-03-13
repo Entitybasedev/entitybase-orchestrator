@@ -20,7 +20,7 @@ clone_repo() {
     fi
 }
 
-clone_repo "--branch v2026.3.2 https://github.com/dpriskorn/entitybase-backend.git" "libs/entitybase-backend" "entitybase-backend"
+clone_repo "https://github.com/dpriskorn/entitybase-backend.git" "libs/entitybase-backend" "entitybase-backend"
 clone_repo "https://github.com/Entitybasedev/kafka2sse-backend.git" "libs/kafka2sse-backend" "kafka2sse-backend"
 clone_repo "https://github.com/Entitybasedev/kafka2sse-frontend.git" "libs/kafka2sse-frontend" "kafka2sse-frontend"
 
