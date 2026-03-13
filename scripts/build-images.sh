@@ -9,6 +9,12 @@ fi
 cd "$(dirname "$0")/.."
 
 echo "=========================================="
+echo "Generating requirements from pyproject.toml"
+echo "=========================================="
+./libs/entitybase-backend/scripts/shell/export-requirements.sh
+
+echo ""
+echo "=========================================="
 echo "Building Docker images for Entitybase"
 echo "=========================================="
 
