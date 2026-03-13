@@ -22,11 +22,11 @@ jobs:
       - name: Clone repositories
         run: make clone
 
+      - name: Build Docker images
+        run: make build
+
       - name: Start services with Docker Compose
-        run: |
-          docker compose --profile core --profile elastic build
-          docker compose --profile core --profile elastic up -d
-          docker compose ps
+        run: docker compose --profile core --profile elastic up -d && docker compose ps
 
       - name: Wait for services to be healthy
         run: |
