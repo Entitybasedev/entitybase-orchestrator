@@ -625,6 +625,7 @@ services:
       ELASTICSEARCH_INDEX: entitybase
       KAFKA_BOOTSTRAP_SERVERS: redpanda:9092
       KAFKA_TOPIC: wikibase.entity_change
+      STREAMING_ENABLED: "true"
     profiles:
       - test
     working_dir: /app

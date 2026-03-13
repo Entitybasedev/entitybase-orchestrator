@@ -19,10 +19,10 @@ help:
 	@echo "  make release       - Create release: update version, commit, and tag (e.g., v2026.3.4)"
 	@echo "  make show-images  - Show all entitybase Docker images"
 	@echo "  make settings      - Query the /settings endpoint on localhost:8083"
-	@echo "  make elastic       - Start Elasticsearch and elasticsearch-indexer worker"
-	@echo "  make run-with-elastic       - Build and run core + workers + elasticsearch"
-	@echo "  make run-clean-all-with-elastic - Clean all and run with elasticsearch"
-	@echo "  make test-elastic-integration - Run Elasticsearch integration tests"
+  @echo "  make elastic       - Start Elasticsearch and elasticsearch-indexer worker"
+  @echo "  make run-with-elastic       - Build and run core + workers + elasticsearch"
+  @echo "  make run-clean-all-with-elastic - Clean all and run with elasticsearch"
+  @echo "  make test-integration        - Run integration tests in container (requires docker)"
 
 release:
 	./scripts/run-release.sh
@@ -121,3 +121,8 @@ run-clean-all-with-elastic: clean-all build check-diskspace
 
 test-elastic-integration:
 	cd libs/entitybase-backend && ELASTICSEARCH_HOST=elasticsearch poetry run pytest tests/integration/models/workers/test_elasticsearch_indexer_integration.py -v
+
+test-integration: check-diskspace stop clean build
+	docker compose --profile core --profile elastic --profile test up test-runner
+	docker compose logs test-runner || true
+	docker compose --profile core --profile elastic --profile test down
