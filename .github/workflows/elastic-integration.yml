@@ -19,8 +19,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Clone submodules
+        run: |
+          git submodule update --init --recursive
+          make clone
+
       - name: Start services with Docker Compose
         run: |
+          docker compose --profile core --profile elastic build
           docker compose --profile core --profile elastic up -d
           docker compose ps
 
