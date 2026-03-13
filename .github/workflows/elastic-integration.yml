@@ -42,8 +42,10 @@ jobs:
           timeout 120 bash -c 'until docker exec mysql mysql -uroot -e "SELECT 1"; do sleep 2; done'
           echo "Waiting for MinIO..."
           timeout 60 bash -c 'until curl -sf http://localhost:9000/minio/health/live; do sleep 2; done'
-          echo "Waiting for Redpanda..."
-          timeout 60 bash -c 'until docker exec redpanda rpk cluster health; do sleep 2; done'
+          echo "Waiting for Redpanda to be ready..."
+          timeout 120 bash -c 'until docker exec redpanda rpk cluster health; do sleep 3; done'
+          echo "Waiting for Redpanda broker to be writable..."
+          timeout 60 bash -c 'until docker exec redpanda rpk topic list; do sleep 2; done'
 
       - name: Set up Python
         uses: actions/setup-python@v5
