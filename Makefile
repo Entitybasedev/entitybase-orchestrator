@@ -121,8 +121,6 @@ run-clean-all-with-elastic: clean-all build check-diskspace
 
 test-integration: stop clean build
 	docker compose --profile core --profile elastic --profile test up -d
-	@echo "Waiting 30s for services to be healthy..."
-	@sleep 30
 	docker compose logs test-runner || true
 	@echo ""
 	@echo "Tests done. Run 'make stop' to stop services."
