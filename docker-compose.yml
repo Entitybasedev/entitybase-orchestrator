@@ -36,8 +36,10 @@ services:
     networks:
       - entitybase-network
     profiles:
+      - core
       - elastic
       - test
+      - workers
 
   mysql-health:
     image: alpine:latest
@@ -56,6 +58,7 @@ services:
       - core
       - elastic
       - test
+      - workers
 
   minio:
     image: minio/minio:latest
@@ -80,8 +83,10 @@ services:
     networks:
       - entitybase-network
     profiles:
+      - core
       - elastic
       - test
+      - workers
 
   valkey:
     image: valkey/valkey:latest
@@ -96,6 +101,7 @@ services:
     networks:
       - entitybase-network
     profiles:
+      - core
       - elastic
       - test
 
@@ -131,6 +137,7 @@ services:
       - core
       - elastic
       - test
+      - workers
 
   redpanda-console:
     image: docker.redpanda.com/redpandadata/console:latest
@@ -174,6 +181,7 @@ services:
     profiles:
       - elastic
       - test
+      - workers
 
   create-buckets:
     container_name: create-buckets
@@ -212,6 +220,7 @@ services:
       - core
       - test
       - elastic
+      - workers
     mem_limit: 512m
     cpus: 0.5
     networks:
@@ -265,6 +274,9 @@ services:
       start_period: 30s
     profiles:
       - core
+      - elastic
+      - test
+      - workers
     mem_limit: 512m
     cpus: 0.5
     networks:
@@ -311,6 +323,9 @@ services:
     #   start_period: 30s
     profiles:
       - core
+      - elastic
+      - test
+      - workers
     mem_limit: 1g
     cpus: 1.0
     networks:
@@ -366,6 +381,9 @@ services:
       start_period: 30s
     profiles:
       - core
+      - elastic
+      - test
+      - workers
     mem_limit: 512m
     cpus: 0.5
     networks:
@@ -512,7 +530,6 @@ services:
       start_period: 30s
     profiles:
       - workers
-      - core
     command: ["python", "-m", "models.workers.backlink_statistics.backlink_statistics_worker"]
     mem_limit: 512m
     cpus: 0.25
@@ -544,7 +561,6 @@ services:
       start_period: 30s
     profiles:
       - workers
-      - core
     command: ["python", "-m", "models.workers.general_stats.general_stats_worker"]
     mem_limit: 512m
     cpus: 0.25
@@ -576,7 +592,6 @@ services:
       start_period: 30s
     profiles:
       - workers
-      - core
     command: ["python", "-m", "models.workers.user_stats.user_stats_worker"]
     mem_limit: 512m
     cpus: 0.25
@@ -622,7 +637,6 @@ services:
       start_period: 30s
     profiles:
       - workers
-      - core
       - elastic
       - test
     command: ["python", "-m", "models.workers.elasticsearch_indexer"]
@@ -662,11 +676,10 @@ services:
       ELASTICSEARCH_PORT: 9200
       ELASTICSEARCH_INDEX: entitybase
       KAFKA_BOOTSTRAP_SERVERS: redpanda:9092
-      KAFKA_TOPIC: wikibase.entity_change
+      KAFKA_ENTITYCHANGE_JSON_TOPIC: wikibase.entity_change
       STREAMING_ENABLED: "true"
     profiles:
       - test
-      - elastic
     working_dir: /app
     command: ["poetry", "run", "pytest", "tests/integration/models/workers/test_elasticsearch_indexer_integration.py", "-v"]
     networks:
