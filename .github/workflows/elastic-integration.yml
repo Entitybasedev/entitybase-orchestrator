@@ -1,0 +1,90 @@
+name: Elasticsearch Integration Tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'libs/entitybase-backend/**'
+      - '.github/workflows/elastic-integration.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'libs/entitybase-backend/**'
+      - '.github/workflows/elastic-integration.yml'
+
+jobs:
+  test-elasticsearch-integration:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Clone repositories
+        run: make clone
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Build Docker images
+        run: make build
+
+      - name: Start services with Docker Compose
+        run: docker compose --profile core --profile elastic up -d && docker compose ps
+
+      - name: Wait for services to be healthy
+        run: |
+          echo "Waiting for Elasticsearch..."
+          timeout 120 bash -c 'until curl -sf http://localhost:9200/_cluster/health; do sleep 2; done'
+          echo "Waiting for MySQL..."
+          timeout 120 bash -c 'until docker exec mysql mysql -uroot -e "SELECT 1"; do sleep 2; done'
+          echo "Waiting for MinIO..."
+          timeout 60 bash -c 'until curl -sf http://localhost:9000/minio/health/live; do sleep 2; done'
+          echo "Waiting for Redpanda to be ready..."
+          timeout 120 bash -c 'until docker exec redpanda rpk cluster health; do sleep 3; done'
+          echo "Checking if Kafka port is accessible from host..."
+          timeout 30 bash -c 'until nc -z localhost 9092; do sleep 2; done'
+          echo "Waiting for Redpanda broker to be writable..."
+          timeout 60 bash -c 'until docker exec redpanda rpk topic list; do sleep 2; done'
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Set up Poetry
+        uses: snok/install-poetry@v1
+
+      - name: Install dependencies
+        working-directory: libs/entitybase-backend
+        run: poetry install
+
+      - name: Wait for setup services to complete
+        run: |
+          echo "Waiting for create-buckets..."
+          timeout 60 bash -c 'until [ "$(docker inspect -f {{.State.Status}} create-buckets 2>/dev/null)" = "exited" ]; do sleep 2; done'
+          echo "create-buckets status: $(docker inspect -f {{.State.ExitCode}} create-buckets)"
+          echo "Waiting for create-tables..."
+          timeout 60 bash -c 'until [ "$(docker inspect -f {{.State.Status}} create-tables 2>/dev/null)" = "exited" ]; do sleep 2; done'
+          echo "create-tables status: $(docker inspect -f {{.State.ExitCode}} create-tables)"
+          echo "Waiting for create-topics..."
+          timeout 120 bash -c 'until [ "$(docker inspect -f {{.State.Status}} create-topics 2>/dev/null)" = "exited" ]; do sleep 3; done'
+          echo "create-topics status: $(docker inspect -f {{.State.ExitCode}} create-topics)"
+          docker logs create-topics
+
+      - name: Run Elasticsearch integration tests via container
+        run: |
+          docker compose --profile core --profile elastic --profile test up test-runner
+          docker compose logs test-runner || true
+
+      - name: Upload logs on failure
+        if: failure()
+        run: |
+          docker compose logs --tail=100 > elastic-logs.txt
+          cat elastic-logs.txt
+
+      - name: Stop services
+        if: always()
+        run: docker compose --profile core --profile elastic --profile test down

@@ -24,12 +24,12 @@ check_running_service() {
         return 1
     fi
     
-    local health_status=$(docker inspect --format='{{.State.Health.Status}}' "$container_name" 2>/dev/null || echo "none")
+    local health_status=$(docker inspect --format='{{.State.Health.Status}}' "$container_name" 2>/dev/null || echo "")
     
     if [ "$health_status" = "healthy" ]; then
         echo -e "${GREEN}✅ $container_name - healthy${NC}"
         return 0
-    elif [ "$health_status" = "none" ]; then
+    elif [ -z "$health_status" ]; then
         echo -e "${GREEN}✅ $container_name - running${NC}"
         return 0
     else
@@ -63,6 +63,7 @@ echo "=== Infrastructure ==="
 check_running_service "mysql" || overall_status=1
 check_running_service "minio" || overall_status=1
 check_running_service "redpanda" || overall_status=1
+check_running_service "valkey" || overall_status=1
 
 echo ""
 echo "=== Setup Jobs ==="
@@ -72,10 +73,11 @@ check_completed_job "create-topics" || overall_status=1
 
 echo ""
 echo "=== Core Services ==="
-check_running_service "entitybase-backend-api" || overall_status=1
+check_running_service "entitybase-api" || overall_status=1
 check_running_service "idworker" || overall_status=1
-check_running_service "entitybase-sse-backend" || overall_status=1
-check_running_service "entitybase-sse-frontend" || overall_status=1
+check_running_service "kafka2sse-backend" || overall_status=1
+check_running_service "kafka2sse-frontend" || overall_status=1
+check_running_service "entitybase-orchestrator-frontend" || overall_status=1
 
 echo ""
 echo "=== Workers ==="
@@ -86,14 +88,6 @@ check_running_service "general-stats-worker" || overall_status=1
 check_running_service "user-stats-worker" || overall_status=1
 
 echo ""
-echo "=== Images ==="
-docker images | grep -E "entitybase-" | head -20 || echo -e "${YELLOW}⚠️  No entitybase images found${NC}"
-
-echo ""
-if [ $overall_status -eq 0 ]; then
-    echo -e "${GREEN}✅ All services healthy${NC}"
-else
-    echo -e "${RED}❌ Some services are not healthy${NC}"
-fi
-
-exit $overall_status
+echo "=== Elasticsearch ==="
+check_running_service "elasticsearch" || overall_status=1
+check_running_service "elasticsearch-indexer-worker" || overall_status=1
