@@ -96,7 +96,7 @@ reclaim:
 run: run_core
 
 run_core: check-diskspace stop clean build
-	docker compose up -d
+	docker compose --profile core up -d
 
 run_workers: check-diskspace stop clean build
 	docker compose --profile workers up -d
