@@ -79,6 +79,8 @@ remove: stop
 clean:
 	docker compose down -v --remove-orphans || true
 	docker container prune -f
+	docker builder prune -f
+	docker image prune -a -f
 
 clean-all: stop
 	docker compose down -v --remove-orphans || true
