@@ -76,7 +76,7 @@ check-diskspace:
 	exit 1
 
 stop:
-	docker compose -f docker-compose.yml down --remove-orphans
+	docker compose -f docker-compose.yml --profile core down --remove-orphans
 
 stop-all:
 	docker stop $$(docker ps -q) || true
