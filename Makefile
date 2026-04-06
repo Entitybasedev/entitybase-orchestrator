@@ -1,4 +1,4 @@
-.PHONY: help clone build build-no-cache check check-diskspace check-deps run_core run_workers run-build-no-cache stop stop-all remove clean clean-all reclaim release show-images settings elastic
+.PHONY: help clone build build-no-cache check check-diskspace check-deps run_core run_workers run-build-no-cache stop stop-all remove clean clean-all reclaim release show-images settings elastic tmpfs-setup
 
 help:
 	@echo "Available targets:"
@@ -24,6 +24,7 @@ help:
 	@echo "  make run-with-elastic       - Build and run core + workers + elasticsearch"
 	@echo "  make run-clean-all-with-elastic - Clean all and run with elasticsearch"
 	@echo "  make test-integration        - Run integration tests in container (requires docker)"
+	@echo "  make tmpfs-setup    - Setup tmpfs for buildkit cache (requires sudo)"
 
 release:
 	./scripts/run-release.sh
@@ -102,6 +103,16 @@ reclaim:
 	docker volume prune -f
 	docker builder prune -f
 	@echo "Disk space reclaimed. Run 'docker system df' to check."
+
+tmpfs-setup:
+	@if df -T /tmp/docker-buildkit 2>/dev/null | grep -q tmpfs; then \
+		echo "tmpfs at /tmp/docker-buildkit already mounted"; \
+	else \
+		echo "Creating and mounting tmpfs at /tmp/docker-buildkit..."; \
+		sudo mkdir -p /tmp/docker-buildkit; \
+		sudo mount -t tmpfs -o size=4G,mode=1777 tmpfs /tmp/docker-buildkit; \
+		echo "tmpfs mounted successfully"; \
+	fi
 
 run: run_core
 
