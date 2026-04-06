@@ -45,7 +45,7 @@ build-no-cache: check-deps
 	./scripts/build-images.sh --no-cache
 
 run-build-no-cache: stop clean build-no-cache
-	cd /home/nizo/src/entitybase-orchestrator && docker compose -f docker-compose.yml up -d
+	docker compose -f docker-compose.yml up -d
 
 check:
 	./scripts/check-services.sh
@@ -75,23 +75,23 @@ check-diskspace:
 	exit 1
 
 stop:
-	cd /home/nizo/src/entitybase-orchestrator && docker compose -f docker-compose.yml down --remove-orphans
+	docker compose -f docker-compose.yml down --remove-orphans
 
 stop-all:
 	docker stop $$(docker ps -q) || true
 	docker rm $$(docker ps -aq) || true
 
 remove: stop
-	cd /home/nizo/src/entitybase-orchestrator && docker compose -f docker-compose.yml down -v --remove-orphans
+	docker compose -f docker-compose.yml down -v --remove-orphans
 
 clean:
-	cd /home/nizo/src/entitybase-orchestrator && docker compose -f docker-compose.yml down -v --remove-orphans || true
+	docker compose -f docker-compose.yml down -v --remove-orphans || true
 	docker container prune -f
 	docker builder prune -f
 	docker image prune -a -f
 
 clean-all: stop
-	cd /home/nizo/src/entitybase-orchestrator && docker compose -f docker-compose.yml down -v --remove-orphans || true
+	docker compose -f docker-compose.yml down -v --remove-orphans || true
 	docker container prune -f
 	docker image prune -a -f
 	docker builder prune -f
@@ -106,10 +106,10 @@ reclaim:
 run: run_core
 
 run_core: check-deps check-diskspace stop clean build
-	cd /home/nizo/src/entitybase-orchestrator && docker compose -f docker-compose.yml --profile core up -d
+	docker compose -f docker-compose.yml --profile core up -d
 
 run_workers: check-deps check-diskspace stop clean build
-	cd /home/nizo/src/entitybase-orchestrator && docker compose -f docker-compose.yml --profile workers up -d
+	docker compose -f docker-compose.yml --profile workers up -d
 
 reset:
 	./scripts/reset.sh
@@ -121,16 +121,16 @@ settings:
 	curl -s http://localhost:8083/settings | python3 -m json.tool
 
 elastic:
-	cd /home/nizo/src/entitybase-orchestrator && docker compose -f docker-compose.yml --profile elastic up -d
+	docker compose -f docker-compose.yml --profile elastic up -d
 
 run-with-elastic: stop clean build check-diskspace
-	cd /home/nizo/src/entitybase-orchestrator && docker compose -f docker-compose.yml --profile elastic up -d
+	docker compose -f docker-compose.yml --profile elastic up -d
 
 run-clean-all-with-elastic: clean-all build check-diskspace
-	cd /home/nizo/src/entitybase-orchestrator && docker compose -f docker-compose.yml --profile elastic up -d
+	docker compose -f docker-compose.yml --profile elastic up -d
 
 test-integration: stop clean build
-	cd /home/nizo/src/entitybase-orchestrator && docker compose -f docker-compose.yml --profile test up -d
+	docker compose -f docker-compose.yml --profile test up -d
 	@echo "Waiting for tests to complete..."
 	@docker compose wait test-runner || EXIT_CODE=$$?; \
 	if [ "$$EXIT_CODE" != "0" ]; then \
