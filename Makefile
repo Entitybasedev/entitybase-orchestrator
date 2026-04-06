@@ -36,7 +36,7 @@ check-deps:
 	@echo "Checking dependencies..."
 	@command -v docker >/dev/null 2>&1 || { echo "Error: docker is required but not installed."; exit 1; }
 	@command -v python3 >/dev/null 2>&1 || { echo "Error: python3 is required but not installed."; exit 1; }
-	@command -v poetry >/dev/null 2>&1 || { echo "Error: poetry is required but not installed. Install with: pip install poetry"; exit 1; }
+	@command -v poetry >/dev/null 2>&1 || { echo "Error: poetry is required but not installed. Install via your OS package manager (e.g., apt install poetry, pacman -S python-poetry, brew install poetry)"; exit 1; }
 	@echo "All dependencies satisfied."
 
 build: check-deps
