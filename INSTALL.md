@@ -1,16 +1,16 @@
 # Installation
 
-## Få igång snabbt
+## Quick Start
 
 ```bash
-make clone          # 1. Klona repos
-cp .env.example .env # 2. Skapa config
-make run           # 3. Bygg & starta
+make clone          # 1. Clone repos
+cp .env.example .env # 2. Create config
+make run           # 3. Build & start
 ```
 
-Det tar ~5 minuter första gången.
+Takes ~5 minutes first time.
 
-## Vanliga problem
+## Common Issues
 
 **"poetry export does not exist"**
 ```bash
@@ -19,11 +19,11 @@ pipx inject poetry poetry-plugin-export
 
 **Docker: not enough space**
 ```bash
-df -h /      # Kolla disk
-make check-diskspace  # Kör check
+df -h /           # Check disk
+make check-diskspace # Run check
 ```
 
-## Detaljerad guide
+## Detailed Guide
 
 ### 1. Python (pyenv)
 
@@ -49,25 +49,25 @@ poetry --version
 
 ### 4. Docker
 
-Ladda ner från [docker.com](https://docker.com).
+Download from [docker.com](https://docker.com).
 
-## Miljövariabler
+## Environment Variables
 
-| Variabel | Default | Beskrivning |
+| Variable | Default | Description |
 |----------|---------|-------------|
 | MYSQL_ROOT_PASSWORD | - | MySQL root |
-| MINIO_ROOT_USER | fakekey | S3-nyckel |
-| MINIO_ROOT_PASSWORD | fakesecret | S3-hemlighet |
+| MINIO_ROOT_USER | fakekey | S3 access key |
+| MINIO_ROOT_PASSWORD | fakesecret | S3 secret key |
 
 ## Cheatsheet
 
 ```bash
-make run    # Starta
-make stop   # Stoppa
-make build # Bygg bara
-make clean # Städ
+make run    # Start
+make stop   # Stop
+make build # Build only
+make clean # Cleanup
 ```
 
-## Hjälp?
+## Help?
 
-Behöver du hjälp? Fråga i [Entitybase Telegram-grupp](https://www.wikidata.org/wiki/Wikidata:Tools/Entitybase#Telegram).
+Need help? Ask in the [Entitybase Telegram group](https://www.wikidata.org/wiki/Wikidata:Tools/Entitybase#Telegram).
