@@ -457,7 +457,6 @@ services:
       start_period: 30s
     profiles:
       - workers
-      - core
     command: ["python", "-m", "models.workers.json_dumps.json_dump_worker"]
     mem_limit: 1g
     cpus: 0.5
@@ -497,7 +496,6 @@ services:
       start_period: 30s
     profiles:
       - workers
-      - core
     command: ["python", "-m", "models.workers.ttl_dumps.ttl_dump_worker"]
     mem_limit: 1g
     cpus: 0.5
