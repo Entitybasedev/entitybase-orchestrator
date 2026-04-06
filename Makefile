@@ -1,4 +1,4 @@
-.PHONY: help clone build build-no-cache check check-diskspace check-deps run-core run-workers build-no-cache run-core-purge stop-all remove clean-all clean-local reclaim release show-images settings elastic tmpfs-setup
+.PHONY: help clone build build-no-cache check check-diskspace check-deps run-core run-workers build-no-cache run-core-purge stop remove clean-all clean-local reclaim release show-images settings elastic tmpfs-setup
 
 help:
 	@echo "Available targets:"
@@ -12,7 +12,7 @@ help:
 	@echo "  make run-core       - Build images and start core services"
 	@echo "  make run-workers   - Build images and start all services (core + workers)"
 	@echo "  make run-core-purge - Manually trigger purge worker once"
-	@echo "  make stop-all      - Stop and remove ALL Docker containers"
+	@echo "  make stop          - Stop all running containers"
 	@echo "  make remove        - Stop services and remove containers/volumes"
 	@echo "  make clean-local   - Remove locally built images only (keep base images)"
 	@echo "  make clean-all     - Remove all containers, images, volumes, and build cache"
@@ -45,7 +45,7 @@ build: check-deps
 build-no-cache: check-deps
 	./scripts/build-images.sh --no-cache
 
-run-build-no-cache: stop-all clean-local build-no-cache
+run-build-no-cache: stop clean-local build-no-cache
 	docker compose -f docker-compose.yml up -d
 
 check:
@@ -75,7 +75,11 @@ check-diskspace:
 	echo "Error: Less than 2GB available"; \
 	exit 1
 
-remove: stop-all
+stop:
+	docker stop $$(docker ps -q) || true
+	docker rm $$(docker ps -aq) || true
+
+remove: stop
 	docker compose -f docker-compose.yml down -v --remove-orphans
 
 clean-local:
@@ -109,13 +113,13 @@ tmpfs-setup:
 
 run: run-core
 
-run-core: check-deps check-diskspace stop-all clean-local build
+run-core: check-deps check-diskspace stop clean-local build
 	docker compose -f docker-compose.yml --profile core up -d
 
-run-workers: check-deps check-diskspace stop-all clean-local build
+run-workers: check-deps check-diskspace stop clean-local build
 	docker compose -f docker-compose.yml --profile workers up -d
 
-run-core-purge: check-deps check-diskspace stop-all clean-local build
+run-core-purge: check-deps check-diskspace stop clean-local build
 	docker compose -f docker-compose.yml --profile core up -d
 	docker compose up -d purge-worker
 
@@ -131,13 +135,13 @@ settings:
 elastic:
 	docker compose -f docker-compose.yml --profile elastic up -d
 
-run-with-elastic: stop-all clean-local build check-diskspace
+run-with-elastic: stop clean-local build check-diskspace
 	docker compose -f docker-compose.yml --profile elastic up -d
 
 run-clean-all-with-elastic: clean-all build check-diskspace
 	docker compose -f docker-compose.yml --profile elastic up -d
 
-test-integration: stop-all clean-local build
+test-integration: stop clean-local build
 	docker compose -f docker-compose.yml --profile test up -d
 	@echo "Waiting for tests to complete..."
 	@docker compose wait test-runner || EXIT_CODE=$$?; \
@@ -147,4 +151,4 @@ test-integration: stop-all clean-local build
 		exit 1; \
 	fi
 	@echo ""
-	@echo "Tests passed. Run 'make stop-all' to stop services."
+	@echo "Tests passed. Run 'make stop' to stop services."
