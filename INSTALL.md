@@ -67,3 +67,7 @@ make stop   # Stoppa
 make build # Bygg bara
 make clean # Städ
 ```
+
+## Hjälp?
+
+Behöver du hjälp? Fråga i [Entitybase Telegram-grupp](https://www.wikidata.org/wiki/Wikidata:Tools/Entitybase#Telegram).
