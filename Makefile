@@ -1,8 +1,9 @@
-.PHONY: help clone build build-no-cache check check-diskspace run_core run_workers run-build-no-cache stop stop-all remove clean clean-all reclaim release show-images settings elastic
+.PHONY: help clone build build-no-cache check check-diskspace check-deps run_core run_workers run-build-no-cache stop stop-all remove clean clean-all reclaim release show-images settings elastic
 
 help:
 	@echo "Available targets:"
 	@echo "  make clone          - Clone required repositories"
+	@echo "  make check-deps     - Check required dependencies (poetry, docker, python)"
 	@echo "  make build         - Build all Docker images for docker-compose"
 	@echo "  make build-no-cache  - Build all Docker images without using cache"
 	@echo "  make run-build-no-cache - Build without cache and start core services"
@@ -30,14 +31,21 @@ release:
 clone:
 	./scripts/clone-repos.sh
 
-build:
+check-deps:
+	@echo "Checking dependencies..."
+	@command -v docker >/dev/null 2>&1 || { echo "Error: docker is required but not installed."; exit 1; }
+	@command -v python3 >/dev/null 2>&1 || { echo "Error: python3 is required but not installed."; exit 1; }
+	@command -v poetry >/dev/null 2>&1 || { echo "Error: poetry is required but not installed. Install with: pip install poetry"; exit 1; }
+	@echo "All dependencies satisfied."
+
+build: check-deps
 	./scripts/build-images.sh
 
-build-no-cache:
+build-no-cache: check-deps
 	./scripts/build-images.sh --no-cache
 
 run-build-no-cache: stop clean build-no-cache
-	docker compose up -d
+	cd /home/nizo/src/entitybase-orchestrator && docker compose -f docker-compose.yml up -d
 
 check:
 	./scripts/check-services.sh
@@ -67,23 +75,23 @@ check-diskspace:
 	exit 1
 
 stop:
-	docker compose stop
+	cd /home/nizo/src/entitybase-orchestrator && docker compose -f docker-compose.yml down --remove-orphans
 
 stop-all:
 	docker stop $$(docker ps -q) || true
 	docker rm $$(docker ps -aq) || true
 
 remove: stop
-	docker compose down -v --remove-orphans
+	cd /home/nizo/src/entitybase-orchestrator && docker compose -f docker-compose.yml down -v --remove-orphans
 
 clean:
-	docker compose down -v --remove-orphans || true
+	cd /home/nizo/src/entitybase-orchestrator && docker compose -f docker-compose.yml down -v --remove-orphans || true
 	docker container prune -f
 	docker builder prune -f
 	docker image prune -a -f
 
 clean-all: stop
-	docker compose down -v --remove-orphans || true
+	cd /home/nizo/src/entitybase-orchestrator && docker compose -f docker-compose.yml down -v --remove-orphans || true
 	docker container prune -f
 	docker image prune -a -f
 	docker builder prune -f
@@ -97,11 +105,11 @@ reclaim:
 
 run: run_core
 
-run_core: check-diskspace stop clean build
-	docker compose --profile core up -d
+run_core: check-deps check-diskspace stop clean build
+	cd /home/nizo/src/entitybase-orchestrator && docker compose -f docker-compose.yml --profile core up -d
 
-run_workers: check-diskspace stop clean build
-	docker compose --profile workers up -d
+run_workers: check-deps check-diskspace stop clean build
+	cd /home/nizo/src/entitybase-orchestrator && docker compose -f docker-compose.yml --profile workers up -d
 
 reset:
 	./scripts/reset.sh
@@ -113,16 +121,16 @@ settings:
 	curl -s http://localhost:8083/settings | python3 -m json.tool
 
 elastic:
-	docker compose --profile elastic up -d
+	cd /home/nizo/src/entitybase-orchestrator && docker compose -f docker-compose.yml --profile elastic up -d
 
 run-with-elastic: stop clean build check-diskspace
-	docker compose --profile elastic up -d
+	cd /home/nizo/src/entitybase-orchestrator && docker compose -f docker-compose.yml --profile elastic up -d
 
 run-clean-all-with-elastic: clean-all build check-diskspace
-	docker compose --profile elastic up -d
+	cd /home/nizo/src/entitybase-orchestrator && docker compose -f docker-compose.yml --profile elastic up -d
 
 test-integration: stop clean build
-	docker compose --profile test up -d
+	cd /home/nizo/src/entitybase-orchestrator && docker compose -f docker-compose.yml --profile test up -d
 	@echo "Waiting for tests to complete..."
 	@docker compose wait test-runner || EXIT_CODE=$$?; \
 	if [ "$$EXIT_CODE" != "0" ]; then \

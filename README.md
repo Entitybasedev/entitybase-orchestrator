@@ -53,6 +53,28 @@ cp .env.example .env
 make run
 ```
 
+## Dependencies
+
+| Tool | Version | Description |
+|------|---------|-------------|
+| [Poetry](https://python-poetry.org/) | >=1.0 | Python package manager |
+| Docker | latest | Container runtime |
+| Docker Compose | latest | Container orchestration |
+| Python | 3.13+ | Required for build scripts |
+
+### Install Poetry
+
+```bash
+# Using pip
+pip install poetry
+
+# Using the official installer
+curl -sSL https://install.python-poetry.org | python3 -
+
+# Using brew (macOS)
+brew install poetry
+```
+
 ## Makefile Commands
 
 | Command | Description |
