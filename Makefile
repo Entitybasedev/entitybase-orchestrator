@@ -1,4 +1,4 @@
-.PHONY: help clone build build-no-cache check check-diskspace check-deps run_core run_workers run-build-no-cache stop stop-all remove clean clean-all reclaim release show-images settings elastic tmpfs-setup
+.PHONY: help clone build build-no-cache check check-diskspace check-deps run-core run-workers build-no-cache run-core-purge stop stop-all remove clean clean-all reclaim release show-images settings elastic tmpfs-setup
 
 help:
 	@echo "Available targets:"
@@ -6,11 +6,12 @@ help:
 	@echo "  make check-deps     - Check required dependencies (poetry, docker, python)"
 	@echo "  make build         - Build all Docker images for docker-compose"
 	@echo "  make build-no-cache  - Build all Docker images without using cache"
-	@echo "  make run-build-no-cache - Build without cache and start core services"
+	@echo "  make build-no-cache - Build without cache and start core services"
 	@echo "  make check         - Check service health status"
 	@echo "  make check-diskspace - Check available disk space (requires 2GB minimum)"
-	@echo "  make run_core       - Build images and start core services"
-	@echo "  make run_workers   - Build images and start all services (core + workers)"
+	@echo "  make run-core       - Build images and start core services"
+	@echo "  make run-workers   - Build images and start all services (core + workers)"
+	@echo "  make run-core-purge - Manually trigger purge worker once"
 	@echo "  make stop          - Stop all running services (docker compose only)"
 	@echo "  make stop-all      - Stop and remove ALL Docker containers"
 	@echo "  make remove        - Stop services and remove containers/volumes"
@@ -66,7 +67,7 @@ check-diskspace:
 		*[0-9]G) \
 			SIZE=$${AVAILABLE%G}; \
 			if [ "$$(echo "$$SIZE >= 2" | awk '{if ($$1 >= 2) print 1; else print 0}')" -eq 1 ]; then exit 0; fi \
-			;; \
+		;; \
 		*[0-9]M) \
 			echo "Error: Less than 2GB available"; \
 			exit 1; \
@@ -114,13 +115,16 @@ tmpfs-setup:
 		echo "tmpfs mounted successfully"; \
 	fi
 
-run: run_core
+run: run-core
 
-run_core: check-deps check-diskspace stop clean build
+run-core: check-deps check-diskspace stop clean build
 	docker compose -f docker-compose.yml --profile core up -d
 
-run_workers: check-deps check-diskspace stop clean build
+run-workers: check-deps check-diskspace stop clean build
 	docker compose -f docker-compose.yml --profile workers up -d
+
+run-core-purge: run-core
+	docker compose up -d purge-worker
 
 reset:
 	./scripts/reset.sh
