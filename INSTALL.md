@@ -1,120 +1,69 @@
 # Installation
 
-## Prerequisites
-
-| Tool | Version | Description |
-|------|---------|-------------|
-| [pyenv](https://github.com/pyenv/pyenv) | latest | Python version manager |
-| [pipx](https://pipx.pypa.io/) | latest | Python package manager (isolate tools) |
-| Docker | latest | Container runtime |
-| Docker Compose | latest | Container orchestration |
-
-### Install Python via pyenv
+## Få igång snabbt
 
 ```bash
-# Install pyenv (see https://github.com/pyenv/pyenv#installation)
-
-# Install Python 3.13
-pyenv install 3.13.0
-
-# Set global version
-pyenv global 3.13.0
-
-# Verify
-python --version
+make clone          # 1. Klona repos
+cp .env.example .env # 2. Skapa config
+make run           # 3. Bygg & starta
 ```
 
-### Install pipx
+Det tar ~5 minuter första gången.
+
+## Vanliga problem
+
+**"poetry export does not exist"**
+```bash
+pipx inject poetry poetry-plugin-export
+```
+
+**Docker: not enough space**
+```bash
+df -h /      # Kolla disk
+make check-diskspace  # Kör check
+```
+
+## Detaljerad guide
+
+### 1. Python (pyenv)
 
 ```bash
-# Using pip (via pyenv Python)
+pyenv install 3.13.0
+pyenv global 3.13.0
+```
+
+### 2. pipx
+
+```bash
 pip install pipx
-
-# Using brew (macOS)
-brew install pipx
-
-# Then ensure pipx is on your PATH
 pipx ensurepath
 ```
 
-## Poetry 2.0+ Setup
-
-Poetry 2.0+ moved the `export` command to a separate plugin. Use pipx to keep Poetry isolated:
+### 3. Poetry + plugin
 
 ```bash
-# Install Poetry via pipx
 pipx install poetry
-
-# Install the export plugin (required for build scripts)
 pipx inject poetry poetry-plugin-export
-
-# Verify installation
 poetry --version
-poetry plugin list
 ```
 
-### Alternative: pip installation
+### 4. Docker
 
-If you prefer pip over pipx:
+Ladda ner från [docker.com](https://docker.com).
 
-```bash
-pip install poetry poetry-plugin-export
-```
+## Miljövariabler
 
-## Initial Setup
-
-```bash
-# Clone repositories
-make clone
-
-# Copy environment template
-cp .env.example .env
-
-# Build and start services
-make run
-```
-
-## Environment Variables
-
-| Variable | Default | Description |
+| Variabel | Default | Beskrivning |
 |----------|---------|-------------|
-| MYSQL_ROOT_PASSWORD | (empty) | MySQL root password |
-| MINIO_ROOT_USER | fakekey | MinIO access key |
-| MINIO_ROOT_PASSWORD | fakesecret | MinIO secret key |
-| ELASTICSEARCH_HOST | elasticsearch | Elasticsearch host |
-| ELASTICSEARCH_PORT | 9200 | Elasticsearch port |
-| ELASTICSEARCH_INDEX | entitybase | Elasticsearch index name |
+| MYSQL_ROOT_PASSWORD | - | MySQL root |
+| MINIO_ROOT_USER | fakekey | S3-nyckel |
+| MINIO_ROOT_PASSWORD | fakesecret | S3-hemlighet |
 
-## Troubleshooting
-
-### Poetry export command not found
-
-If you get `The requested command export does not exist`, install the plugin:
+## Cheatsheet
 
 ```bash
-pipx inject poetry poetry-plugin-export
-```
-
-### Docker build fails
-
-Ensure you have at least 2GB free disk space:
-
-```bash
-make check-diskspace
-```
-
-## Quick Reference
-
-```bash
-# Build images
-make build
-
-# Start services
-make run
-
-# Stop services
-make stop
-
-# Full cleanup
-make clean-all
+make run    # Starta
+make stop   # Stoppa
+make build # Bygg bara
+make clean # Städ
 ```
