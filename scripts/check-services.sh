@@ -83,6 +83,7 @@ echo ""
 echo "=== Workers ==="
 check_running_service "json-dump-worker" || overall_status=1
 check_running_service "ttl-dump-worker" || overall_status=1
+check_running_service "purge-worker" || overall_status=1
 check_running_service "backlink-stats-worker" || overall_status=1
 check_running_service "general-stats-worker" || overall_status=1
 check_running_service "user-stats-worker" || overall_status=1

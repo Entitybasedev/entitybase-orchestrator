@@ -29,7 +29,7 @@ jobs:
           password: ${{ secrets.DOCKER_TOKEN }}
 
       - name: Build Docker images
-        run: make build
+        run: make build-no-cache
 
       - name: Start services with Docker Compose
         run: docker compose --profile core --profile elastic up -d && docker compose ps
