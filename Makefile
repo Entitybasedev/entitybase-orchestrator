@@ -1,4 +1,4 @@
-.PHONY: help clone build build-no-cache check check-diskspace check-deps run-core run-workers build-no-cache run-core-purge stop stop-all remove clean clean-all reclaim release show-images settings elastic tmpfs-setup
+.PHONY: help clone build build-no-cache check check-diskspace check-deps run-core run-workers build-no-cache run-core-purge stop stop-all remove clean-all clean-local reclaim release show-images settings elastic tmpfs-setup
 
 help:
 	@echo "Available targets:"
@@ -6,7 +6,7 @@ help:
 	@echo "  make check-deps     - Check required dependencies (poetry, docker, python)"
 	@echo "  make build         - Build all Docker images for docker-compose"
 	@echo "  make build-no-cache  - Build all Docker images without using cache"
-	@echo "  make build-no-cache - Build without cache and start core services"
+	@echo "  make run-build-no-cache - Build without cache and start core services"
 	@echo "  make check         - Check service health status"
 	@echo "  make check-diskspace - Check available disk space (requires 2GB minimum)"
 	@echo "  make run-core       - Build images and start core services"
@@ -15,7 +15,7 @@ help:
 	@echo "  make stop          - Stop all running services (docker compose only)"
 	@echo "  make stop-all      - Stop and remove ALL Docker containers"
 	@echo "  make remove        - Stop services and remove containers/volumes"
-	@echo "  make clean         - Remove stopped containers, volumes, and unused images"
+	@echo "  make clean-local   - Remove locally built images only (keep base images)"
 	@echo "  make clean-all     - Remove all containers, images, volumes, and build cache"
 	@echo "  make reclaim      - Reclaim disk space (prune unused images, volumes, build cache)"
 	@echo "  make release       - Create release: update version, commit, and tag (e.g., v2026.3.4)"
@@ -46,7 +46,7 @@ build: check-deps
 build-no-cache: check-deps
 	./scripts/build-images.sh --no-cache
 
-run-build-no-cache: stop clean build-no-cache
+run-build-no-cache: stop clean-local build-no-cache
 	docker compose -f docker-compose.yml up -d
 
 check:
@@ -86,11 +86,11 @@ stop-all:
 remove: stop
 	docker compose -f docker-compose.yml down -v --remove-orphans
 
-clean:
+clean-local:
 	docker compose -f docker-compose.yml down -v --remove-orphans || true
 	docker container prune -f
 	docker builder prune -f
-	docker image prune -a -f
+	docker images | grep -E "^entitybase-|^kafka2sse-" | awk '{print $$3}' | xargs -r docker rmi -f || true
 
 clean-all: stop
 	docker compose -f docker-compose.yml down -v --remove-orphans || true
@@ -117,13 +117,14 @@ tmpfs-setup:
 
 run: run-core
 
-run-core: check-deps check-diskspace stop clean build
+run-core: check-deps check-diskspace stop clean-local build
 	docker compose -f docker-compose.yml --profile core up -d
 
-run-workers: check-deps check-diskspace stop clean build
+run-workers: check-deps check-diskspace stop clean-local build
 	docker compose -f docker-compose.yml --profile workers up -d
 
-run-core-purge: run-core
+run-core-purge: check-deps check-diskspace stop clean-local build
+	docker compose -f docker-compose.yml --profile core up -d
 	docker compose up -d purge-worker
 
 reset:
@@ -138,13 +139,13 @@ settings:
 elastic:
 	docker compose -f docker-compose.yml --profile elastic up -d
 
-run-with-elastic: stop clean build check-diskspace
+run-with-elastic: stop clean-local build check-diskspace
 	docker compose -f docker-compose.yml --profile elastic up -d
 
 run-clean-all-with-elastic: clean-all build check-diskspace
 	docker compose -f docker-compose.yml --profile elastic up -d
 
-test-integration: stop clean build
+test-integration: stop clean-local build
 	docker compose -f docker-compose.yml --profile test up -d
 	@echo "Waiting for tests to complete..."
 	@docker compose wait test-runner || EXIT_CODE=$$?; \
