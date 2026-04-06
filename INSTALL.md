@@ -4,15 +4,30 @@
 
 | Tool | Version | Description |
 |------|---------|-------------|
+| [pyenv](https://github.com/pyenv/pyenv) | latest | Python version manager |
 | [pipx](https://pipx.pypa.io/) | latest | Python package manager (isolate tools) |
 | Docker | latest | Container runtime |
 | Docker Compose | latest | Container orchestration |
-| Python | 3.13+ | Required for build scripts |
+
+### Install Python via pyenv
+
+```bash
+# Install pyenv (see https://github.com/pyenv/pyenv#installation)
+
+# Install Python 3.13
+pyenv install 3.13.0
+
+# Set global version
+pyenv global 3.13.0
+
+# Verify
+python --version
+```
 
 ### Install pipx
 
 ```bash
-# Using pip
+# Using pip (via pyenv Python)
 pip install pipx
 
 # Using brew (macOS)
@@ -24,7 +39,7 @@ pipx ensurepath
 
 ## Poetry 2.0+ Setup
 
-Poetry 2.0+ moved the `export` command to a separate plugin. Use pipx to keep Poetry isolated from your system Python:
+Poetry 2.0+ moved the `export` command to a separate plugin. Use pipx to keep Poetry isolated:
 
 ```bash
 # Install Poetry via pipx
