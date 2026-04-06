@@ -45,7 +45,7 @@ build: check-deps
 build-no-cache: check-deps
 	./scripts/build-images.sh --no-cache
 
-run-build-no-cache: stop clean-local build-no-cache
+run-build-no-cache: clean-local build-no-cache
 	docker compose -f docker-compose.yml up -d
 
 check:
@@ -82,15 +82,13 @@ stop:
 remove: stop
 	docker compose -f docker-compose.yml down -v --remove-orphans
 
-clean-local:
+clean-local: stop
 	docker compose -f docker-compose.yml down -v --remove-orphans || true
 	docker container prune -f
 	docker builder prune -f
 	docker images | grep -E "^entitybase-|^kafka2sse-" | awk '{print $$3}' | xargs -r docker rmi -f || true
 
-clean-all: stop
-	docker compose -f docker-compose.yml down -v --remove-orphans || true
-	docker container prune -f
+clean-all: clean-local
 	docker image prune -a -f
 	docker builder prune -f
 	docker volume prune -f
@@ -113,13 +111,13 @@ tmpfs-setup:
 
 run: run-core
 
-run-core: check-deps check-diskspace stop clean-local build
+run-core: check-deps check-diskspace clean-local build
 	docker compose -f docker-compose.yml --profile core up -d
 
-run-workers: check-deps check-diskspace stop clean-local build
+run-workers: check-deps check-diskspace clean-local build
 	docker compose -f docker-compose.yml --profile workers up -d
 
-run-core-purge: check-deps check-diskspace stop clean-local build
+run-core-purge: check-deps check-diskspace clean-local build
 	docker compose -f docker-compose.yml --profile core up -d
 	docker compose up -d purge-worker
 
@@ -135,13 +133,13 @@ settings:
 elastic:
 	docker compose -f docker-compose.yml --profile elastic up -d
 
-run-with-elastic: stop clean-local build check-diskspace
+run-with-elastic: clean-local build check-diskspace
 	docker compose -f docker-compose.yml --profile elastic up -d
 
 run-clean-all-with-elastic: clean-all build check-diskspace
 	docker compose -f docker-compose.yml --profile elastic up -d
 
-test-integration: stop clean-local build
+test-integration: clean-local build
 	docker compose -f docker-compose.yml --profile test up -d
 	@echo "Waiting for tests to complete..."
 	@docker compose wait test-runner || EXIT_CODE=$$?; \
