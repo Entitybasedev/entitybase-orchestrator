@@ -51,15 +51,15 @@ docker build $NO_CACHE $CACHE_ARGS -t entitybase-backend-ttl-worker:latest -f li
 
 echo ""
 echo "[6/12] Building entitybase-backend-create-buckets:latest..."
-docker build $NO_CACHE $CACHE_ARGS -t entitybase-backend-create-buckets:latest -f libs/entitybase-backend/docker/containers/Dockerfile.api libs/entitybase-backend/
+docker build $NO_CACHE $CACHE_ARGS -t entitybase-backend-create-buckets:latest -f libs/entitybase-backend/docker/containers/Dockerfile.dev-worker libs/entitybase-backend/
 
 echo ""
 echo "[7/12] Building entitybase-backend-create-tables:latest..."
-docker build $NO_CACHE $CACHE_ARGS -t entitybase-backend-create-tables:latest -f libs/entitybase-backend/docker/containers/Dockerfile.api libs/entitybase-backend/
+docker build $NO_CACHE $CACHE_ARGS -t entitybase-backend-create-tables:latest -f libs/entitybase-backend/docker/containers/Dockerfile.dev-worker libs/entitybase-backend/
 
 echo ""
 echo "[8/12] Building entitybase-backend-create-topics:latest..."
-docker build $NO_CACHE $CACHE_ARGS -t entitybase-backend-create-topics:latest -f libs/entitybase-backend/docker/containers/Dockerfile.api libs/entitybase-backend/
+docker build $NO_CACHE $CACHE_ARGS -t entitybase-backend-create-topics:latest -f libs/entitybase-backend/docker/containers/Dockerfile.dev-worker libs/entitybase-backend/
 
 echo ""
 echo "[9/12] Building entitybase-backend-elasticsearch-worker:latest..."
