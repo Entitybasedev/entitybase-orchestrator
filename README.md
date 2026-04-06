@@ -107,16 +107,6 @@ docker compose stop
 docker compose --profile workers up -d
 ```
 
-## Docker Images
-
-The following custom images must be built before running:
-
-- `entitybase-backend:latest` - from `entitybase-backend/docker/containers/Dockerfile.api`
-- `entitybase-sse-backend:latest` - from `entitybase-sse/Dockerfile`
-- `entitybase-sse-frontend:latest` - from `entitybase-sse/frontend/Dockerfile`
-
-Run `make build` to build all images.
-
 ## License
 
 This project is licensed under the [GNU General Public License v3.0 or later](LICENSE).
