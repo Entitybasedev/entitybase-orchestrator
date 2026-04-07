@@ -672,8 +672,6 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
-    profiles:
-      - core
     command: ["python", "-m", "models.workers.purge.purge_worker"]
     mem_limit: 512m
     cpus: 0.25
