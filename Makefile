@@ -1,4 +1,4 @@
-.PHONY: help clone build build-no-cache check check-deps check-diskspace clean-all clean-cache-volumes clean-local elastic reclaim release remove pull run run-build-no-cache run-clean-all-with-elastic run-core run-core-purge run-with-elastic run-workers settings show-images stop tmpfs-setup
+.PHONY: help clone build build-no-cache check check-deps check-diskspace clean-all clean-all-except-base-images clean-cache-volumes clean-local-images elastic reclaim release remove pull run run-build-no-cache run-clean-all-with-elastic run-core run-core-purge run-with-elastic run-workers settings show-images stop tmpfs-setup
 
 help:
 	@echo "Available targets:"
@@ -8,8 +8,9 @@ help:
 	@echo "  make check-deps              - Check required dependencies (poetry, docker, python)"
 	@echo "  make check-diskspace         - Check available disk space (requires 2GB minimum)"
 	@echo "  make clean-all               - Remove all containers, images, volumes, and build cache"
+	@echo "  make clean-all-except-base-images - Remove containers and non-base images, keep base images"
 	@echo "  make clean-cache-volumes    - Stop services, remove containers, volumes, and build cache"
-	@echo "  make clean-local             - Remove locally built images only (keep base images)"
+	@echo "  make clean-local-images     - Remove locally built images only (keep base images)"
 	@echo "  make clone                   - Clone required repositories"
 	@echo "  make elastic                 - Start Elasticsearch and elasticsearch-indexer worker"
 	@echo "  make pull                    - Pull latest changes in orchestrator and backend"
@@ -51,7 +52,7 @@ build: check-deps
 build-no-cache: check-deps
 	./scripts/build-images.sh --no-cache
 
-run-build-no-cache: clean-local build-no-cache
+run-build-no-cache: clean-local-images build-no-cache
 	docker compose -f docker-compose.yml up -d
 
 check:
@@ -89,12 +90,16 @@ remove: stop
 	docker network rm $$(docker network ls -q) || true
 	docker compose -f docker-compose.yml down -v --remove-orphans
 
-clean-local: remove
+clean-local-images: remove
 	docker container prune -f
 	docker builder prune -f
 	docker images | grep -E "^entitybase-|^kafka2sse-" | awk '{print $$3}' | xargs -r docker rmi -f || true
 
-clean-all: clean-local
+clean-all-except-base-images: clean-local-images
+	docker image prune -a -f
+	@echo "All unused images removed (except base images)"
+
+clean-all: clean-local-images
 	docker image prune -a -f
 	docker builder prune -f
 	docker volume prune -f
@@ -121,13 +126,13 @@ tmpfs-setup:
 
 run: run-core
 
-run-core: check-deps check-diskspace clean-local build
+run-core: check-deps check-diskspace clean-local-images build
 	docker compose -f docker-compose.yml --profile core up -d
 
-run-workers: check-deps check-diskspace clean-local build
+run-workers: check-deps check-diskspace clean-local-images build
 	docker compose -f docker-compose.yml --profile workers up -d
 
-run-core-purge: check-deps check-diskspace clean-local build
+run-core-purge: check-deps check-diskspace clean-local-images build
 	docker compose -f docker-compose.yml --profile core up -d
 	docker compose up -d purge-worker
 
@@ -143,7 +148,7 @@ settings:
 elastic:
 	docker compose -f docker-compose.yml --profile elastic up -d
 
-run-with-elastic: clean-local build check-diskspace
+run-with-elastic: clean-local-images build check-diskspace
 	docker compose -f docker-compose.yml --profile elastic up -d
 
 run-clean-all-with-elastic: clean-all build check-diskspace
