@@ -36,7 +36,6 @@ services:
     profiles:
       - core
       - elastic
-      
       - workers
 
   mysql-health:
@@ -57,7 +56,6 @@ services:
     profiles:
       - core
       - elastic
-      
       - workers
 
   minio:
@@ -85,7 +83,6 @@ services:
     profiles:
       - core
       - elastic
-      
       - workers
 
   valkey:
@@ -196,7 +193,7 @@ services:
     command: python -m models.workers.dev buckets setup
     profiles:
       - core
-      
+      - workers
       - elastic
     mem_limit: 512m
     cpus: 0.5
@@ -218,7 +215,7 @@ services:
       VITESS_PASSWORD: "${MYSQL_ROOT_PASSWORD:-}"
     profiles:
       - core
-      
+      - workers
       - elastic
       - workers
     mem_limit: 512m
@@ -241,7 +238,7 @@ services:
       KAFKA_THANKS_TOPIC: thanks
     profiles:
       - core
-      
+      - workers      
       - elastic
     mem_limit: 512m
     cpus: 0.5
