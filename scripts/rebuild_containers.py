@@ -73,6 +73,17 @@ def pull_backend():
         print("Warning: libs/entitybase-backend not found, skipping backend pull")
 
 
+def export_requirements():
+    """Export Poetry dependencies to requirements files for Docker builds."""
+    print("\n=== Exporting requirements from pyproject.toml ===")
+    backend_path = Path("libs/entitybase-backend")
+    export_script = backend_path / "scripts" / "shell" / "export-requirements.sh"
+    if export_script.exists():
+        run_command(["bash", "scripts/shell/export-requirements.sh"], cwd=backend_path)
+    else:
+        print(f"Warning: {export_script} not found, skipping requirements export")
+
+
 def build_image(image: str, dockerfile: str, context: str):
     """Build a Docker image."""
     print(f"\n=== Building {image} ===")
@@ -124,6 +135,8 @@ def main():
             sys.exit(1)
 
     pull_backend()
+
+    export_requirements()
 
     for container in containers:
         config = CONTAINER_MAP[container]
