@@ -1,4 +1,4 @@
-.PHONY: help clone build build-no-cache check check-deps check-diskspace clean-all clean-local elastic reclaim release remove pull run run-build-no-cache run-clean-all-with-elastic run-core run-core-purge run-with-elastic run-workers settings show-images stop tmpfs-setup
+.PHONY: help clone build build-no-cache check check-deps check-diskspace clean-all clean-cache-volumes clean-local elastic reclaim release remove pull run run-build-no-cache run-clean-all-with-elastic run-core run-core-purge run-with-elastic run-workers settings show-images stop tmpfs-setup
 
 help:
 	@echo "Available targets:"
@@ -8,6 +8,7 @@ help:
 	@echo "  make check-deps              - Check required dependencies (poetry, docker, python)"
 	@echo "  make check-diskspace         - Check available disk space (requires 2GB minimum)"
 	@echo "  make clean-all               - Remove all containers, images, volumes, and build cache"
+	@echo "  make clean-cache-volumes    - Stop services, remove containers, volumes, and build cache"
 	@echo "  make clean-local             - Remove locally built images only (keep base images)"
 	@echo "  make clone                   - Clone required repositories"
 	@echo "  make elastic                 - Start Elasticsearch and elasticsearch-indexer worker"
@@ -97,6 +98,10 @@ clean-all: clean-local
 	docker image prune -a -f
 	docker builder prune -f
 	docker volume prune -f
+
+clean-cache-volumes: remove
+	docker builder prune -f
+	@echo "Build cache cleared"
 
 reclaim:
 	docker image prune -a -f
