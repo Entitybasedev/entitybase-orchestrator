@@ -77,14 +77,13 @@ check-diskspace:
 
 stop:
 	docker stop $$(docker ps -q) || true
-	docker rm $$(docker ps -aq) || true
-	docker network rm $$(docker network ls -q) || true
 
 remove: stop
+	docker rm $$(docker ps -aq) || true
+	docker network rm $$(docker network ls -q) || true
 	docker compose -f docker-compose.yml down -v --remove-orphans
 
-clean-local: stop
-	docker compose -f docker-compose.yml down -v --remove-orphans || true
+clean-local: remove
 	docker container prune -f
 	docker builder prune -f
 	docker images | grep -E "^entitybase-|^kafka2sse-" | awk '{print $$3}' | xargs -r docker rmi -f || true
