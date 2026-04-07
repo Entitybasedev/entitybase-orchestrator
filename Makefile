@@ -38,6 +38,8 @@ clone:
 pull:
 	git pull
 	cd libs/entitybase-backend && git pull
+	cd libs/kafka2sse-backend && git pull
+	cd libs/kafka2sse-frontend && git pull
 
 check-deps:
 	@echo "Checking dependencies..."
