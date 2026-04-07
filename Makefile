@@ -97,7 +97,8 @@ clean-local-images: remove
 
 clean-all-except-base-images: clean-local-images
 	docker volume prune -f
-	@echo "Volumes removed (images and build cache already cleaned by clean-local-images)"
+	docker builder prune -f
+	@echo "Volumes and build cache removed (images already cleaned by clean-local-images)"
 
 clean-all: clean-local-images
 	docker image prune -a -f
