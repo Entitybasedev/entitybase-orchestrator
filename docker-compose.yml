@@ -330,13 +330,18 @@ services:
 
   kafka2sse-backend:
     container_name: kafka2sse-backend
-    image: kafka2sse-backend:latest
+    build:
+      context: ./libs/kafka2sse-backend
+      dockerfile: Dockerfile
+      args:
+        - VERSION=${VERSION_KAFKA2SSE_BACKEND}
     ports:
       - "8888:8888"
     environment:
-      KAFKA_BROKERS: redpanda:9092
-      VALKEY_HOST: valkey
-      LOG_LEVEL: debug
+      - KAFKA_BROKERS=redpanda:9092
+      - VALKEY_HOST=valkey
+      - LOG_LEVEL=debug
+      - VERSION=${VERSION_KAFKA2SSE_BACKEND}
     depends_on:
       redpanda:
         condition: service_healthy
@@ -363,6 +368,7 @@ services:
       dockerfile: Dockerfile
       args:
         - KAFKA2SSE_BACKEND_URL=${KAFKA2SSE_BACKEND_URL}
+        - VITE_APP_VERSION=${VERSION_KAFKA2SSE_FRONTEND}
     ports:
       - "8889:8889"
     environment:
@@ -390,6 +396,9 @@ services:
     container_name: entitybase-orchestrator-frontend
     build:
       context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_APP_VERSION=${VERSION_ENTITYBASE_BACKEND}
     ports:
       - "8080:8083"
     profiles:

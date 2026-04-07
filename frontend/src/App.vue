@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 
 const HOST = import.meta.env.VITE_HOST || 'localhost'
+const version = ref(import.meta.env.VITE_APP_VERSION || 'dev')
 
 const infrastructure = [
   { name: 'MinIO', url: `http://${HOST}:9001`, description: 'S3 storage + console', healthPath: '/minio/health/live', linkUrl: `http://${HOST}:9001` },
@@ -131,6 +132,7 @@ onMounted(async () => {
     <footer class="legend">
       <span class="legend-item"><span class="dot healthy"></span> Healthy</span>
       <span class="legend-item"><span class="dot unhealthy"></span> Unhealthy</span>
+      <span class="version">v{{ version }}</span>
     </footer>
   </div>
 </template>
