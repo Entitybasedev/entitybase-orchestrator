@@ -9,17 +9,17 @@ from pathlib import Path
 CONTAINER_MAP = {
     "create-tables": {
         "image": "entitybase-backend-create-tables:latest",
-        "dockerfile": "libs/entitybase-backend/docker/containers/Dockerfile.dev-worker",
+        "dockerfile": "libs/entitybase-backend/docker/containers/Dockerfile.create-tables",
         "context": "libs/entitybase-backend/",
     },
     "create-buckets": {
         "image": "entitybase-backend-create-buckets:latest",
-        "dockerfile": "libs/entitybase-backend/docker/containers/Dockerfile.dev-worker",
+        "dockerfile": "libs/entitybase-backend/docker/containers/Dockerfile.create-buckets",
         "context": "libs/entitybase-backend/",
     },
     "create-topics": {
         "image": "entitybase-backend-create-topics:latest",
-        "dockerfile": "libs/entitybase-backend/docker/containers/Dockerfile.dev-worker",
+        "dockerfile": "libs/entitybase-backend/docker/containers/Dockerfile.create-topics",
         "context": "libs/entitybase-backend/",
     },
     "idworker": {
