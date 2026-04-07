@@ -1,4 +1,4 @@
-.PHONY: help clone build build-no-cache check check-deps check-diskspace clean-all clean-local elastic reclaim release remove run run-build-no-cache run-clean-all-with-elastic run-core run-core-purge run-with-elastic run-workers settings show-images stop tmpfs-setup
+.PHONY: help clone build build-no-cache check check-deps check-diskspace clean-all clean-local elastic reclaim release remove pull run run-build-no-cache run-clean-all-with-elastic run-core run-core-purge run-with-elastic run-workers settings show-images stop tmpfs-setup
 
 help:
 	@echo "Available targets:"
@@ -11,6 +11,7 @@ help:
 	@echo "  make clean-local             - Remove locally built images only (keep base images)"
 	@echo "  make clone                   - Clone required repositories"
 	@echo "  make elastic                 - Start Elasticsearch and elasticsearch-indexer worker"
+	@echo "  make pull                    - Pull latest changes in orchestrator and backend"
 	@echo "  make reclaim                 - Reclaim disk space (prune unused images, volumes, build cache)"
 	@echo "  make release                 - Create release: update version, commit, and tag (e.g., v2026.3.4)"
 	@echo "  make remove                  - Stop services and remove containers/volumes"
@@ -31,6 +32,10 @@ release:
 
 clone:
 	./scripts/clone-repos.sh
+
+pull:
+	git pull
+	cd libs/entitybase-backend && git pull
 
 check-deps:
 	@echo "Checking dependencies..."
