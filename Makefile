@@ -24,7 +24,6 @@ help:
 	@echo "  make settings                - Query the /settings endpoint on localhost:8083"
 	@echo "  make show-images             - Show all entitybase Docker images"
 	@echo "  make stop                    - Stop all running containers"
-	@echo "  make test-integration        - Run integration tests in container (requires docker)"
 	@echo "  make tmpfs-setup             - Setup tmpfs for buildkit cache (requires sudo)"
 
 release:
@@ -140,15 +139,3 @@ run-with-elastic: clean-local build check-diskspace
 
 run-clean-all-with-elastic: clean-all build check-diskspace
 	docker compose -f docker-compose.yml --profile elastic up -d
-
-test-integration: clean-local build
-	docker compose -f docker-compose.yml --profile test up -d
-	@echo "Waiting for tests to complete..."
-	@docker compose wait test-runner || EXIT_CODE=$$?; \
-	if [ "$$EXIT_CODE" != "0" ]; then \
-		echo "Tests failed! Exit code: $$EXIT_CODE"; \
-		docker compose logs test-runner; \
-		exit 1; \
-	fi
-	@echo ""
-	@echo "Tests passed. Run 'make stop' to stop services."
