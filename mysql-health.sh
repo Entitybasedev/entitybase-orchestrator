@@ -5,11 +5,14 @@ python3 -c "
 import http.server
 import socketserver
 import pymysql
+import os
+
+password = os.getenv('MYSQL_ROOT_PASSWORD', '')
 
 class Handler(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
         try:
-            conn = pymysql.connect(host='mysql', user='root', connect_timeout=2)
+            conn = pymysql.connect(host='mysql', user='root', password=password, connect_timeout=2)
             conn.close()
             status = 200
             msg = b'healthy'
