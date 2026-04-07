@@ -331,11 +331,7 @@ services:
 
   kafka2sse-backend:
     container_name: kafka2sse-backend
-    build:
-      context: ./libs/kafka2sse-backend
-      dockerfile: Dockerfile
-      args:
-        - VERSION=${VERSION_KAFKA2SSE_BACKEND}
+    image: kafka2sse-backend:latest
     ports:
       - "8888:8888"
     environment:
@@ -364,12 +360,7 @@ services:
 
   kafka2sse-frontend:
     container_name: kafka2sse-frontend
-    build:
-      context: ./libs/kafka2sse-frontend
-      dockerfile: Dockerfile
-      args:
-        - KAFKA2SSE_BACKEND_URL=${KAFKA2SSE_BACKEND_URL}
-        - VITE_APP_VERSION=${VERSION_KAFKA2SSE_FRONTEND}
+    image: kafka2sse-frontend:latest
     ports:
       - "8889:8889"
     environment:
@@ -395,11 +386,7 @@ services:
 
   entitybase-orchestrator-frontend:
     container_name: entitybase-orchestrator-frontend
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-      args:
-        - VITE_APP_VERSION=${VERSION_ENTITYBASE_BACKEND}
+    image: entitybase-orchestrator-frontend:latest
     ports:
       - "8080:8083"
     profiles:
