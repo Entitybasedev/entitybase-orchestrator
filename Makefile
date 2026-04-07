@@ -96,8 +96,8 @@ clean-local-images: remove
 	docker images | grep -E "^entitybase-|^kafka2sse-" | awk '{print $$3}' | xargs -r docker rmi -f || true
 
 clean-all-except-base-images: clean-local-images
-	docker image prune -a -f
-	@echo "All unused images removed (except base images)"
+	docker volume prune -f
+	@echo "Volumes removed (images and build cache already cleaned by clean-local-images)"
 
 clean-all: clean-local-images
 	docker image prune -a -f
