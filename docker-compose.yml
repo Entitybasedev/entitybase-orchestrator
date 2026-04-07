@@ -23,8 +23,6 @@ services:
       MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD:-}"
       MYSQL_DATABASE: entitybase
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
-    ports:
-      - "3306:3306"
     healthcheck:
       test: ["CMD", "mysql", "-uroot", "-e", "SELECT 1"]
       interval: 10s
