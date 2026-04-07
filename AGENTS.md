@@ -136,9 +136,9 @@ Each sub-project in `libs/` has its own AGENTS.md:
 
 ## Environment Variables
 
-Copy `.env.example` to `.env` before running:
+Copy `env.example` to `.env` before running:
 ```bash
-cp .env.example .env
+cp env.example .env
 ```
 
 Key variables:
