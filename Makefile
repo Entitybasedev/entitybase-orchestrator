@@ -79,6 +79,7 @@ check-diskspace:
 stop:
 	docker stop $$(docker ps -q) || true
 	docker rm $$(docker ps -aq) || true
+	docker network rm $$(docker network ls -q) || true
 
 remove: stop
 	docker compose -f docker-compose.yml down -v --remove-orphans
