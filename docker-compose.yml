@@ -20,11 +20,11 @@ services:
     image: mysql:8.0
     container_name: mysql
     environment:
-      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD:-}"
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
       MYSQL_DATABASE: entitybase
-      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_ALLOW_EMPTY_PASSWORD: "no"
     healthcheck:
-      test: ["CMD", "mysql", "-uroot", "-e", "SELECT 1"]
+      test: ["CMD", "mysql", "-uroot", "-p${MYSQL_ROOT_PASSWORD}", "-e", "SELECT 1"]
       interval: 10s
       timeout: 5s
       retries: 30
