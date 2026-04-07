@@ -362,11 +362,11 @@ services:
       context: ./libs/kafka2sse-frontend
       dockerfile: Dockerfile
       args:
-        - VITE_BACKEND_URL=http://localhost:8888
+        - KAFKA2SSE_BACKEND_URL=${KAFKA2SSE_BACKEND_URL}
     ports:
       - "8889:8889"
     environment:
-      - VITE_BACKEND_URL=http://localhost:8888
+      - KAFKA2SSE_BACKEND_URL=${KAFKA2SSE_BACKEND_URL}
     depends_on:
       redpanda:
         condition: service_healthy
