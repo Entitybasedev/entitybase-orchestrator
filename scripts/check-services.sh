@@ -93,3 +93,8 @@ echo "=== Elasticsearch ==="
 check_running_service "elasticsearch" || overall_status=1
 check_running_service "elasticsearch-health" || overall_status=1
 check_running_service "elasticsearch-indexer-worker" || overall_status=1
+
+echo ""
+echo "=== Meilisearch ==="
+check_running_service "meilisearch" || overall_status=1
+check_running_service "meilisearch-health" || overall_status=1
