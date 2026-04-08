@@ -38,7 +38,7 @@ services:
       - workers
 
   mysql-health:
-    image: alpine:latest
+    image: python:3.13-alpine
     container_name: mysql-health
     volumes:
       - ./scripts/health/mysql-health.sh:/mysql-health.sh:ro
@@ -98,6 +98,23 @@ services:
       - core
       
 
+  valkey-health:
+    image: python:3.13-alpine
+    container_name: valkey-health
+    volumes:
+      - ./scripts/health/valkey-health.sh:/valkey-health.sh:ro
+    command: ["/bin/sh", "/valkey-health.sh"]
+    ports:
+      - "6378:8080"
+    depends_on:
+      valkey:
+        condition: service_healthy
+    networks:
+      - entitybase-network
+    profiles:
+      - core
+      - workers
+
   redpanda:
     image: docker.redpanda.com/redpandadata/redpanda:v25.3.6
     container_name: redpanda
@@ -151,7 +168,7 @@ services:
       - workers
 
   redpanda-health:
-    image: alpine:latest
+    image: python:3.13-alpine
     container_name: redpanda-health
     volumes:
       - ./scripts/health/redpanda-health.sh:/redpanda-health.sh:ro
@@ -195,7 +212,7 @@ services:
       - elastic
 
   elasticsearch-health:
-    image: alpine:latest
+    image: python:3.13-alpine
     container_name: elasticsearch-health
     volumes:
       - ./scripts/health/elasticsearch-health.sh:/elasticsearch-health.sh:ro
@@ -238,7 +255,7 @@ services:
       - meilisearch
 
   meilisearch-health:
-    image: alpine:latest
+    image: python:3.13-alpine
     container_name: meilisearch-health
     volumes:
       - ./scripts/health/meilisearch-health.sh:/meilisearch-health.sh:ro

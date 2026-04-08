@@ -1,5 +1,5 @@
 #!/bin/sh
-apk add --no-cache mysql-client python3 py3-pymysql > /dev/null 2>&1
+pip install pymysql > /dev/null 2>&1
 
 python3 -c "
 import http.server

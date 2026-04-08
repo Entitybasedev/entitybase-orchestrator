@@ -1,5 +1,5 @@
 #!/bin/sh
-apk add --no-cache docker-cli python3 > /dev/null 2>&1
+apk add --no-cache docker-cli > /dev/null 2>&1
 
 python3 -c "
 import http.server

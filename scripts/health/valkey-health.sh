@@ -1,25 +1,24 @@
 #!/bin/sh
+apk add --no-cache busybox-extras > /dev/null 2>&1
 
 python3 -c "
 import http.server
 import socketserver
-import urllib.request
-import os
-
-host = os.getenv('MEILISEARCH_HOST', 'meilisearch')
-port = os.getenv('MEILISEARCH_PORT', '7700')
+import subprocess
 
 class Handler(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
         try:
-            req = urllib.request.Request(f'http://{host}:{port}/health', method='GET')
-            with urllib.request.urlopen(req, timeout=2) as response:
-                if response.status == 200:
-                    status = 200
-                    msg = b'healthy'
-                else:
-                    status = 503
-                    msg = b'unhealthy'
+            result = subprocess.run(
+                ['nc', '-z', 'valkey', '6379'],
+                capture_output=True, timeout=5
+            )
+            if result.returncode == 0:
+                status = 200
+                msg = b'healthy'
+            else:
+                status = 503
+                msg = b'unhealthy'
         except Exception as e:
             status = 503
             msg = b'unhealthy'
