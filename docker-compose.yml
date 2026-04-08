@@ -44,8 +44,8 @@ services:
     volumes:
       - ./mysql-health.sh:/mysql-health.sh:ro
     command: ["/bin/sh", "/mysql-health.sh"]
-    # ports:
-    #   - "3307:8080"
+    ports:
+      - "3307:8080"
     environment:
       MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD:-}"
     depends_on:
@@ -62,9 +62,9 @@ services:
     image: minio/minio:latest
     container_name: minio
     command: server /data --console-address ":9001"
-    # ports:
-    #   - "9000:9000"
-    #   - "9001:9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
     environment:
       - MINIO_ROOT_USER=${MINIO_ROOT_USER:-fakekey}
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:-fakesecret}
@@ -248,8 +248,8 @@ services:
   idworker:
     container_name: idworker
     image: entitybase-backend-idworker:latest
-    # ports:
-    #   - "8001:8001"
+    ports:
+      - "8001:8001"
     environment:
       WORKER_ID: id_worker_1
       WORKER_COUNT: 1
@@ -421,8 +421,8 @@ services:
   json-dump-worker:
     container_name: json-dump-worker
     image: entitybase-backend-json-worker:latest
-    # ports:
-    #   - "8002:8002"
+    ports:
+      - "8002:8002"
     environment:
       WORKER_ID: json_dump_worker_1
       VITESS_HOST: mysql
@@ -460,8 +460,8 @@ services:
   ttl-dump-worker:
     container_name: ttl-dump-worker
     image: entitybase-backend-ttl-worker:latest
-    # ports:
-    #   - "8003:8003"
+    ports:
+      - "8003:8003"
     environment:
       WORKER_ID: ttl_dump_worker_1
       VITESS_HOST: mysql
@@ -499,8 +499,8 @@ services:
   backlink-stats-worker:
     container_name: backlink-stats-worker
     image: entitybase-backend-stats-worker:latest
-    # ports:
-    #   - "8004:8004"
+    ports:
+      - "8004:8004"
     environment:
       WORKER_ID: backlink_stats_worker_1
       VITESS_HOST: mysql
@@ -531,8 +531,8 @@ services:
   general-stats-worker:
     container_name: general-stats-worker
     image: entitybase-backend-stats-worker:latest
-    # ports:
-    #   - "8005:8005"
+    ports:
+      - "8005:8005"
     environment:
       WORKER_ID: general_stats_worker_1
       VITESS_HOST: mysql
@@ -562,8 +562,8 @@ services:
   user-stats-worker:
     container_name: user-stats-worker
     image: entitybase-backend-stats-worker:latest
-    # ports:
-    #   - "8006:8006"
+    ports:
+      - "8006:8006"
     environment:
       WORKER_ID: user_stats_worker_1
       VITESS_HOST: mysql
@@ -593,8 +593,8 @@ services:
   elasticsearch-indexer-worker:
     container_name: elasticsearch-indexer-worker
     image: entitybase-backend-elasticsearch-worker:latest
-    # ports:
-    #   - "8007:8007"
+    ports:
+      - "8007:8007"
     environment:
       WORKER_ID: elasticsearch_indexer_worker_1
       VITESS_HOST: mysql
@@ -640,8 +640,8 @@ services:
   purge-worker:
     container_name: purge-worker
     image: entitybase-backend-purge-worker:latest
-    # ports:
-    #   - "8008:8008"
+    ports:
+      - "8008:8008"
     environment:
       WORKER_ID: purge_worker_1
       VITESS_HOST: mysql
