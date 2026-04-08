@@ -35,7 +35,6 @@ services:
       - entitybase-network
     profiles:
       - core
-      - elastic
       - workers
 
   mysql-health:
@@ -55,7 +54,6 @@ services:
       - entitybase-network
     profiles:
       - core
-      - elastic
       - workers
 
   minio:
@@ -82,7 +80,6 @@ services:
       - entitybase-network
     profiles:
       - core
-      - elastic
       - workers
 
   valkey:
@@ -99,7 +96,6 @@ services:
       - entitybase-network
     profiles:
       - core
-      - elastic
       
 
   redpanda:
@@ -132,8 +128,6 @@ services:
       - redpanda-data:/var/lib/redpanda/data
     profiles:
       - core
-      - elastic
-      
       - workers
 
   redpanda-console:
@@ -149,55 +143,51 @@ services:
       - entitybase-network
     profiles:
       - core
-      - elastic
       
 
   # Setup jobs (run once, then exit)
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.17.4
-    container_name: elasticsearch
+  # Setup jobs (run once, then exit)
+  meilisearch:
+    image: getmeili/meilisearch:latest
+    container_name: meilisearch
     environment:
-      - discovery.type=single-node
-      - xpack.security.enabled=false
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      MEILI_ENV: development
+      MEILI_MASTER_KEY: "${MEILISEARCH_MASTER_KEY:-}"
     ports:
-      - "9200:9200"
-      - "9300:9300"
+      - "7700:7700"
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      test: ["CMD-SHELL", "curl -sf http://localhost:7700/health || exit 1"]
       interval: 10s
       timeout: 5s
-      retries: 10
-      start_period: 30s
-    mem_limit: 1g
-    cpus: 1.0
+      retries: 5
+      start_period: 10s
+    mem_limit: 256m
+    cpus: 0.25
     networks:
       - entitybase-network
     volumes:
-      - elasticsearch-data:/usr/share/elasticsearch/data
+      - meilisearch-data:/meili_data
     profiles:
-      - elastic
-      
-      - workers
+      - meilisearch
 
-  elasticsearch-health:
+  meilisearch-health:
     image: alpine:latest
-    container_name: elasticsearch-health
+    container_name: meilisearch-health
     volumes:
-      - ./scripts/health/elasticsearch-health.sh:/elasticsearch-health.sh:ro
-    command: ["/bin/sh", "/elasticsearch-health.sh"]
+      - ./scripts/health/meilisearch-health.sh:/meilisearch-health.sh:ro
+    command: ["/bin/sh", "/meilisearch-health.sh"]
     ports:
-      - "9201:8080"
+      - "7701:8080"
     environment:
-      ELASTICSEARCH_HOST: elasticsearch
-      ELASTICSEARCH_PORT: 9200
+      MEILISEARCH_HOST: meilisearch
+      MEILISEARCH_PORT: 7700
     depends_on:
-      elasticsearch:
+      meilisearch:
         condition: service_healthy
     networks:
       - entitybase-network
     profiles:
-      - elastic
+      - meilisearch
 
   create-buckets:
     container_name: create-buckets
@@ -213,7 +203,6 @@ services:
     profiles:
       - core
       - workers
-      - elastic
     mem_limit: 512m
     cpus: 0.5
     networks:
@@ -235,8 +224,6 @@ services:
     profiles:
       - core
       - workers
-      - elastic
-      - workers
     mem_limit: 512m
     cpus: 0.5
     networks:
@@ -257,12 +244,12 @@ services:
       KAFKA_THANKS_TOPIC: thanks
     profiles:
       - core
-      - workers      
-      - elastic
+      - workers
     mem_limit: 512m
     cpus: 0.5
     networks:
       - entitybase-network
+
 
   idworker:
     container_name: idworker
@@ -290,13 +277,12 @@ services:
       start_period: 30s
     profiles:
       - core
-      - elastic
-      
       - workers
     mem_limit: 512m
     cpus: 0.5
     networks:
       - entitybase-network
+
 
   entitybase-api:
     container_name: entitybase-api
@@ -340,8 +326,6 @@ services:
     #   start_period: 30s
     profiles:
       - core
-      - elastic
-      
       - workers
     mem_limit: 1g
     cpus: 1.0
@@ -372,6 +356,7 @@ services:
       start_period: 30s
     profiles:
       - core
+      - workers
     mem_limit: 512m
     cpus: 0.5
     networks:
@@ -395,8 +380,6 @@ services:
       start_period: 30s
     profiles:
       - core
-      - elastic
-      
       - workers
     mem_limit: 512m
     cpus: 0.5
@@ -700,4 +683,4 @@ networks:
 volumes:
   redpanda-data:
   minio-data:
-  elasticsearch-data:
+  meilisearch-data:
