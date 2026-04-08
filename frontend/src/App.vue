@@ -23,6 +23,7 @@ const workers = [
   { name: 'Backlink Stats Worker', url: `http://${HOST}:8004`, healthPath: '/health' },
   { name: 'General Stats Worker', url: `http://${HOST}:8005`, healthPath: '/health' },
   { name: 'User Stats Worker', url: `http://${HOST}:8006`, healthPath: '/health' },
+  { name: 'Purge Worker', url: `http://${HOST}:8008`, healthPath: '/health' },
 ]
 
 const healthStatus = ref({})
