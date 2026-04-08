@@ -1,4 +1,4 @@
-.PHONY: help clone build build-no-cache check check-deps check-diskspace clean-all clean-all-except-base-images clean-cache-volumes clean-local-images elastic reclaim release remove pull run run-build-no-cache run-clean-all-with-elastic run-core run-core-purge run-with-elastic run-workers settings show-images stop tmpfs-setup
+.PHONY: help clone build build-no-cache check check-deps check-diskspace clean-all clean-all-except-base-images clean-cache-volumes clean-local-images elastic reclaim release remove pull run run-all run-build-no-cache run-clean-all-with-elastic run-core run-core-purge run-with-elastic run-workers settings show-images stop tmpfs-setup
 
 help:
 	@echo "Available targets:"
@@ -18,6 +18,7 @@ help:
 	@echo "  make release                 - Create release: update version, commit, and tag (e.g., v2026.3.4)"
 	@echo "  make remove                  - Stop services and remove containers/volumes"
 	@echo "  make run                     - Build images and start core services"
+	@echo "  make run-all                - Build and start all services (core + workers + elastic)"
 	@echo "  make run-build-no-cache      - Build without cache and start core services"
 	@echo "  make run-clean-all-with-elastic - Clean all and run with elasticsearch"
 	@echo "  make run-core                - Build images and start core services"
@@ -138,6 +139,9 @@ run-workers: check-deps check-diskspace clean-local-images build
 run-core-purge: check-deps check-diskspace clean-local-images build
 	docker compose -f docker-compose.yml --profile core up -d
 	docker compose -f docker-compose.yml --profile workers up -d purge-worker
+
+run-all: check-deps check-diskspace clean-local-images build
+	docker compose -f docker-compose.yml --profile core --profile workers --profile elastic up -d
 
 reset:
 	./scripts/reset.sh
