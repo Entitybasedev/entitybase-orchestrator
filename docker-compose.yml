@@ -659,8 +659,6 @@ services:
       KAFKA_ENTITYCHANGE_JSON_TOPIC: entity_change
       ELASTICSEARCH_CONSUMER_GROUP: entitybase-elasticsearch-indexer
     depends_on:
-      elasticsearch:
-        condition: service_healthy
       create-tables:
         condition: service_completed_successfully
       create-topics:
@@ -675,8 +673,7 @@ services:
       start_period: 30s
     profiles:
       - workers
-      - elastic
-      
+
     command: ["python", "-m", "models.workers.elasticsearch_indexer"]
     mem_limit: 1g
     cpus: 0.5
