@@ -398,7 +398,7 @@ services:
         condition: service_healthy
     restart: on-failure
     healthcheck:
-      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8888/health"]
+      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:8888/health"]
       interval: 10s
       timeout: 3s
       retries: 3
@@ -422,7 +422,7 @@ services:
       redpanda:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8889/health"]
+      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:8889/health"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -495,7 +495,7 @@ services:
       minio:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8002/health"]
+      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:8002/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -534,7 +534,7 @@ services:
       minio:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8003/health"]
+      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:8003/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -566,7 +566,7 @@ services:
       create-tables:
         condition: service_completed_successfully
     healthcheck:
-      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8004/health"]
+      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:8004/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -597,7 +597,7 @@ services:
       create-tables:
         condition: service_completed_successfully
     healthcheck:
-      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8005/health"]
+      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:8005/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -628,7 +628,7 @@ services:
       create-tables:
         condition: service_completed_successfully
     healthcheck:
-      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8006/health"]
+      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:8006/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -671,7 +671,7 @@ services:
       minio:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8007/health"]
+      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:8007/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -709,7 +709,7 @@ services:
       minio:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8008/health"]
+      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:8008/health"]
       interval: 30s
       timeout: 10s
       retries: 3
