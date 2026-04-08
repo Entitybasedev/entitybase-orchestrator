@@ -638,6 +638,7 @@ services:
       - entitybase-network
 
   purge-worker:
+    container_name: purge-worker
     image: entitybase-backend-purge-worker:latest
     # ports:
     #   - "8008:8008"

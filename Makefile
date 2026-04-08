@@ -137,7 +137,7 @@ run-workers: check-deps check-diskspace clean-local-images build
 
 run-core-purge: check-deps check-diskspace clean-local-images build
 	docker compose -f docker-compose.yml --profile core up -d
-	docker compose up -d purge-worker
+	docker compose -f docker-compose.yml --profile workers up -d purge-worker
 
 reset:
 	./scripts/reset.sh
