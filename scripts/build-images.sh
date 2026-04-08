@@ -8,6 +8,12 @@ fi
 
 cd "$(dirname "$0")/.."
 
+if [ -f .env ]; then
+    set -a
+    source .env
+    set +a
+fi
+
 CACHE_ARGS=""
 if df -T /tmp/docker-buildkit 2>/dev/null | grep -q tmpfs; then
     CACHE_ARGS="--cache-to=type=local,dest=/tmp/docker-buildkit --cache-from=type=local,src=/tmp/docker-buildkit"
@@ -75,7 +81,7 @@ docker build $NO_CACHE $CACHE_ARGS -t kafka2sse-frontend:latest -f libs/kafka2ss
 
 echo ""
 echo "[12/13] Building entitybase-orchestrator-frontend:latest..."
-docker build $NO_CACHE $CACHE_ARGS -t entitybase-orchestrator-frontend:latest -f frontend/Dockerfile frontend/
+docker build $NO_CACHE $CACHE_ARGS --build-arg VITE_APP_VERSION=${VERSION_ORCHESTRATOR_FRONTEND} -t entitybase-orchestrator-frontend:latest -f frontend/Dockerfile frontend/
 
 echo ""
 echo "[13/13] Building entitybase-backend-purge-worker:latest..."
