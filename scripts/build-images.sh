@@ -72,6 +72,10 @@ echo "[9/12] Building entitybase-backend-elasticsearch-worker:latest..."
 docker build $NO_CACHE $CACHE_ARGS -t entitybase-backend-elasticsearch-worker:latest -f libs/entitybase-backend/docker/containers/Dockerfile.api libs/entitybase-backend/
 
 echo ""
+echo "[9b/12] Building entitybase-backend-meilisearch-worker:latest..."
+docker build $NO_CACHE $CACHE_ARGS -t entitybase-backend-meilisearch-worker:latest -f libs/entitybase-backend/docker/containers/Dockerfile.api libs/entitybase-backend/
+
+echo ""
 echo "[10/12] Building kafka2sse-backend:latest..."
 docker build $NO_CACHE $CACHE_ARGS -t kafka2sse-backend:latest -f libs/kafka2sse-backend/Dockerfile libs/kafka2sse-backend/
 

@@ -9,6 +9,7 @@ const infrastructure = [
   { name: 'MySQL', url: `http://${HOST}:3307`, description: 'Database (no HTTP interface)', healthPath: '/' },
   { name: 'Redpanda', url: `http://${HOST}:8084`, description: 'Kafka messaging + console', healthPath: '', linkUrl: `http://${HOST}:8084`, brokerUrl: `http://${HOST}:9644`, brokerHealthPath: '/status' },
   { name: 'Elasticsearch', url: `http://${HOST}:9201`, description: 'Search engine', healthPath: '/' },
+  { name: 'Meilisearch', url: `http://${HOST}:7700`, description: 'Full-text search', healthPath: '/' },
 ]
 
 const services = [
@@ -25,6 +26,7 @@ const workers = [
   { name: 'General Stats Worker', url: `http://${HOST}:8005`, healthPath: '/health' },
   { name: 'User Stats Worker', url: `http://${HOST}:8006`, healthPath: '/health' },
   { name: 'Elasticsearch Indexer Worker', url: `http://${HOST}:8007`, healthPath: '/health' },
+  { name: 'Meilisearch Indexer Worker', url: `http://${HOST}:8009`, healthPath: '/health' },
   { name: 'Purge Worker', url: `http://${HOST}:8008`, healthPath: '/health' },
 ]
 

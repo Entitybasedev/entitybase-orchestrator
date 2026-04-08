@@ -47,6 +47,11 @@ CONTAINER_MAP = {
         "dockerfile": "libs/entitybase-backend/docker/containers/Dockerfile.api",
         "context": "libs/entitybase-backend/",
     },
+    "meilisearch-worker": {
+        "image": "entitybase-backend-meilisearch-worker:latest",
+        "dockerfile": "libs/entitybase-backend/docker/containers/Dockerfile.api",
+        "context": "libs/entitybase-backend/",
+    },
     "purge-worker": {
         "image": "entitybase-backend-purge-worker:latest",
         "dockerfile": "libs/entitybase-backend/docker/containers/Dockerfile.purge-worker",
