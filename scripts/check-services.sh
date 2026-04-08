@@ -61,8 +61,10 @@ check_completed_job() {
 
 echo "=== Infrastructure ==="
 check_running_service "mysql" || overall_status=1
+check_running_service "mysql-health" || overall_status=1
 check_running_service "minio" || overall_status=1
 check_running_service "redpanda" || overall_status=1
+check_running_service "redpanda-health" || overall_status=1
 check_running_service "valkey" || overall_status=1
 
 echo ""
