@@ -75,15 +75,15 @@ check-diskspace:
 	echo "Available space: $$AVAILABLE"; \
 	case $$AVAILABLE in \
 		*[0-9]G) \
-			SIZE=$${AVAILABLE%G}; \
-			if [ "$$(echo "$$SIZE >= 2" | awk '{if ($$1 >= 2) print 1; else print 0}')" -eq 1 ]; then exit 0; fi \
+SIZE=$${AVAILABLE%G}; \
+			if [ "$$(echo "$$SIZE >= 1" | awk '{if ($$1 >= 1) print 1; else print 0}')" -eq 1 ]; then exit 0; fi \
 		;; \
 		*[0-9]M) \
-			echo "Error: Less than 2GB available"; \
+			echo "Error: Less than 1GB available"; \
 			exit 1; \
-		;; \
+	;; \
 	esac; \
-	echo "Error: Less than 2GB available"; \
+	echo "Error: Less than 1GB available"; \
 	exit 1
 
 stop:
