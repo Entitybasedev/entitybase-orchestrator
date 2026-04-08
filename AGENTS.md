@@ -18,10 +18,30 @@ entitybase-orchestrator/
 │   └── entitybase-artwork/ # Logo and assets
 ├── frontend/                # Orchestrator's own frontend (Vite)
 ├── scripts/                # Automation scripts
+│   └── health/             # Health check scripts for infrastructure
 ├── docker-compose.yml      # Main Docker Compose configuration
 ├── Makefile                # Build and run commands
 └── AGENTS.md              # This file
 ```
+
+## Health Check Scripts
+
+Health check scripts for infrastructure services (MySQL, Elasticsearch) are located in `scripts/health/`.
+
+### Architecture Principle: Separation of Concerns
+
+The orchestrator frontend is separate from entitybase-backend. Health checks work as follows:
+
+1. **Browser-based health checks** - The Vue frontend runs in the browser and makes HTTP requests directly to services
+2. **Port exposure required** - Services must expose ports in docker-compose for browser to reach them
+3. **Health proxy pattern** - Services like MySQL/Elasticsearch that don't have HTTP health endpoints use a proxy container (e.g., `mysql-health`, `elasticsearch-health`) that exposes a `/health` endpoint on an exposed port
+
+### Adding Health Check Cards
+
+When adding new services to the frontend:
+1. Ensure the service has a `/health` endpoint
+2. Expose the port in docker-compose (e.g., `8001:8001`)
+3. Add entry to `infrastructure` or `workers` array in `frontend/src/App.vue`
 
 ## Key Commands
 

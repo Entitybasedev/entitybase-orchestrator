@@ -42,7 +42,7 @@ services:
     image: alpine:latest
     container_name: mysql-health
     volumes:
-      - ./mysql-health.sh:/mysql-health.sh:ro
+      - ./scripts/health/mysql-health.sh:/mysql-health.sh:ro
     command: ["/bin/sh", "/mysql-health.sh"]
     ports:
       - "3307:8080"
@@ -179,6 +179,23 @@ services:
       - elastic
       
       - workers
+
+  elasticsearch-health:
+    image: alpine:latest
+    container_name: elasticsearch-health
+    volumes:
+      - ./scripts/health/elasticsearch-health.sh:/elasticsearch-health.sh:ro
+    command: ["/bin/sh", "/elasticsearch-health.sh"]
+    environment:
+      ELASTICSEARCH_HOST: elasticsearch
+      ELASTICSEARCH_PORT: 9200
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - entitybase-network
+    profiles:
+      - elastic
 
   create-buckets:
     container_name: create-buckets
