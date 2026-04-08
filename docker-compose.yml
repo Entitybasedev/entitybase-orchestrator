@@ -148,7 +148,25 @@ services:
       - entitybase-network
     profiles:
       - core
-      
+      - workers
+
+  redpanda-health:
+    image: alpine:latest
+    container_name: redpanda-health
+    volumes:
+      - ./scripts/health/redpanda-health.sh:/redpanda-health.sh:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: ["/bin/sh", "/redpanda-health.sh"]
+    ports:
+      - "9645:8080"
+    depends_on:
+      redpanda:
+        condition: service_healthy
+    networks:
+      - entitybase-network
+    profiles:
+      - core
+      - workers
 
   # Search services
   elasticsearch:

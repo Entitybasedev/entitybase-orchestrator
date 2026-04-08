@@ -7,7 +7,7 @@ const version = ref(import.meta.env.VITE_APP_VERSION || 'dev')
 const infrastructure = [
   { name: 'MinIO', url: `http://${HOST}:9001`, description: 'S3 storage + console', healthPath: '/minio/health/live', linkUrl: `http://${HOST}:9001` },
   { name: 'MySQL', url: `http://${HOST}:3307`, description: 'Database (no HTTP interface)', healthPath: '/' },
-  { name: 'Redpanda', url: `http://${HOST}:8084`, description: 'Kafka messaging + console', healthPath: '', linkUrl: `http://${HOST}:8084`, brokerUrl: `http://${HOST}:9644`, brokerHealthPath: '/status' },
+  { name: 'Redpanda', url: `http://${HOST}:9645`, description: 'Kafka messaging + console', healthPath: '/', linkUrl: `http://${HOST}:8084` },
   { name: 'Elasticsearch', url: `http://${HOST}:9201`, description: 'Search engine', healthPath: '/' },
   { name: 'Meilisearch', url: `http://${HOST}:7700`, description: 'Full-text search', healthPath: '/' },
 ]
