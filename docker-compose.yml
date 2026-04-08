@@ -186,6 +186,8 @@ services:
     volumes:
       - ./scripts/health/elasticsearch-health.sh:/elasticsearch-health.sh:ro
     command: ["/bin/sh", "/elasticsearch-health.sh"]
+    ports:
+      - "9201:8080"
     environment:
       ELASTICSEARCH_HOST: elasticsearch
       ELASTICSEARCH_PORT: 9200
