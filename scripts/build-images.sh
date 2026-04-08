@@ -74,6 +74,14 @@ echo "[11/12] Building kafka2sse-frontend:latest..."
 docker build $NO_CACHE $CACHE_ARGS -t kafka2sse-frontend:latest -f libs/kafka2sse-frontend/Dockerfile libs/kafka2sse-frontend/
 
 echo ""
+echo "[12/13] Building entitybase-orchestrator-frontend:latest..."
+docker build $NO_CACHE $CACHE_ARGS -t entitybase-orchestrator-frontend:latest -f frontend/Dockerfile frontend/
+
+echo ""
+echo "[13/13] Building entitybase-backend-purge-worker:latest..."
+docker build $NO_CACHE $CACHE_ARGS -t entitybase-backend-purge-worker:latest -f libs/entitybase-backend/docker/containers/Dockerfile.purge-worker libs/entitybase-backend/
+
+echo ""
 echo "=========================================="
 echo "Done! Images built:"
 echo "=========================================="

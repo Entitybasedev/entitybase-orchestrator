@@ -638,10 +638,7 @@ services:
       - entitybase-network
 
   purge-worker:
-    container_name: purge-worker
-    build:
-      context: ./libs/entitybase-backend
-      dockerfile: docker/containers/Dockerfile.purge-worker
+    image: entitybase-backend-purge-worker:latest
     # ports:
     #   - "8008:8008"
     environment:
