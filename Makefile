@@ -1,4 +1,4 @@
-.PHONY: help clone build build-no-cache check check-deps check-diskspace clean-all clean-all-except-base-images clean-cache-volumes clean-local-images elastic meilisearch reclaim release remove pull run run-core-workers-meilisearch run-build-no-cache run-clean-all-with-elastic run-core run-core-purge run-with-elastic run-workers settings show-images stop tmpfs-setup
+.PHONY: help clone build build-no-cache check check-deps check-diskspace clean-all clean-all-except-base-images clean-build-cache clean-cache-volumes clean-local-images elastic meilisearch reclaim release remove pull run run-core-workers-meilisearch run-build-no-cache run-clean-all-with-elastic run-core run-core-purge run-with-elastic run-workers settings show-images stop tmpfs-setup
 
 help:
 	@echo "Available targets:"
@@ -9,6 +9,7 @@ help:
 	@echo "  make check-diskspace         - Check available disk space (requires 2GB minimum)"
 	@echo "  make clean-all               - Remove all containers, images, volumes, and build cache"
 	@echo "  make clean-all-except-base-images - Remove containers and non-base images, keep base images"
+	@echo "  make clean-build-cache      - Clear only Docker build cache (keep images/containers)"
 	@echo "  make clean-cache-volumes    - Stop services, remove containers, volumes, and build cache"
 	@echo "  make clean-local-images     - Remove locally built images only (keep base images)"
 	@echo "  make clone                   - Clone required repositories"
@@ -117,6 +118,10 @@ reclaim:
 	docker volume prune -f
 	docker builder prune -f
 	@echo "Disk space reclaimed. Run 'docker system df' to check."
+
+clean-build-cache:
+	docker builder prune -f
+	@echo "Build cache cleared. Run 'docker system df' to check."
 
 tmpfs-setup:
 	@if df -T /tmp/docker-buildkit 2>/dev/null | grep -q tmpfs; then \
