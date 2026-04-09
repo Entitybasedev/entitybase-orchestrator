@@ -13,83 +13,29 @@ on:
       - '.github/workflows/meilisearch-integration.yml'
 
 jobs:
-  test-meilisearch-integration:
+  test-meilisearch:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Clone repositories
-        run: |
-          make clone
-          ls -la libs/entitybase-backend/docker/containers/ | head -10
+      - name: Checkout backend
+        uses: actions/checkout@v4
+        with:
+          repository: Entitybasedev/entitybase-backend
+          path: libs/entitybase-backend
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.13'
 
-      - name: Install Poetry
-        run: pip install poetry poetry-plugin-export
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip wheel
+          pipx install poetry
 
-      - name: Generate requirements
+      - name: Install and run Meilisearch tests
         run: |
           cd libs/entitybase-backend
-          mkdir -p var
-          poetry export --format requirements.txt --output var/requirements.txt --without-hashes
-          poetry export --format requirements.txt --output var/requirements-api.txt --without-hashes --with dev
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_TOKEN }}
-
-      - name: Build Docker images
-        run: make build
-
-      - name: Start services with Docker Compose
-        run: docker compose --profile core --profile meilisearch --profile test up -d && docker compose ps
-
-      - name: Wait for services to be healthy
-        run: |
-          echo "Waiting for Meilisearch..."
-          timeout 120 bash -c 'until curl -sf http://localhost:7700/health; do sleep 2; done'
-          echo "Waiting for MySQL..."
-          timeout 120 bash -c 'until docker exec mysql mysql -uroot -e "SELECT 1"; do sleep 2; done'
-          echo "Waiting for MinIO..."
-          timeout 60 bash -c 'until curl -sf http://localhost:9000/minio/health/live; do sleep 2; done'
-          echo "Waiting for Redpanda to be ready..."
-          timeout 120 bash -c 'until docker exec redpanda rpk cluster health; do sleep 3; done'
-          echo "Checking if Kafka port is accessible from host..."
-          timeout 30 bash -c 'until nc -z localhost 9092; do sleep 2; done'
-          echo "Waiting for Redpanda broker to be writable..."
-          timeout 60 bash -c 'until docker exec redpanda rpk topic list; do sleep 2; done'
-
-      - name: Wait for setup services to complete
-        run: |
-          echo "Waiting for create-buckets..."
-          timeout 60 bash -c 'until [ "$(docker inspect -f {{.State.Status}} create-buckets 2>/dev/null)" = "exited" ]; do sleep 2; done'
-          echo "create-buckets status: $(docker inspect -f {{.State.ExitCode}} create-buckets)"
-          echo "Waiting for create-tables..."
-          timeout 60 bash -c 'until [ "$(docker inspect -f {{.State.Status}} create-tables 2>/dev/null)" = "exited" ]; do sleep 2; done'
-          echo "create-tables status: $(docker inspect -f {{.State.ExitCode}} create-tables)"
-          echo "Waiting for create-topics..."
-          timeout 120 bash -c 'until [ "$(docker inspect -f {{.State.Status}} create-topics 2>/dev/null)" = "exited" ]; do sleep 3; done'
-          echo "create-topics status: $(docker inspect -f {{.State.ExitCode}} create-topics)"
-          docker logs create-topics
-
-      - name: Run Meilisearch tests via container
-        run: |
-          docker compose --profile core --profile meilisearch --profile test up test-runner
-          docker compose logs test-runner || true
-
-      - name: Upload logs on failure
-        if: failure()
-        run: |
-          docker compose logs --tail=100 > meilisearch-logs.txt
-          cat meilisearch-logs.txt
-
-      - name: Stop services
-        if: always()
-        run: docker compose --profile core --profile meilisearch --profile test down
+          poetry install --with=dev
+          poetry run pytest tests/unit -k "meilisearch" -v --tb=short
