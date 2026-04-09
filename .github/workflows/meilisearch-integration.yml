@@ -22,6 +22,14 @@ jobs:
       - name: Clone repositories
         run: make clone
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Set up Poetry
+        uses: snok/install-poetry@v1
+
       - name: Generate requirements
         run: ./libs/entitybase-backend/scripts/shell/export-requirements.sh
 
@@ -51,18 +59,6 @@ jobs:
           timeout 30 bash -c 'until nc -z localhost 9092; do sleep 2; done'
           echo "Waiting for Redpanda broker to be writable..."
           timeout 60 bash -c 'until docker exec redpanda rpk topic list; do sleep 2; done'
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.13'
-
-      - name: Set up Poetry
-        uses: snok/install-poetry@v1
-
-      - name: Install dependencies
-        working-directory: libs/entitybase-backend
-        run: poetry install
 
       - name: Wait for setup services to complete
         run: |
