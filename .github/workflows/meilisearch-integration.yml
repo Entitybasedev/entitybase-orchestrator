@@ -32,10 +32,13 @@ jobs:
 
       - name: Update poetry.lock
         working-directory: libs/entitybase-backend
-        run: poetry lock --no-update || poetry lock
+        run: poetry lock || true
 
       - name: Generate requirements
-        run: ./libs/entitybase-backend/scripts/shell/export-requirements.sh
+        run: |
+          cd libs/entitybase-backend
+          ./scripts/shell/export-requirements.sh
+          cat var/requirements-api.txt | head -10
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
