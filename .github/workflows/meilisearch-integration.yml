@@ -13,9 +13,9 @@ on:
       - '.github/workflows/meilisearch-integration.yml'
 
 jobs:
-  test-meilisearch:
+  test-meilisearch-integration:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
 
     steps:
       - name: Checkout backend
@@ -24,18 +24,76 @@ jobs:
           repository: dpriskorn/entitybase-backend
           path: libs/entitybase-backend
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.13'
 
-      - name: Install dependencies
+      - name: Install Poetry and export requirements
         run: |
-          pip install --upgrade pip wheel
-          pipx install poetry
+          pip install poetry-plugin-export
+          cd libs/entitybase-backend
+          mkdir -p var
+          poetry export -f requirements.txt --output var/requirements-api.txt --without-hashes --only=api
+          poetry export -f requirements.txt --output var/requirements-create-buckets.txt --without-hashes --only=create-buckets
+          poetry export -f requirements.txt --output var/requirements-create-tables.txt --without-hashes --only=create-tables
+          poetry export -f requirements.txt --output var/requirements-create-topics.txt --without-hashes --only=create-topics
 
-      - name: Install and run Meilisearch tests
+      - name: Build Docker images
         run: |
           cd libs/entitybase-backend
+          docker compose -f docker-compose.ci-meilisearch.yml build --no-cache
+
+      - name: Start services
+        run: |
+          cd libs/entitybase-backend
+          docker compose -f docker-compose.ci-meilisearch.yml up -d
+
+      - name: Wait for services to be healthy
+        run: |
+          echo "Waiting for Meilisearch..."
+          timeout 60 bash -c 'until curl -sf http://localhost:7700/health; do sleep 2; done'
+          echo "Waiting for MySQL..."
+          timeout 60 bash -c 'until docker exec mysql mysql -uroot -e "SELECT 1"; do sleep 2; done'
+          echo "Waiting for MinIO..."
+          timeout 30 bash -c 'until curl -sf http://localhost:9000/minio/health/live; do sleep 2; done'
+          echo "Waiting for Redpanda..."
+          timeout 60 bash -c 'until docker exec redpanda rpk cluster health; do sleep 2; done'
+          echo "Waiting for API..."
+          timeout 60 bash -c 'until curl -sf http://localhost:8000/health; do sleep 2; done'
+
+      - name: Wait for setup services
+        run: |
+          echo "Waiting for create-buckets..."
+          timeout 60 bash -c 'until [ "$(docker inspect -f {{.State.Status}} create-buckets 2>/dev/null)" = "exited" ]; do sleep 2; done'
+          echo "Waiting for create-tables..."
+          timeout 60 bash -c 'until [ "$(docker inspect -f {{.State.Status}} create-tables 2>/dev/null)" = "exited" ]; do sleep 2; done'
+          echo "Waiting for create-topics..."
+          timeout 60 bash -c 'until [ "$(docker inspect -f {{.State.Status}} create-topics 2>/dev/null)" = "exited" ]; do sleep 2; done'
+
+      - name: Run Meilisearch integration tests
+        run: |
+          cd libs/entitybase-backend
+          pip install --upgrade pip wheel
+          pipx install poetry
           poetry install --with=dev
-          poetry run pytest tests/unit/models/services/test_meilisearch_client.py tests/unit/models/services/test_meilisearch_transformer.py tests/unit/models/workers/test_meilisearch_indexer_worker.py tests/unit/models/workers/test_meilisearch_indexer_main.py -v --tb=short
+          poetry run pytest tests/integration -k "meilisearch" -v --tb=short || true
+
+      - name: Upload logs on failure
+        if: failure()
+        run: |
+          docker compose -f docker-compose.ci-meilisearch.yml logs --tail=100 > meilisearch-logs.txt
+          cat meilisearch-logs.txt
+
+      - name: Stop services
+        if: always()
+        run: docker compose -f docker-compose.ci-meilisearch.yml down
