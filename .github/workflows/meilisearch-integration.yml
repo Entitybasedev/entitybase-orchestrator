@@ -34,7 +34,8 @@ jobs:
         run: |
           cd libs/entitybase-backend
           mkdir -p var
-          poetry export --format requirements.txt --output var/requirements-api.txt --without-hashes --only=api
+          poetry export --format requirements.txt --output var/requirements.txt --without-hashes
+          poetry export --format requirements.txt --output var/requirements-api.txt --without-hashes --with dev
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
