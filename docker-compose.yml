@@ -298,8 +298,9 @@ services:
       - VITESS_PASSWORD=${MYSQL_ROOT_PASSWORD:-}
       - STREAMING_ENABLED=true
       - KAFKA_BOOTSTRAP_SERVERS=redpanda:9092
-      - KAFKA_ENTITY_CHANGE_TOPIC=entity_change
+      - KAFKA_ENTITYCHANGE_JSON_TOPIC=entity_change
       - KAFKA_ENTITY_DIFF_TOPIC=entity_diff
+      - KAFKA_USERCHANGE_JSON_TOPIC=user_change
       - KAFKA_ENDORSEMENT_TOPIC=endorsement
       - KAFKA_THANKS_TOPIC=thanks
     depends_on:
@@ -314,12 +315,12 @@ services:
       idworker:
         condition: service_healthy
     command: uvicorn models.rest_api.main:app --host 0.0.0.0 --port 8080 --workers 10
-    # healthcheck:
-    #   test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8080/health"]
-    #   interval: 10s
-    #   timeout: 5s
-    #   retries: 5
-    #   start_period: 30s
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     profiles:
       - core
       - workers
