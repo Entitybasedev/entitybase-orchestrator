@@ -38,4 +38,4 @@ jobs:
         run: |
           cd libs/entitybase-backend
           poetry install --with=dev
-          poetry run pytest tests/unit -k "meilisearch" -v --tb=short
+          poetry run pytest tests/unit/models/services/test_meilisearch_client.py tests/unit/models/services/test_meilisearch_transformer.py tests/unit/models/workers/test_meilisearch_indexer_worker.py tests/unit/models/workers/test_meilisearch_indexer_main.py -v --tb=short
