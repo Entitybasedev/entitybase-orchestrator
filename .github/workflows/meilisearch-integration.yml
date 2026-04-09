@@ -35,20 +35,11 @@ jobs:
       - name: Install Poetry export plugin
         run: pip install poetry-plugin-export
 
-      - name: Update poetry.lock
-        working-directory: libs/entitybase-backend
-        run: poetry lock || true
-
       - name: Generate requirements
         run: |
           cd libs/entitybase-backend
-          pwd
-          ls -la *.txt 2>/dev/null | head -5
-          echo "Running export script with explicit var dir..."
-          mkdir -p var
-          ls -la var/
-          poetry export --format requirements.txt --output var/requirements-api.txt --without-hashes --only=api
-          cat var/requirements-api.txt | head -5
+          pip install poetry-plugin-export
+          poetry export --format requirements.txt --output var/requirements-api.txt --without-hashes --only=api || poetry export --format requirements.txt --output var/requirements-api.txt --without-hashes --only=api
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
