@@ -20,7 +20,9 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Clone repositories
-        run: make clone
+        run: |
+          make clone
+          ls -la libs/entitybase-backend/docker/containers/ | head -10
 
       - name: Set up Python
         uses: actions/setup-python@v5
