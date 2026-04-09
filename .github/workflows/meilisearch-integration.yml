@@ -30,8 +30,8 @@ jobs:
       - name: Set up Poetry
         uses: snok/install-poetry@v1
         with:
-          plugins:
-            - poetry-plugin-export
+          version: "2.3.3"
+          plugins: "poetry-plugin-export"
 
       - name: Update poetry.lock
         working-directory: libs/entitybase-backend
