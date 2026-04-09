@@ -1,4 +1,4 @@
-.PHONY: build build-no-cache check check-deps check-diskspace clean-all clean-all-except-base-images clean-build-cache clean-build-run-all-with-elastic clean-build-run-core clean-build-run-core-purge clean-build-run-core-workers-meilisearch clean-build-run-no-cache clean-build-run-with-elastic clean-build-run-with-meilisearch clean-build-run-workers clean-cache-volumes clean-local-images clone elastic help meilisearch pull reclaim release remove reset run-core run-core-purge run-core-workers-meilisearch run-with-elastic run-with-meilisearch run-workers settings show-images stop tmpfs-setup
+.PHONY: build build-no-cache check check-deps check-diskspace clean-all clean-all-except-base-images clean-build-cache clean-build-run-all-with-elastic clean-build-run-core clean-build-run-core-purge clean-build-run-core-workers-meilisearch clean-build-run-no-cache clean-build-run-with-elastic clean-build-run-with-meilisearch clean-build-run-workers clean-cache-volumes clean-local-images clone elastic help meilisearch pull reclaim release remove reset run-core run-core-purge run-core-workers-meilisearch run-with-elastic run-with-meilisearch run-workers settings show-images stop tmpfs-setup test-frontend
 
 help:
 	@echo "Available targets:"
@@ -37,6 +37,7 @@ help:
 	@echo "  make settings                - Query the /settings endpoint on localhost:8083"
 	@echo "  make show-images             - Show all entitybase Docker images"
 	@echo "  make stop                    - Stop all running containers"
+	@echo "  make test-frontend           - Run frontend tests (requires npm)"
 	@echo "  make tmpfs-setup             - Setup tmpfs for buildkit cache (requires sudo)"
 
 build: check-deps
@@ -186,6 +187,9 @@ show-images:
 
 stop:
 	docker stop $$(docker ps -q) || true
+
+test-frontend:
+	cd frontend && npm install && npm run lint && npm run test && npm run build
 
 tmpfs-setup:
 	@if df -T /tmp/docker-buildkit 2>/dev/null | grep -q tmpfs; then \
