@@ -1,4 +1,4 @@
-.PHONY: help clone build build-no-cache check check-deps check-diskspace clean-all clean-all-except-base-images clean-build-cache clean-cache-volumes clean-local-images elastic meilisearch reclaim release remove pull clean-build-run-core clean-build-run-workers clean-build-run-core-purge clean-build-run-core-workers-meilisearch clean-build-run-with-elastic clean-build-run-with-meilisearch clean-build-run-all-with-elastic clean-build-run-no-cache run-core run-workers run-core-purge run-core-workers-meilisearch run-with-elastic run-with-meilisearch settings show-images stop tmpfs-setup
+.PHONY: build build-no-cache check check-deps check-diskspace clean-all clean-all-except-base-images clean-build-cache clean-build-run-all-with-elastic clean-build-run-core clean-build-run-core-purge clean-build-run-core-workers-meilisearch clean-build-run-no-cache clean-build-run-with-elastic clean-build-run-with-meilisearch clean-build-run-workers clean-cache-volumes clean-local-images clone elastic help meilisearch pull reclaim release remove reset run-core run-core-purge run-core-workers-meilisearch run-with-elastic run-with-meilisearch run-workers settings show-images stop tmpfs-setup
 
 help:
 	@echo "Available targets:"
@@ -18,6 +18,7 @@ help:
 	@echo "  make reclaim                 - Reclaim disk space (prune unused images, volumes, build cache)"
 	@echo "  make release                 - Create release: update version, commit, and tag (e.g., v2026.3.4)"
 	@echo "  make remove                  - Stop services and remove containers/volumes"
+	@echo "  make reset                   - Reset the environment (experimental)"
 	@echo "  make run-core                - Start core services (no build)"
 	@echo "  make run-workers             - Start all services (core + workers, no build)"
 	@echo "  make run-core-purge          - Start core + workers + purge worker (no build)"
@@ -37,17 +38,14 @@ help:
 	@echo "  make stop                    - Stop all running containers"
 	@echo "  make tmpfs-setup             - Setup tmpfs for buildkit cache (requires sudo)"
 
-release:
-	./scripts/run-release.sh
+build: check-deps
+	./scripts/build-images.sh
 
-clone:
-	./scripts/clone-repos.sh
+build-no-cache: check-deps
+	./scripts/build-images.sh --no-cache
 
-pull:
-	git pull
-	cd libs/entitybase-backend && git pull
-	cd libs/kafka2sse-backend && git pull
-	cd libs/kafka2sse-frontend && git pull
+check:
+	./scripts/check-services.sh
 
 check-deps:
 	@echo "Checking dependencies..."
@@ -56,22 +54,10 @@ check-deps:
 	@command -v poetry >/dev/null 2>&1 || { echo "Error: poetry is required but not installed. Install via your OS package manager (e.g., apt install poetry, pacman -S python-poetry, brew install poetry)"; exit 1; }
 	@echo "All dependencies satisfied."
 
-build: check-deps
-	./scripts/build-images.sh
-
-build-no-cache: check-deps
-	./scripts/build-images.sh --no-cache
-
-clean-build-run-no-cache: clean-local-images build-no-cache
-	docker compose -f docker-compose.yml --profile core up -d
-
-check:
-	./scripts/check-services.sh
-
 check-diskspace:
-	@if df /dev/mapper/arch >/dev/null 2>&1; then \
+	@if df -T /dev/mapper/arch >/dev/null 2>&1; then \
 		DEVICE="/dev/mapper/arch"; \
-	elif df /dev/sda1 >/dev/null 2>&1; then \
+	elif df -T /dev/sda1 >/dev/null 2>&1; then \
 		DEVICE="/dev/sda1"; \
 	else \
 		echo "Disk check skipped: no known device found"; \
@@ -81,9 +67,9 @@ check-diskspace:
 	echo "Available space: $$AVAILABLE"; \
 	case $$AVAILABLE in \
 		*[0-9]G) \
-SIZE=$${AVAILABLE%G}; \
+	SIZE=$${AVAILABLE%G}; \
 			if [ "$$(echo "$$SIZE >= 1" | awk '{if ($$1 >= 1) print 1; else print 0}')" -eq 1 ]; then exit 0; fi \
-		;; \
+	;; \
 		*[0-9]M) \
 			echo "Error: Less than 1GB available"; \
 			exit 1; \
@@ -92,32 +78,68 @@ SIZE=$${AVAILABLE%G}; \
 	echo "Error: Less than 1GB available"; \
 	exit 1
 
-stop:
-	docker stop $$(docker ps -q) || true
-
-remove: stop
-	docker rm $$(docker ps -aq) || true
-	docker network rm $$(docker network ls -q) || true
-	docker compose -f docker-compose.yml down -v --remove-orphans
-
-clean-local-images: remove
-	docker container prune -f
+clean-all: clean-local-images
+	docker image prune -a -f
 	docker builder prune -f
-	docker images | grep -E "^entitybase-|^kafka2sse-" | awk '{print $$3}' | xargs -r docker rmi -f || true
+	docker volume prune -f
 
 clean-all-except-base-images: clean-local-images
 	docker builder prune -af
 	docker volume prune -f
 	@echo "Build cache and volumes cleared"
 
-clean-all: clean-local-images
-	docker image prune -a -f
+clean-build-cache:
 	docker builder prune -f
-	docker volume prune -f
+	@echo "Build cache cleared. Run 'docker system df' to check."
+
+clean-build-run-all-with-elastic: clean-all build check-diskspace
+	docker compose -f docker-compose.yml --profile elastic up -d
+
+clean-build-run-core: check-deps check-diskspace clean-local-images build
+	docker compose -f docker-compose.yml --profile core up -d
+
+clean-build-run-core-purge: check-deps check-diskspace clean-local-images build
+	docker compose -f docker-compose.yml --profile core up -d
+	docker compose -f docker-compose.yml --profile workers up -d purge-worker
+
+clean-build-run-core-workers-meilisearch: check-deps check-diskspace clean-local-images build
+	docker compose -f docker-compose.yml --profile core --profile workers --profile meilisearch up -d
+
+clean-build-run-no-cache: clean-local-images build-no-cache
+	docker compose -f docker-compose.yml --profile core up -d
+
+clean-build-run-with-elastic: check-deps check-diskspace clean-local-images build
+	docker compose -f docker-compose.yml --profile elastic up -d
+
+clean-build-run-with-meilisearch: check-deps check-diskspace clean-local-images build
+	docker compose -f docker-compose.yml --profile meilisearch up -d
+
+clean-build-run-workers: check-deps check-diskspace clean-local-images build
+	docker compose -f docker-compose.yml --profile workers up -d
 
 clean-cache-volumes: remove
 	docker builder prune -f
 	@echo "Build cache cleared"
+
+clean-local-images: remove
+	docker container prune -f
+	docker builder prune -f
+	docker images | grep -E "^entitybase-|^kafka2sse-" | awk '{print $$3}' | xargs -r docker rmi -f || true
+
+clone:
+	./scripts/clone-repos.sh
+
+elastic:
+	docker compose -f docker-compose.yml --profile elastic up -d
+
+meilisearch:
+	docker compose -f docker-compose.yml --profile meilisearch up -d
+
+pull:
+	git pull
+	cd libs/entitybase-backend && git pull
+	cd libs/kafka2sse-backend && git pull
+	cd libs/kafka2sse-frontend && git pull
 
 reclaim:
 	docker image prune -a -f
@@ -125,9 +147,44 @@ reclaim:
 	docker builder prune -f
 	@echo "Disk space reclaimed. Run 'docker system df' to check."
 
-clean-build-cache:
-	docker builder prune -f
-	@echo "Build cache cleared. Run 'docker system df' to check."
+release:
+	./scripts/run-release.sh
+
+remove: stop
+	docker rm $$(docker ps -aq) || true
+	docker network rm $$(docker network ls -q) || true
+	docker compose -f docker-compose.yml down -v --remove-orphans
+
+reset:
+	./scripts/reset.sh
+
+run-core:
+	docker compose -f docker-compose.yml --profile core up -d
+
+run-core-purge:
+	docker compose -f docker-compose.yml --profile core up -d
+	docker compose -f docker-compose.yml --profile workers up -d purge-worker
+
+run-core-workers-meilisearch:
+	docker compose -f docker-compose.yml --profile core --profile workers --profile meilisearch up -d
+
+run-with-elastic:
+	docker compose -f docker-compose.yml --profile elastic up -d
+
+run-with-meilisearch:
+	docker compose -f docker-compose.yml --profile meilisearch up -d
+
+run-workers:
+	docker compose -f docker-compose.yml --profile workers up -d
+
+settings:
+	curl -s http://localhost:8083/settings | python3 -m json.tool
+
+show-images:
+	./scripts/show-images.sh
+
+stop:
+	docker stop $$(docker ps -q) || true
 
 tmpfs-setup:
 	@if df -T /tmp/docker-buildkit 2>/dev/null | grep -q tmpfs; then \
@@ -138,59 +195,3 @@ tmpfs-setup:
 		sudo mount -t tmpfs -o size=4G,mode=1777 tmpfs /tmp/docker-buildkit; \
 		echo "tmpfs mounted successfully"; \
 	fi
-
-run-core:
-	docker compose -f docker-compose.yml --profile core up -d
-
-run-workers:
-	docker compose -f docker-compose.yml --profile workers up -d
-
-run-core-purge:
-	docker compose -f docker-compose.yml --profile core up -d
-	docker compose -f docker-compose.yml --profile workers up -d purge-worker
-
-run-core-workers-meilisearch:
-	docker compose -f docker-compose.yml --profile core --profile workers --profile meilisearch up -d
-
-clean-build-run-core: check-deps check-diskspace clean-local-images build
-	docker compose -f docker-compose.yml --profile core up -d
-
-clean-build-run-workers: check-deps check-diskspace clean-local-images build
-	docker compose -f docker-compose.yml --profile workers up -d
-
-clean-build-run-core-purge: check-deps clean-local-images check-diskspace build
-	docker compose -f docker-compose.yml --profile core up -d
-	docker compose -f docker-compose.yml --profile workers up -d purge-worker
-
-clean-build-run-core-workers-meilisearch: check-deps check-diskspace clean-local-images build
-	docker compose -f docker-compose.yml --profile core --profile workers --profile meilisearch up -d
-
-reset:
-	./scripts/reset.sh
-
-show-images:
-	./scripts/show-images.sh
-
-settings:
-	curl -s http://localhost:8083/settings | python3 -m json.tool
-
-elastic:
-	docker compose -f docker-compose.yml --profile elastic up -d
-
-meilisearch:
-	docker compose -f docker-compose.yml --profile meilisearch up -d
-
-run-with-elastic:
-	docker compose -f docker-compose.yml --profile elastic up -d
-
-run-with-meilisearch:
-	docker compose -f docker-compose.yml --profile meilisearch up -d
-
-clean-build-run-with-elastic: clean-local-images build check-diskspace
-	docker compose -f docker-compose.yml --profile elastic up -d
-
-clean-build-run-with-meilisearch: clean-local-images build check-diskspace
-	docker compose -f docker-compose.yml --profile meilisearch up -d
-
-clean-build-run-all-with-elastic: clean-all build check-diskspace
-	docker compose -f docker-compose.yml --profile elastic up -d
