@@ -6,7 +6,7 @@ import StatusCard from './components/StatusCard.vue'
 
 const version = import.meta.env.VITE_APP_VERSION || 'dev'
 
-const { checkHealth, checkProducerHealth, getStatus, checkAll } = useHealth()
+const { getStatus, checkAll } = useHealth()
 
 onMounted(async () => {
   await checkAll(infrastructure)
