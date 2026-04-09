@@ -32,14 +32,12 @@ jobs:
         with:
           virtualenvs-create: false
 
-      - name: Install Poetry export plugin
-        run: pip install poetry-plugin-export
-
       - name: Generate requirements
         run: |
           cd libs/entitybase-backend
           pip install poetry-plugin-export
-          poetry export --format requirements.txt --output var/requirements-api.txt --without-hashes --only=api || poetry export --format requirements.txt --output var/requirements-api.txt --without-hashes --only=api
+          mkdir -p var
+          poetry export --format requirements.txt --output var/requirements-api.txt --without-hashes --only=api
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
