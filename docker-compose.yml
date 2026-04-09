@@ -553,6 +553,8 @@ services:
       BACKLINK_STATS_SCHEDULE: "0 2 * * *"
       BACKLINK_STATS_TOP_LIMIT: "100"
     depends_on:
+      mysql:
+        condition: service_healthy
       create-tables:
         condition: service_completed_successfully
     healthcheck:
@@ -584,6 +586,8 @@ services:
       GENERAL_STATS_ENABLED: "true"
       GENERAL_STATS_SCHEDULE: "0 2 * * *"
     depends_on:
+      mysql:
+        condition: service_healthy
       create-tables:
         condition: service_completed_successfully
     healthcheck:
@@ -615,6 +619,8 @@ services:
       USER_STATS_ENABLED: "true"
       USER_STATS_SCHEDULE: "0 2 * * *"
     depends_on:
+      mysql:
+        condition: service_healthy
       create-tables:
         condition: service_completed_successfully
     healthcheck:
