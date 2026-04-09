@@ -37,11 +37,15 @@ jobs:
       - name: Generate requirements
         run: |
           cd libs/entitybase-backend
-          ls -la
           pwd
-          ./scripts/shell/export-requirements.sh
-          ls -la var/
-          cat var/requirements-api.txt | head -10
+          ls -la var/ 2>/dev/null || echo "var not present before"
+          echo "Running export script..."
+          ./scripts/shell/export-requirements.sh 2>&1
+          echo "Script done, checking var/"
+          pwd
+          ls -la
+          ls -la var/ 2>/dev/null || echo "var not found after"
+          cat var/requirements-api.txt 2>/dev/null | head -10 || echo "file not found"
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
