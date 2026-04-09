@@ -30,6 +30,10 @@ jobs:
       - name: Set up Poetry
         uses: snok/install-poetry@v1
 
+      - name: Update poetry.lock
+        working-directory: libs/entitybase-backend
+        run: poetry lock --no-update || poetry lock
+
       - name: Generate requirements
         run: ./libs/entitybase-backend/scripts/shell/export-requirements.sh
 
