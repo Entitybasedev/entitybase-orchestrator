@@ -30,6 +30,9 @@ jobs:
       - name: Set up Poetry
         uses: snok/install-poetry@v1
 
+      - name: Install Poetry export plugin
+        run: pip install poetry-plugin-export
+
       - name: Update poetry.lock
         working-directory: libs/entitybase-backend
         run: poetry lock || true
