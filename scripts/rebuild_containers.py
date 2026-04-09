@@ -22,6 +22,12 @@ CONTAINER_MAP = {
         "dockerfile": "libs/entitybase-backend/docker/containers/Dockerfile.create-topics",
         "context": "libs/entitybase-backend/",
     },
+    "api": {
+        "image": "entitybase-api:latest",
+        "dockerfile": "libs/entitybase-backend/docker/containers/Dockerfile.api",
+        "context": "libs/entitybase-backend/",
+        "service": "entitybase-api",
+    },
     "idworker": {
         "image": "entitybase-backend-idworker:latest",
         "dockerfile": "libs/entitybase-backend/docker/containers/Dockerfile.idworker",
@@ -107,11 +113,12 @@ def build_image(image: str, dockerfile: str, context: str):
     run_command(cmd)
 
 
-def recreate_container(container: str):
+def recreate_container(container: str, service: str | None = None):
     """Recreate a Docker Compose container."""
+    service_name = service or container
     print(f"\n=== Recreating {container} ===")
-    run_command(["docker", "compose", "rm", "-sf", container], check=False)
-    run_command(["docker", "compose", "up", "-d", container])
+    run_command(["docker", "compose", "rm", "-sf", service_name], check=False)
+    run_command(["docker", "compose", "up", "-d", service_name])
 
 
 def main():
@@ -151,7 +158,7 @@ def main():
     for container in containers:
         config = CONTAINER_MAP[container]
         build_image(config["image"], config["dockerfile"], config["context"])
-        recreate_container(container)
+        recreate_container(container, config.get("service"))
 
     print("\n=== Done ===")
 
