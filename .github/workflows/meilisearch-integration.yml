@@ -37,6 +37,8 @@ jobs:
       - name: Generate requirements
         run: |
           cd libs/entitybase-backend
+          ls -la
+          pwd
           ./scripts/shell/export-requirements.sh
           ls -la var/
           cat var/requirements-api.txt | head -10
