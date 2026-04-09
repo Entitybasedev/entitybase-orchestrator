@@ -2,12 +2,12 @@ name: Meilisearch Integration Tests
 
 on:
   push:
-    branches: [main, elastic]
+    branches: [main, elastic, frontend]
     paths:
       - 'libs/entitybase-backend/**'
       - '.github/workflows/meilisearch-integration.yml'
   pull_request:
-    branches: [main, elastic]
+    branches: [main, elastic, frontend]
     paths:
       - 'libs/entitybase-backend/**'
       - '.github/workflows/meilisearch-integration.yml'
