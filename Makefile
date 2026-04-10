@@ -109,7 +109,7 @@ clean-all-except-base-images: clean-local-images
 	@echo "Build cache and volumes cleared"
 
 clean-build-cache:
-	docker builder prune -f
+	docker builder prune -af
 	@echo "Build cache cleared. Run 'docker system df' to check."
 
 clean-build-run-all-with-elastic: clean-all check-diskspace
@@ -154,7 +154,7 @@ clean-build-run-core-workers: check-deps check-diskspace clean-local-images
 	docker compose -f docker-compose.yml --profile core --profile workers up -d
 
 clean-cache-volumes: remove
-	docker builder prune -f
+	docker builder prune -af
 	@echo "Build cache cleared"
 
 clean-local-images: remove
