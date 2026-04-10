@@ -25,7 +25,7 @@ help:
 	@echo "  make clone                   - Clone required repositories"
 	@echo "  make elastic                 - Start Elasticsearch and elasticsearch-indexer worker"
 	@echo "  make meilisearch              - Start Meilisearch and meilisearch-indexer worker"
-	@echo "  make pull                    - Pull latest changes in orchestrator and backend"
+	@echo "  make pull                    - Pull latest changes in orchestrator and libs"
 	@echo "  make reclaim                 - Reclaim disk space (prune unused images, volumes, build cache)"
 	@echo "  make release                 - Create release: update version, commit, and tag (e.g., v2026.3.4)"
 	@echo "  make remove                  - Stop services and remove containers/volumes"
@@ -174,6 +174,7 @@ meilisearch: check-setup
 pull:
 	git pull
 	cd libs/entitybase-backend && git pull
+	cd libs/entitybase-import && git pull
 	cd libs/kafka2sse-backend && git pull
 	cd libs/kafka2sse-frontend && git pull
 
