@@ -23,6 +23,7 @@ jobs:
         with:
           repository: dpriskorn/entitybase-backend
           path: libs/entitybase-backend
+          ref: elastic
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
