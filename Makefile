@@ -126,7 +126,7 @@ clean-build-run-core-purge: check-deps check-diskspace clean-local-images
 	docker compose -f docker-compose.yml --profile workers up -d purge-worker
 
 clean-build-run-core-workers-meilisearch: check-deps check-diskspace clean-local-images
-	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true MEILISEARCH_ENABLED=true make build
+	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true MEILISEARCH_ENABLED=true PURGE_WORKER_ENABLED=true make build
 	docker compose -f docker-compose.yml --profile core --profile workers --profile meilisearch up -d
 
 clean-build-run-no-cache: clean-local-images
@@ -142,15 +142,15 @@ clean-build-run-with-meilisearch: check-deps check-diskspace clean-local-images
 	docker compose -f docker-compose.yml --profile meilisearch up -d
 
 clean-build-run-workers: check-deps check-diskspace clean-local-images
-	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true make build
+	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true PURGE_WORKER_ENABLED=true make build
 	docker compose -f docker-compose.yml --profile workers up -d
 
 build-core-workers: check-deps check-diskspace clean-local-images
-	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true make build
+	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true PURGE_WORKER_ENABLED=true make build
 	docker compose -f docker-compose.yml --profile core --profile workers up -d
 
 clean-build-run-core-workers: check-deps check-diskspace clean-local-images
-	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true make build
+	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true PURGE_WORKER_ENABLED=true make build
 	docker compose -f docker-compose.yml --profile core --profile workers up -d
 
 clean-cache-volumes: remove
@@ -212,7 +212,7 @@ run-with-meilisearch: check-setup
 	ID_WORKER_ENABLED=true MEILISEARCH_ENABLED=true docker compose -f docker-compose.yml --profile meilisearch up -d
 
 run-core-workers: check-setup
-	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true docker compose -f docker-compose.yml --profile core --profile workers up -d
+	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true PURGE_WORKER_ENABLED=true docker compose -f docker-compose.yml --profile core --profile workers up -d
 
 settings:
 	curl -s http://localhost:8083/settings | python3 -m json.tool

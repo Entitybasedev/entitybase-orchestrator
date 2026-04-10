@@ -19,15 +19,15 @@ export const eventStreaming = [
 ]
 
 export const workers = [
-  { name: 'ID Worker', url: `http://${HOST}:8001`, healthPath: '/health', configKey: 'id_worker_enabled' },
-  { name: 'JSON Dump Worker', url: `http://${HOST}:8002`, healthPath: '/health', configKey: 'json_worker_enabled' },
-  { name: 'TTL Dump Worker', url: `http://${HOST}:8003`, healthPath: '/health', configKey: 'ttl_worker_enabled' },
-  { name: 'Backlink Stats Worker', url: `http://${HOST}:8004`, healthPath: '/health', configKey: 'backlink_stats_worker_enabled' },
-  { name: 'General Stats Worker', url: `http://${HOST}:8005`, healthPath: '/health', configKey: 'general_stats_worker_enabled' },
-  { name: 'User Stats Worker', url: `http://${HOST}:8006`, healthPath: '/health', configKey: 'user_stats_worker_enabled' },
-  { name: 'Elasticsearch Indexer Worker', url: `http://${HOST}:8007`, healthPath: '/health', configKey: 'elasticsearch_enabled' },
-  { name: 'Meilisearch Indexer Worker', url: `http://${HOST}:8009`, healthPath: '/health', configKey: 'meilisearch_enabled' },
-  { name: 'Purge Worker', url: `http://${HOST}:8008`, healthPath: '/health', configKey: 'purge_worker_enabled' },
+  { name: 'ID Worker', url: `http://${HOST}:8001`, healthPath: '/health', linkUrl: `http://${HOST}:8001/health`, configKey: 'id_worker_enabled' },
+  { name: 'JSON Dump Worker', url: `http://${HOST}:8002`, healthPath: '/health', linkUrl: `http://${HOST}:8002/health`, configKey: 'json_worker_enabled' },
+  { name: 'TTL Dump Worker', url: `http://${HOST}:8003`, healthPath: '/health', linkUrl: `http://${HOST}:8003/health`, configKey: 'ttl_worker_enabled' },
+  { name: 'Backlink Stats Worker', url: `http://${HOST}:8004`, healthPath: '/health', linkUrl: `http://${HOST}:8004/health`, configKey: 'backlink_stats_worker_enabled' },
+  { name: 'General Stats Worker', url: `http://${HOST}:8005`, healthPath: '/health', linkUrl: `http://${HOST}:8005/health`, configKey: 'general_stats_worker_enabled' },
+  { name: 'User Stats Worker', url: `http://${HOST}:8006`, healthPath: '/health', linkUrl: `http://${HOST}:8006/health`, configKey: 'user_stats_worker_enabled' },
+  { name: 'Elasticsearch Indexer Worker', url: `http://${HOST}:8007`, healthPath: '/health', linkUrl: `http://${HOST}:8007/health`, configKey: 'elasticsearch_enabled' },
+  { name: 'Meilisearch Indexer Worker', url: `http://${HOST}:8009`, healthPath: '/health', linkUrl: `http://${HOST}:8009/health`, configKey: 'meilisearch_enabled' },
+  { name: 'Purge Worker', url: `http://${HOST}:8008`, healthPath: '/health', linkUrl: `http://${HOST}:8008/health`, configKey: 'purge_worker_enabled' },
 ]
 
 export const producers = eventStreaming.filter(item => item.producerKey)
