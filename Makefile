@@ -45,10 +45,10 @@ setup:
 	python3 ./scripts/setup.py
 
 build: check-deps
-	./scripts/build-images.sh
+	@ID_WORKER_ENABLED=${ID_WORKER_ENABLED} JSON_WORKER_ENABLED=${JSON_WORKER_ENABLED} TTL_WORKER_ENABLED=${TTL_WORKER_ENABLED} STATS_WORKER_ENABLED=${STATS_WORKER_ENABLED} ELASTICSEARCH_ENABLED=${ELASTICSEARCH_ENABLED} MEILISEARCH_ENABLED=${MEILISEARCH_ENABLED} PURGE_WORKER_ENABLED=${PURGE_WORKER_ENABLED} ./scripts/build-images.sh
 
 build-no-cache: check-deps
-	./scripts/build-images.sh --no-cache
+	@ID_WORKER_ENABLED=${ID_WORKER_ENABLED} JSON_WORKER_ENABLED=${JSON_WORKER_ENABLED} TTL_WORKER_ENABLED=${TTL_WORKER_ENABLED} STATS_WORKER_ENABLED=${STATS_WORKER_ENABLED} ELASTICSEARCH_ENABLED=${ELASTICSEARCH_ENABLED} MEILISEARCH_ENABLED=${MEILISEARCH_ENABLED} PURGE_WORKER_ENABLED=${PURGE_WORKER_ENABLED} ./scripts/build-images.sh --no-cache
 
 check:
 	python3 ./scripts/check_services.py
@@ -110,30 +110,38 @@ clean-build-cache:
 	docker builder prune -f
 	@echo "Build cache cleared. Run 'docker system df' to check."
 
-clean-build-run-all-with-elastic: clean-all build check-diskspace
-	ID_WORKER_ENABLED=true ELASTICSEARCH_ENABLED=true docker compose -f docker-compose.yml --profile elastic up -d
+clean-build-run-all-with-elastic: clean-all check-diskspace
+	ID_WORKER_ENABLED=true ELASTICSEARCH_ENABLED=true make build
+	docker compose -f docker-compose.yml --profile elastic up -d
 
-clean-build-run-core: check-deps check-diskspace clean-local-images build
-	ID_WORKER_ENABLED=true docker compose -f docker-compose.yml --profile core up -d
+clean-build-run-core: check-deps check-diskspace clean-local-images
+	ID_WORKER_ENABLED=true make build
+	docker compose -f docker-compose.yml --profile core up -d
 
-clean-build-run-core-purge: check-deps check-diskspace clean-local-images build
-	ID_WORKER_ENABLED=true PURGE_WORKER_ENABLED=true docker compose -f docker-compose.yml --profile core up -d
+clean-build-run-core-purge: check-deps check-diskspace clean-local-images
+	ID_WORKER_ENABLED=true PURGE_WORKER_ENABLED=true make build
+	docker compose -f docker-compose.yml --profile core up -d
 	docker compose -f docker-compose.yml --profile workers up -d purge-worker
 
-clean-build-run-core-workers-meilisearch: check-deps check-diskspace clean-local-images build
-	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true MEILISEARCH_ENABLED=true docker compose -f docker-compose.yml --profile core --profile workers --profile meilisearch up -d
+clean-build-run-core-workers-meilisearch: check-deps check-diskspace clean-local-images
+	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true MEILISEARCH_ENABLED=true make build
+	docker compose -f docker-compose.yml --profile core --profile workers --profile meilisearch up -d
 
-clean-build-run-no-cache: clean-local-images build-no-cache
-	ID_WORKER_ENABLED=true docker compose -f docker-compose.yml --profile core up -d
+clean-build-run-no-cache: clean-local-images
+	ID_WORKER_ENABLED=true make build-no-cache
+	docker compose -f docker-compose.yml --profile core up -d
 
-clean-build-run-with-elastic: check-deps check-diskspace clean-local-images build
-	ID_WORKER_ENABLED=true ELASTICSEARCH_ENABLED=true docker compose -f docker-compose.yml --profile elastic up -d
+clean-build-run-with-elastic: check-deps check-diskspace clean-local-images
+	ID_WORKER_ENABLED=true ELASTICSEARCH_ENABLED=true make build
+	docker compose -f docker-compose.yml --profile elastic up -d
 
-clean-build-run-with-meilisearch: check-deps check-diskspace clean-local-images build
-	ID_WORKER_ENABLED=true MEILISEARCH_ENABLED=true docker compose -f docker-compose.yml --profile meilisearch up -d
+clean-build-run-with-meilisearch: check-deps check-diskspace clean-local-images
+	ID_WORKER_ENABLED=true MEILISEARCH_ENABLED=true make build
+	docker compose -f docker-compose.yml --profile meilisearch up -d
 
-clean-build-run-workers: check-deps check-diskspace clean-local-images build
-	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true docker compose -f docker-compose.yml --profile workers up -d
+clean-build-run-workers: check-deps check-diskspace clean-local-images
+	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true make build
+	docker compose -f docker-compose.yml --profile workers up -d
 
 clean-cache-volumes: remove
 	docker builder prune -f
