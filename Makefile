@@ -42,21 +42,7 @@ help:
 	@echo "  make setup                   - Initialize environment (run once before first make run)"
 
 setup:
-	@if [ ! -f .env ]; then \
-		if [ -f env.example ]; then \
-			cp env.example .env; \
-			echo "Created .env from env.example. Please edit it with your settings."; \
-		else \
-			echo "Error: env.example not found."; \
-			exit 1; \
-		fi; \
-	else \
-		echo ".env already exists."; \
-	fi
-	@if grep -q "SETUP_COMPLETED=false" .env 2>/dev/null; then \
-		sed -i 's/SETUP_COMPLETED=false/SETUP_COMPLETED=true/' .env; \
-		echo "Setup completed. You can now run 'make run-core'."; \
-	fi
+	python3 ./scripts/setup.py
 
 build: check-deps
 	./scripts/build-images.sh
