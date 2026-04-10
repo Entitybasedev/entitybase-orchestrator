@@ -316,12 +316,13 @@ services:
       idworker:
         condition: service_healthy
     command: uvicorn models.rest_api.main:app --host 0.0.0.0 --port 8080 --workers 10
+    # Long start_period needed to initialize redpanda producers when STREAMING_ENABLED=true
     healthcheck:
       test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8080/health"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 30s
+      start_period: 100s
     profiles:
       - core
       - workers
