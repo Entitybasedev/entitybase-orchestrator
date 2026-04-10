@@ -4,7 +4,7 @@ export const infrastructure = [
   { name: 'MinIO', url: `http://${HOST}:9001`, description: 'S3 storage + console', healthPath: '/minio/health/live', linkUrl: `http://${HOST}:9001` },
   { name: 'MySQL', url: `http://${HOST}:3307`, description: 'Database (no HTTP interface)', healthPath: '/' },
   { name: 'Redpanda', url: `http://${HOST}:9645`, description: 'Kafka messaging + console', healthPath: '/', linkUrl: `http://${HOST}:8084` },
-  { name: 'Backend API', url: `http://${HOST}:8083`, description: 'Main API server', healthPath: '/health' },
+  { name: 'Entitybase API', url: `http://${HOST}:8083`, description: 'Main API server', healthPath: '/health' },
   { name: 'Valkey', url: `http://${HOST}:6378`, description: 'Redis-compatible caching', healthPath: '/' },
   { name: 'Elasticsearch', url: `http://${HOST}:9201`, description: 'Search engine', healthPath: '/', configKey: 'elasticsearch_enabled' },
   { name: 'Meilisearch', url: `http://${HOST}:7700`, description: 'Full-text search', healthPath: '/', linkUrl: `http://${HOST}:7700`, configKey: 'meilisearch_enabled' },

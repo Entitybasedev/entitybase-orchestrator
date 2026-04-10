@@ -110,7 +110,7 @@ onMounted(async () => {
       <span class="legend-item"><span class="dot unhealthy"></span> Unhealthy</span>
       <span class="legend-item"><span class="dot not_configured"></span> Not Configured</span>
       <span class="version">v{{ version }}</span>
-      <span v-if="uptime" class="uptime">Up: {{ uptime }}</span>
+      <span v-if="uptime" class="uptime" title="Uptime for the Entitybase API">Up: {{ uptime }}</span>
     </footer>
   </div>
 </template>
