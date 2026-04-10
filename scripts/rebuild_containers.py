@@ -58,10 +58,11 @@ CONTAINER_MAP = {
         "dockerfile": "libs/entitybase-backend/docker/containers/Dockerfile.api",
         "context": "libs/entitybase-backend/",
     },
-    "purge-worker": {
-        "image": "entitybase-backend-purge-worker:latest",
-        "dockerfile": "libs/entitybase-backend/docker/containers/Dockerfile.purge-worker",
-        "context": "libs/entitybase-backend/",
+    "orchestrator-frontend": {
+        "image": "entitybase-orchestrator-frontend:latest",
+        "dockerfile": "frontend/Dockerfile",
+        "context": "frontend/",
+        "service": "orchestrator-frontend",
     },
 }
 

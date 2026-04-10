@@ -385,8 +385,8 @@ services:
     networks:
       - entitybase-network
 
-  entitybase-orchestrator-frontend:
-    container_name: entitybase-orchestrator-frontend
+  orchestrator-frontend:
+    container_name: orchestrator-frontend
     image: entitybase-orchestrator-frontend:latest
     ports:
       - "8080:8083"
