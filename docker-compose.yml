@@ -297,6 +297,7 @@ services:
       - VITESS_USER=root
       - VITESS_PASSWORD=${MYSQL_ROOT_PASSWORD:-}
       - STREAMING_ENABLED=true
+      - STREAMING_BACKEND=redpanda
       - KAFKA_BOOTSTRAP_SERVERS=redpanda:9092
       - KAFKA_ENTITYCHANGE_JSON_TOPIC=entity_change
       - KAFKA_ENTITY_DIFF_TOPIC=entity_diff
