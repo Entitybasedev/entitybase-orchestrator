@@ -47,7 +47,7 @@ build-no-cache: check-deps
 	./scripts/build-images.sh --no-cache
 
 check:
-	./scripts/check-services.sh
+	python3 ./scripts/check_services.py
 
 check-deps:
 	@echo "Checking dependencies..."
