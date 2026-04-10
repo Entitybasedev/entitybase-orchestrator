@@ -79,6 +79,8 @@ make show-images   # Show built Docker images
 | entitybase-sse-frontend | 8889 | SSE Frontend |
 | idworker | 8001 | ID generation service |
 
+See [PORTS.md](PORTS.md) for complete port reference.
+
 ## Building Docker Images
 
 ### Option A: Full build (recommended)
