@@ -30,7 +30,7 @@ fi
 echo "=========================================="
 echo "Generating requirements from pyproject.toml"
 echo "=========================================="
-./libs/entitybase-backend/scripts/shell/export-requirements.sh
+ID_WORKER_ENABLED=${ID_WORKER_ENABLED:-false} JSON_WORKER_ENABLED=${JSON_WORKER_ENABLED:-false} TTL_WORKER_ENABLED=${TTL_WORKER_ENABLED:-false} STATS_WORKER_ENABLED=${STATS_WORKER_ENABLED:-false} ELASTICSEARCH_ENABLED=${ELASTICSEARCH_ENABLED:-false} MEILISEARCH_ENABLED=${MEILISEARCH_ENABLED:-false} PURGE_WORKER_ENABLED=${PURGE_WORKER_ENABLED:-false} ./libs/entitybase-backend/scripts/shell/export-requirements.sh
 
 echo ""
 echo "=========================================="
