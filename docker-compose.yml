@@ -116,7 +116,7 @@ services:
       - workers
 
   redpanda:
-    image: docker.redpanda.com/redpandadata/redpanda:v25.3.6
+    image: redpandadata/redpanda:v25.3.6
     container_name: redpanda
     command:
       - redpanda
@@ -153,7 +153,7 @@ services:
       - workers
 
   redpanda-console:
-    image: docker.redpanda.com/redpandadata/console:latest
+    image: redpandadata/console:latest
     container_name: redpanda-console
     ports:
       - "8084:8080"
