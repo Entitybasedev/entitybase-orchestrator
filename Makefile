@@ -1,4 +1,4 @@
-.PHONY: build build-no-cache check check-deps check-diskspace clean-all clean-all-except-base-images clean-build-cache clean-build-run-all-with-elastic clean-build-run-core clean-build-run-core-purge clean-build-run-core-workers-meilisearch clean-build-run-no-cache clean-build-run-with-elastic clean-build-run-with-meilisearch clean-build-run-workers clean-cache-volumes clean-local-images clone elastic help meilisearch pull reclaim release remove reset run-core run-core-purge run-core-workers-meilisearch run-with-elastic run-with-meilisearch run-workers settings show-images stop tmpfs-setup test-frontend
+.PHONY: build build-no-cache check check-deps check-diskspace check-setup clean-all clean-all-except-base-images clean-build-cache clean-build-run-all-with-elastic clean-build-run-core clean-build-run-core-purge clean-build-run-core-workers-meilisearch clean-build-run-no-cache clean-build-run-with-elastic clean-build-run-with-meilisearch clean-build-run-workers clean-cache-volumes clean-local-images clone elastic help meilisearch pull reclaim release remove reset run-core run-core-purge run-core-workers-meilisearch run-with-elastic run-with-meilisearch run-workers settings setup show-images stop tmpfs-setup test-frontend
 
 help:
 	@echo "Available targets:"
@@ -33,12 +33,30 @@ help:
 	@echo "  make run-core-workers-meilisearch - Start core + workers + meilisearch (no build)"
 	@echo "  make run-with-elastic        - Start core + elasticsearch (no build)"
 	@echo "  make run-with-meilisearch    - Start core + meilisearch (no build)"
-	@echo "  make run-workers             - Start all services (core + workers, no build)"
+	@echo "  make run-core-workers             - Start all services (core + workers, no build)"
 	@echo "  make settings                - Query the /settings endpoint on localhost:8083"
 	@echo "  make show-images             - Show all entitybase Docker images"
 	@echo "  make stop                    - Stop all running containers"
 	@echo "  make test-frontend           - Run frontend tests (requires npm)"
 	@echo "  make tmpfs-setup             - Setup tmpfs for buildkit cache (requires sudo)"
+	@echo "  make setup                   - Initialize environment (run once before first make run)"
+
+setup:
+	@if [ ! -f .env ]; then \
+		if [ -f env.example ]; then \
+			cp env.example .env; \
+			echo "Created .env from env.example. Please edit it with your settings."; \
+		else \
+			echo "Error: env.example not found."; \
+			exit 1; \
+		fi; \
+	else \
+		echo ".env already exists."; \
+	fi
+	@if grep -q "SETUP_COMPLETED=false" .env 2>/dev/null; then \
+		sed -i 's/SETUP_COMPLETED=false/SETUP_COMPLETED=true/' .env; \
+		echo "Setup completed. You can now run 'make run-core'."; \
+	fi
 
 build: check-deps
 	./scripts/build-images.sh
@@ -80,6 +98,18 @@ check-diskspace:
 	echo "Error: Less than 1GB available"; \
 	exit 1
 
+check-setup:
+	@if [ -f .env ]; then \
+		SETUP=$$(grep "^SETUP_COMPLETED=" .env | cut -d'=' -f2); \
+		if [ "$$SETUP" != "true" ]; then \
+			echo "Error: Run 'make setup' first to initialize the environment."; \
+			exit 1; \
+		fi; \
+	else \
+		echo "Error: .env file not found. Run 'make setup' first."; \
+		exit 1; \
+	fi
+
 clean-all: clean-local-images
 	docker image prune -a -f
 	docker builder prune -f
@@ -95,7 +125,7 @@ clean-build-cache:
 	@echo "Build cache cleared. Run 'docker system df' to check."
 
 clean-build-run-all-with-elastic: clean-all build check-diskspace
-	docker compose -f docker-compose.yml --profile elastic up -d
+	ELASTICSEARCH_ENABLED=true docker compose -f docker-compose.yml --profile elastic up -d
 
 clean-build-run-core: check-deps check-diskspace clean-local-images build
 	docker compose -f docker-compose.yml --profile core up -d
@@ -105,16 +135,16 @@ clean-build-run-core-purge: check-deps check-diskspace clean-local-images build
 	docker compose -f docker-compose.yml --profile workers up -d purge-worker
 
 clean-build-run-core-workers-meilisearch: check-deps check-diskspace clean-local-images build
-	docker compose -f docker-compose.yml --profile core --profile workers --profile meilisearch up -d
+	MEILISEARCH_ENABLED=true docker compose -f docker-compose.yml --profile core --profile workers --profile meilisearch up -d
 
 clean-build-run-no-cache: clean-local-images build-no-cache
 	docker compose -f docker-compose.yml --profile core up -d
 
 clean-build-run-with-elastic: check-deps check-diskspace clean-local-images build
-	docker compose -f docker-compose.yml --profile elastic up -d
+	ELASTICSEARCH_ENABLED=true docker compose -f docker-compose.yml --profile elastic up -d
 
 clean-build-run-with-meilisearch: check-deps check-diskspace clean-local-images build
-	docker compose -f docker-compose.yml --profile meilisearch up -d
+	MEILISEARCH_ENABLED=true docker compose -f docker-compose.yml --profile meilisearch up -d
 
 clean-build-run-workers: check-deps check-diskspace clean-local-images build
 	docker compose -f docker-compose.yml --profile workers up -d
@@ -131,11 +161,11 @@ clean-local-images: remove
 clone:
 	./scripts/clone-repos.sh
 
-elastic:
-	docker compose -f docker-compose.yml --profile elastic up -d
+elastic: check-setup
+	ELASTICSEARCH_ENABLED=true docker compose -f docker-compose.yml --profile elastic up -d
 
-meilisearch:
-	docker compose -f docker-compose.yml --profile meilisearch up -d
+meilisearch: check-setup
+	MEILISEARCH_ENABLED=true docker compose -f docker-compose.yml --profile meilisearch up -d
 
 pull:
 	git pull
@@ -160,23 +190,23 @@ remove: stop
 reset:
 	./scripts/reset.sh
 
-run-core:
+run-core: check-setup
 	docker compose -f docker-compose.yml --profile core up -d
 
-run-core-purge:
+run-core-purge: check-setup
 	docker compose -f docker-compose.yml --profile core up -d
 	docker compose -f docker-compose.yml --profile workers up -d purge-worker
 
-run-core-workers-meilisearch:
+run-core-workers-meilisearch: check-setup
 	docker compose -f docker-compose.yml --profile core --profile workers --profile meilisearch up -d
 
-run-with-elastic:
-	docker compose -f docker-compose.yml --profile elastic up -d
+run-with-elastic: check-setup
+	ELASTICSEARCH_ENABLED=true docker compose -f docker-compose.yml --profile elastic up -d
 
-run-with-meilisearch:
-	docker compose -f docker-compose.yml --profile meilisearch up -d
+run-with-meilisearch: check-setup
+	MEILISEARCH_ENABLED=true docker compose -f docker-compose.yml --profile meilisearch up -d
 
-run-workers:
+run-core-workers: check-setup
 	docker compose -f docker-compose.yml --profile workers up -d
 
 settings:
