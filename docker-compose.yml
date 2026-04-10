@@ -306,6 +306,11 @@ services:
       - KAFKA_THANKS_TOPIC=thanks
       - ELASTICSEARCH_ENABLED=${ELASTICSEARCH_ENABLED:-false}
       - MEILISEARCH_ENABLED=${MEILISEARCH_ENABLED:-false}
+      - ID_WORKER_ENABLED=${ID_WORKER_ENABLED:-true}
+      - JSON_WORKER_ENABLED=${JSON_WORKER_ENABLED:-false}
+      - TTL_WORKER_ENABLED=${TTL_WORKER_ENABLED:-false}
+      - STATS_WORKER_ENABLED=${STATS_WORKER_ENABLED:-false}
+      - PURGE_WORKER_ENABLED=${PURGE_WORKER_ENABLED:-false}
     depends_on:
       create-tables:
         condition: service_completed_successfully

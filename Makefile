@@ -111,29 +111,29 @@ clean-build-cache:
 	@echo "Build cache cleared. Run 'docker system df' to check."
 
 clean-build-run-all-with-elastic: clean-all build check-diskspace
-	ELASTICSEARCH_ENABLED=true docker compose -f docker-compose.yml --profile elastic up -d
+	ID_WORKER_ENABLED=true ELASTICSEARCH_ENABLED=true docker compose -f docker-compose.yml --profile elastic up -d
 
 clean-build-run-core: check-deps check-diskspace clean-local-images build
-	docker compose -f docker-compose.yml --profile core up -d
+	ID_WORKER_ENABLED=true docker compose -f docker-compose.yml --profile core up -d
 
 clean-build-run-core-purge: check-deps check-diskspace clean-local-images build
-	docker compose -f docker-compose.yml --profile core up -d
+	ID_WORKER_ENABLED=true PURGE_WORKER_ENABLED=true docker compose -f docker-compose.yml --profile core up -d
 	docker compose -f docker-compose.yml --profile workers up -d purge-worker
 
 clean-build-run-core-workers-meilisearch: check-deps check-diskspace clean-local-images build
-	MEILISEARCH_ENABLED=true docker compose -f docker-compose.yml --profile core --profile workers --profile meilisearch up -d
+	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true MEILISEARCH_ENABLED=true docker compose -f docker-compose.yml --profile core --profile workers --profile meilisearch up -d
 
 clean-build-run-no-cache: clean-local-images build-no-cache
-	docker compose -f docker-compose.yml --profile core up -d
+	ID_WORKER_ENABLED=true docker compose -f docker-compose.yml --profile core up -d
 
 clean-build-run-with-elastic: check-deps check-diskspace clean-local-images build
-	ELASTICSEARCH_ENABLED=true docker compose -f docker-compose.yml --profile elastic up -d
+	ID_WORKER_ENABLED=true ELASTICSEARCH_ENABLED=true docker compose -f docker-compose.yml --profile elastic up -d
 
 clean-build-run-with-meilisearch: check-deps check-diskspace clean-local-images build
-	MEILISEARCH_ENABLED=true docker compose -f docker-compose.yml --profile meilisearch up -d
+	ID_WORKER_ENABLED=true MEILISEARCH_ENABLED=true docker compose -f docker-compose.yml --profile meilisearch up -d
 
 clean-build-run-workers: check-deps check-diskspace clean-local-images build
-	docker compose -f docker-compose.yml --profile workers up -d
+	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true docker compose -f docker-compose.yml --profile workers up -d
 
 clean-cache-volumes: remove
 	docker builder prune -f
@@ -177,23 +177,23 @@ reset:
 	./scripts/reset.sh
 
 run-core: check-setup
-	docker compose -f docker-compose.yml --profile core up -d
+	ID_WORKER_ENABLED=true docker compose -f docker-compose.yml --profile core up -d
 
 run-core-purge: check-setup
-	docker compose -f docker-compose.yml --profile core up -d
+	ID_WORKER_ENABLED=true PURGE_WORKER_ENABLED=true docker compose -f docker-compose.yml --profile core up -d
 	docker compose -f docker-compose.yml --profile workers up -d purge-worker
 
 run-core-workers-meilisearch: check-setup
-	docker compose -f docker-compose.yml --profile core --profile workers --profile meilisearch up -d
+	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true MEILISEARCH_ENABLED=true docker compose -f docker-compose.yml --profile core --profile workers --profile meilisearch up -d
 
 run-with-elastic: check-setup
-	ELASTICSEARCH_ENABLED=true docker compose -f docker-compose.yml --profile elastic up -d
+	ID_WORKER_ENABLED=true ELASTICSEARCH_ENABLED=true docker compose -f docker-compose.yml --profile elastic up -d
 
 run-with-meilisearch: check-setup
-	MEILISEARCH_ENABLED=true docker compose -f docker-compose.yml --profile meilisearch up -d
+	ID_WORKER_ENABLED=true MEILISEARCH_ENABLED=true docker compose -f docker-compose.yml --profile meilisearch up -d
 
 run-core-workers: check-setup
-	docker compose -f docker-compose.yml --profile workers up -d
+	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true docker compose -f docker-compose.yml --profile workers up -d
 
 settings:
 	curl -s http://localhost:8083/settings | python3 -m json.tool
