@@ -1,20 +1,21 @@
 #!/bin/sh
-apk add --no-cache docker-cli > /dev/null 2>&1
 
 python3 -c "
 import http.server
 import socketserver
-import subprocess
+import urllib.request
 import json
+import signal
 
 class Handler(http.server.BaseHTTPRequestHandler):
+    def log_message(self, format, *args):
+        pass
+
     def do_GET(self):
         try:
-            result = subprocess.run(
-                ['docker', 'exec', 'redpanda', 'rpk', 'cluster', 'health', '--format', 'json'],
-                capture_output=True, timeout=5
-            )
-            health = json.loads(result.stdout)
+            with urllib.request.urlopen('http://redpanda:9644/v1/cluster/health_overview', timeout=5) as response:
+                health = json.load(response)
+            
             if health.get('is_healthy'):
                 status = 200
                 msg = b'healthy'
@@ -24,6 +25,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
         except Exception as e:
             status = 503
             msg = b'unhealthy'
+        
         self.send_response(status)
         self.send_header('Content-Type', 'text/plain')
         self.end_headers()
