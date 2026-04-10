@@ -1,24 +1,44 @@
 <script setup>
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import { infrastructure, workers, producers, streamingServices } from './config/services.js'
 import { useHealth } from './composables/useHealth.js'
 import StatusCard from './components/StatusCard.vue'
 
 const version = import.meta.env.VITE_APP_VERSION || 'dev'
+const uptime = ref('')
 
 const { getStatus, checkAll } = useHealth()
+
+function formatUptime(seconds) {
+  const hours = Math.floor(seconds / 3600)
+  const minutes = Math.floor((seconds % 3600) / 60)
+  return `${hours}h ${minutes}m`
+}
+
+async function fetchUptime() {
+  try {
+    const res = await fetch('http://localhost:8083/v1/uptime')
+    if (!res.ok) return
+    const data = await res.json()
+    uptime.value = formatUptime(data.uptime_seconds)
+  } catch {
+    uptime.value = ''
+  }
+}
 
 onMounted(async () => {
   await checkAll(infrastructure)
   await checkAll(streamingServices)
   await checkAll(producers)
   await checkAll(workers)
+  await fetchUptime()
 
   setInterval(async () => {
     await checkAll(infrastructure)
     await checkAll(streamingServices)
     await checkAll(producers)
     await checkAll(workers)
+    await fetchUptime()
   }, 30000)
 })
 </script>
@@ -89,6 +109,7 @@ onMounted(async () => {
       <span class="legend-item"><span class="dot unhealthy"></span> Unhealthy</span>
       <span class="legend-item"><span class="dot not_configured"></span> Not Configured</span>
       <span class="version">v{{ version }}</span>
+      <span v-if="uptime" class="uptime">Up: {{ uptime }}</span>
     </footer>
   </div>
 </template>
@@ -142,6 +163,10 @@ h1 {
 .dot.healthy { background: #22c55e; }
 .dot.unhealthy { background: #ef4444; }
 .dot.not_configured { background: #f59e0b; }
+
+.uptime {
+  color: #22c55e;
+}
 
 h2 {
   font-size: 1.5rem;
