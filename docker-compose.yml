@@ -311,6 +311,7 @@ services:
       - TTL_WORKER_ENABLED=${TTL_WORKER_ENABLED:-false}
       - STATS_WORKER_ENABLED=${STATS_WORKER_ENABLED:-false}
       - PURGE_WORKER_ENABLED=${PURGE_WORKER_ENABLED:-false}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
     depends_on:
       create-tables:
         condition: service_completed_successfully
@@ -322,7 +323,7 @@ services:
         condition: service_healthy
       idworker:
         condition: service_healthy
-    command: uvicorn models.rest_api.main:app --reload --host 0.0.0.0 --port 8080 --workers 1 --log-config=log_conf.yaml
+    command: uvicorn models.rest_api.main:app --reload --host 0.0.0.0 --port 8080 --workers 1
     # Long start_period needed to initialize redpanda producers when STREAMING_ENABLED=true
     healthcheck:
       test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8080/health"]
