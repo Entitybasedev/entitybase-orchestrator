@@ -18,6 +18,10 @@ flowchart TB
         Workers[Workers<br/>8002-8006]
     end
 
+    subgraph Frontend
+        Orch[orchestrator-frontend<br/>8080]
+    end
+
     subgraph SSE
         SSE_BE[entitybase-sse-backend<br/>8888]
         SSE_FE[entitybase-sse-frontend<br/>8889]
@@ -25,9 +29,12 @@ flowchart TB
 
     Users((Users))
 
+    Users -->|HTTP| Orch
     Users -->|HTTP| API
     Users -->|HTTP| SSE_BE
     Users -->|HTTP| SSE_FE
+
+    Orch --> API
 
     API --> MySQL
     API --> Minio

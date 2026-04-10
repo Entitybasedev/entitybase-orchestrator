@@ -567,12 +567,12 @@ services:
         condition: service_healthy
       create-tables:
         condition: service_completed_successfully
-    # healthcheck:
-    #   test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:8004/health"]
-    #   interval: 30s
-    #   timeout: 10s
-    #   retries: 3
-    #   start_period: 30s
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:8004/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
     profiles:
       - workers
     command: ["python", "-m", "models.workers.backlink_statistics"]
@@ -600,12 +600,12 @@ services:
         condition: service_healthy
       create-tables:
         condition: service_completed_successfully
-    # healthcheck:
-    #   test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:8005/health"]
-    #   interval: 30s
-    #   timeout: 10s
-    #   retries: 3
-    #   start_period: 30s
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:8005/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
     profiles:
       - workers
     command: ["python", "-m", "models.workers.general_stats"]
@@ -633,12 +633,12 @@ services:
         condition: service_healthy
       create-tables:
         condition: service_completed_successfully
-    # healthcheck:
-    #   test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:8006/health"]
-    #   interval: 30s
-    #   timeout: 10s
-    #   retries: 3
-    #   start_period: 30s
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:8006/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
     profiles:
       - workers
     command: ["python", "-m", "models.workers.user_stats"]
