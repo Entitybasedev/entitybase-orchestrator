@@ -43,6 +43,16 @@ When adding new services to the frontend:
 2. Expose the port in docker-compose (e.g., `8001:8001`)
 3. Add entry to `infrastructure` or `workers` array in `frontend/src/App.vue`
 
+### Host Configuration
+
+Always use `HOST` from `./config/services.js` instead of hardcoding `localhost`:
+```js
+import { HOST } from './config/services.js'
+const url = `http://${HOST}:8083/...`
+```
+
+This ensures the frontend works with custom hostnames via `VITE_HOST` env variable.
+
 ## Key Commands
 
 ```bash

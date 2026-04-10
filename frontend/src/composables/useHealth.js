@@ -1,4 +1,5 @@
 import { ref } from 'vue'
+import { HOST } from '../config/services.js'
 
 const healthStatus = ref({})
 const producerStatus = ref({})
@@ -58,7 +59,7 @@ export function useHealth() {
 
   async function fetchSettings() {
     try {
-      const response = await fetch('http://localhost:8083/settings')
+      const response = await fetch(`http://${HOST}:8083/settings`)
       settings.value = await response.json()
     } catch {
       settings.value = {}

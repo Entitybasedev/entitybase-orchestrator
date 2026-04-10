@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, ref } from 'vue'
-import { infrastructure, workers, producers, streamingServices } from './config/services.js'
+import { infrastructure, workers, producers, streamingServices, HOST } from './config/services.js'
 import { useHealth } from './composables/useHealth.js'
 import StatusCard from './components/StatusCard.vue'
 
@@ -17,7 +17,7 @@ function formatUptime(seconds) {
 
 async function fetchUptime() {
   try {
-    const res = await fetch('http://localhost:8083/v1/uptime')
+    const res = await fetch(`http://${HOST}:8083/v1/uptime`)
     if (!res.ok) return
     const data = await res.json()
     uptime.value = formatUptime(data.uptime_seconds)
@@ -109,7 +109,7 @@ onMounted(async () => {
       <span class="legend-item"><span class="dot healthy"></span> Healthy</span>
       <span class="legend-item"><span class="dot unhealthy"></span> Unhealthy</span>
       <span class="legend-item"><span class="dot not_configured"></span> Not Configured</span>
-      <span class="version">v{{ version }}</span>
+      <span class="version">{{ version }}</span>
       <span v-if="uptime" class="uptime" title="Uptime for the Entitybase API">Up: {{ uptime }}</span>
     </footer>
   </div>

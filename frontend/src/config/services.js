@@ -1,4 +1,4 @@
-const HOST = import.meta.env.VITE_HOST || 'localhost'
+export const HOST = import.meta.env.VITE_HOST || 'localhost'
 
 export const infrastructure = [
   { name: 'MinIO', url: `http://${HOST}:9001`, description: 'S3 storage + console', healthPath: '/minio/health/live', linkUrl: `http://${HOST}:9001` },
