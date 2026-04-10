@@ -8,7 +8,7 @@ const settings = ref({})
 export function useHealth() {
   async function checkHealth(item) {
     if (item.configKey && settings.value[item.configKey] === false) {
-      healthStatus.value[item.url] = 'not_configured'
+      healthStatus.value[item.url] = 'disabled'
       return
     }
 
@@ -33,7 +33,7 @@ export function useHealth() {
     try {
       const response = await fetch(`${item.url}${item.healthPath}`)
       const data = await response.json()
-      const status = data.producers?.[item.producerKey] || 'not_configured'
+      const status = data.producers?.[item.producerKey] || 'disabled'
       producerStatus.value[item.producerKey] = status
     } catch {
       producerStatus.value[item.producerKey] = 'disconnected'

@@ -108,7 +108,7 @@ onMounted(async () => {
     <footer class="legend">
       <span class="legend-item"><span class="dot healthy"></span> Healthy</span>
       <span class="legend-item"><span class="dot unhealthy"></span> Unhealthy</span>
-      <span class="legend-item"><span class="dot not_configured"></span> Not Configured</span>
+      <span class="legend-item"><span class="dot disabled"></span> Disabled</span>
       <span class="version">{{ version }}</span>
       <span v-if="uptime" class="uptime" title="Uptime for the Entitybase API">Up: {{ uptime }}</span>
     </footer>
@@ -163,7 +163,7 @@ h1 {
 
 .dot.healthy { background: #22c55e; }
 .dot.unhealthy { background: #ef4444; }
-.dot.not_configured { background: #f59e0b; }
+.dot.disabled { background: #f59e0b; }
 
 .uptime {
   color: #22c55e;

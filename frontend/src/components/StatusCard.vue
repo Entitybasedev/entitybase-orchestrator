@@ -92,7 +92,7 @@ defineProps({
 
 .status.healthy { background: #22c55e; }
 .status.unhealthy { background: #ef4444; }
-.status.not_configured { background: #f59e0b; }
+.status.disabled { background: #f59e0b; }
 .status.disconnected { background: #ef4444; }
 .status.connected { background: #22c55e; }
 
