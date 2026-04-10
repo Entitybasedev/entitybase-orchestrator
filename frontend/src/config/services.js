@@ -6,8 +6,8 @@ export const infrastructure = [
   { name: 'Redpanda', url: `http://${HOST}:9645`, description: 'Kafka messaging + console', healthPath: '/', linkUrl: `http://${HOST}:8084` },
   { name: 'Backend API', url: `http://${HOST}:8083`, description: 'Main API server', healthPath: '/health' },
   { name: 'Valkey', url: `http://${HOST}:6378`, description: 'Redis-compatible caching', healthPath: '/' },
-  { name: 'Elasticsearch', url: `http://${HOST}:9201`, description: 'Search engine', healthPath: '/' },
-  { name: 'Meilisearch', url: `http://${HOST}:7700`, description: 'Full-text search', healthPath: '/', linkUrl: `http://${HOST}:7700` },
+  { name: 'Elasticsearch', url: `http://${HOST}:9201`, description: 'Search engine', healthPath: '/', configKey: 'elasticsearch_enabled' },
+  { name: 'Meilisearch', url: `http://${HOST}:7700`, description: 'Full-text search', healthPath: '/', linkUrl: `http://${HOST}:7700`, configKey: 'meilisearch_enabled' },
 ]
 
 export const eventStreaming = [

@@ -2,9 +2,15 @@ import { ref } from 'vue'
 
 const healthStatus = ref({})
 const producerStatus = ref({})
+const settings = ref({})
 
 export function useHealth() {
   async function checkHealth(item) {
+    if (item.configKey && settings.value[item.configKey] === false) {
+      healthStatus.value[item.url] = 'not_configured'
+      return
+    }
+
     const urlToCheck = item.brokerUrl || item.url
     const healthPath = item.brokerHealthPath || item.healthPath
 
@@ -50,12 +56,23 @@ export function useHealth() {
     }
   }
 
+  async function fetchSettings() {
+    try {
+      const response = await fetch('http://localhost:8083/settings')
+      settings.value = await response.json()
+    } catch {
+      settings.value = {}
+    }
+  }
+
   return {
     healthStatus,
     producerStatus,
+    settings,
     checkHealth,
     checkProducerHealth,
     getStatus,
     checkAll,
+    fetchSettings,
   }
 }

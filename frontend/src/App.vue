@@ -7,7 +7,7 @@ import StatusCard from './components/StatusCard.vue'
 const version = import.meta.env.VITE_APP_VERSION || 'dev'
 const uptime = ref('')
 
-const { getStatus, checkAll } = useHealth()
+const { getStatus, checkAll, fetchSettings } = useHealth()
 
 function formatUptime(seconds) {
   const hours = Math.floor(seconds / 3600)
@@ -27,6 +27,7 @@ async function fetchUptime() {
 }
 
 onMounted(async () => {
+  await fetchSettings()
   await checkAll(infrastructure)
   await checkAll(streamingServices)
   await checkAll(producers)
