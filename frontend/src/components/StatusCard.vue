@@ -115,7 +115,4 @@ defineProps({
   margin-top: auto;
 }
 
-.status-card.producer {
-  background: #e8f4fd;
-}
 </style>
