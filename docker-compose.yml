@@ -235,10 +235,9 @@ services:
     command: python -m models.workers.create topics setup
     environment:
       KAFKA_BOOTSTRAP_SERVERS: redpanda:9092
-      KAFKA_ENTITY_CHANGE_TOPIC: entity_change
-      KAFKA_ENTITY_DIFF_TOPIC: entity_diff
-      KAFKA_ENDORSEMENT_TOPIC: endorsement
-      KAFKA_THANKS_TOPIC: thanks
+      KAFKA_ENTITY_CHANGE_TOPIC: ${KAFKA_ENTITY_CHANGE_TOPIC:-entity_change}
+      KAFKA_ENTITY_DIFF_TOPIC: ${KAFKA_ENTITY_DIFF_TOPIC:-entity_diff}
+      KAFKA_INCREMENTAL_RDF_TOPIC: ${KAFKA_INCREMENTAL_RDF_TOPIC:-incremental_rdf_diff}
     profiles:
       - core
       - workers
@@ -299,8 +298,8 @@ services:
       - STREAMING_ENABLED=true
       - STREAMING_BACKEND=redpanda
       - KAFKA_BOOTSTRAP_SERVERS=redpanda:9092
-      - KAFKA_ENTITYCHANGE_JSON_TOPIC=entity_change
-      - KAFKA_ENTITY_DIFF_TOPIC=entity_diff
+      - KAFKA_ENTITYCHANGE_JSON_TOPIC=${KAFKA_ENTITY_CHANGE_TOPIC:-entity_change}
+      - KAFKA_ENTITY_DIFF_TOPIC=${KAFKA_ENTITY_DIFF_TOPIC:-entity_diff}
       - KAFKA_USERCHANGE_JSON_TOPIC=user_change
       - KAFKA_ENDORSEMENT_TOPIC=endorsement
       - KAFKA_THANKS_TOPIC=thanks
@@ -669,7 +668,7 @@ services:
       ELASTICSEARCH_PORT: 9200
       ELASTICSEARCH_INDEX: entitybase
       KAFKA_BOOTSTRAP_SERVERS: redpanda:9092
-      KAFKA_ENTITYCHANGE_JSON_TOPIC: entity_change
+      KAFKA_ENTITYCHANGE_JSON_TOPIC: ${KAFKA_ENTITY_CHANGE_TOPIC:-entity_change}
       ELASTICSEARCH_CONSUMER_GROUP: entitybase-elasticsearch-indexer
     depends_on:
       create-tables:
@@ -715,7 +714,7 @@ services:
       MEILISEARCH_PORT: 7700
       MEILISEARCH_INDEX: entitybase
       KAFKA_BOOTSTRAP_SERVERS: redpanda:9092
-      KAFKA_ENTITYCHANGE_JSON_TOPIC: entity_change
+      KAFKA_ENTITYCHANGE_JSON_TOPIC: ${KAFKA_ENTITY_CHANGE_TOPIC:-entity_change}
       MEILISEARCH_CONSUMER_GROUP: entitybase-meilisearch-indexer
     depends_on:
       create-tables:
@@ -854,7 +853,7 @@ services:
       MEILISEARCH_API_KEY: ${MEILISEARCH_MASTER_KEY:-}
       MEILISEARCH_INDEX: entitybase
       KAFKA_BOOTSTRAP_SERVERS: redpanda:9092
-      KAFKA_ENTITYCHANGE_JSON_TOPIC: entity_change
+      KAFKA_ENTITYCHANGE_JSON_TOPIC: ${KAFKA_ENTITY_CHANGE_TOPIC:-entity_change}
       STREAMING_ENABLED: "true"
     working_dir: /app
     command: ["poetry", "run", "pytest", "tests/unit/models/workers/test_meilisearch_indexer_worker.py", "-v"]
