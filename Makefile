@@ -1,4 +1,4 @@
-.PHONY: build build-core-workers build-no-cache check check-deps check-diskspace check-setup clean-all clean-all-except-base-images clean-build-cache clean-build-run-core clean-build-run-core-purge clean-build-run-core-workers clean-build-run-core-workers-meilisearch clean-build-run-workers clean-cache-volumes clean-local-images clone elastic help meilisearch pull release remove run-core run-core-purge run-core-workers run-core-workers-meilisearch settings setup show-images stop test-frontend tmpfs-check tmpfs-clean-build-run-core-workers-meilisearch tmpfs-setup
+.PHONY: build build-core-workers build-no-cache check check-deps check-diskspace check-setup clean-all clean-all-except-base-images clean-build-cache clean-build-run-core clean-build-run-core-purge clean-build-run-core-workers clean-build-run-core-workers-meilisearch clean-build-run-workers clean-cache-volumes clean-local-images clone elastic help meilisearch pull release remove run-core run-core-purge run-core-workers run-core-workers-meilisearch settings setup show-images stop test-frontend tmpfs-check tmpfs-clean-build-run-core-workers-meilisearch tmpfs-setup tmpfs-volumes-setup
 
 help:
 	@echo "Available targets:"
@@ -36,6 +36,7 @@ help:
 	@echo "  make tmpfs-check            - Check if tmpfs is set up, warn if not"
 	@echo "  make tmpfs-clean-build-run-core-workers-meilisearch - Setup tmpfs, clean local images, build, and start core + workers + meilisearch"
 	@echo "  make tmpfs-setup             - Setup tmpfs for buildkit cache (requires sudo)"
+	@echo "  make tmpfs-volumes-setup     - Setup tmpfs for Docker volumes (requires sudo)"
 
 setup:
 	python3 ./scripts/setup.py
@@ -81,6 +82,8 @@ check-diskspace:
 	exit 1
 
 check-setup:
+	@make tmpfs-setup
+	@make tmpfs-volumes-setup
 	@if [ -f .env ]; then \
 		SETUP=$$(grep "^SETUP_COMPLETED=" .env | cut -d'=' -f2); \
 		if [ "$$SETUP" != "true" ]; then \
@@ -166,6 +169,10 @@ remove: stop
 	docker network rm $$(docker network ls -q) || true
 	docker compose -f docker-compose.yml down -v --remove-orphans
 	docker volume prune -f
+	@if df -T /tmp/docker-volumes 2>/dev/null | grep -q tmpfs; then \
+		echo "Cleaning tmpfs volumes..."; \
+		sudo rm -rf /tmp/docker-volumes/*; \
+	fi
 
 run-core: check-setup
 	ID_WORKER_ENABLED=true docker compose -f docker-compose.yml --profile core up -d
@@ -202,14 +209,28 @@ tmpfs-setup:
 		echo "tmpfs mounted successfully"; \
 	fi
 
+tmpfs-volumes-setup:
+	@if df -T /tmp/docker-volumes 2>/dev/null | grep -q tmpfs; then \
+		echo "tmpfs at /tmp/docker-volumes already mounted"; \
+	else \
+		echo "Creating and mounting tmpfs at /tmp/docker-volumes..."; \
+		sudo mkdir -p /tmp/docker-volumes; \
+		sudo mount -t tmpfs -o size=1G,mode=1777 tmpfs /tmp/docker-volumes; \
+		echo "tmpfs mounted successfully"; \
+	fi
+
 tmpfs-check:
 	@if df -T /tmp/docker-buildkit 2>/dev/null | grep -q tmpfs; then \
-		exit 0; \
+		:; \
 	else \
 		echo "Warning: tmpfs not set up at /tmp/docker-buildkit. Build performance may be slower."; \
 		read -p "Continue building without tmpfs? (y/N) " ans; \
 		if [ "$$ans" != "y" ] && [ "$$ans" != "Y" ]; then \
-			echo "Aborted."; \
 			exit 1; \
 		fi \
+	fi
+	@if df -T /tmp/docker-volumes 2>/dev/null | grep -q tmpfs; then \
+		:; \
+	else \
+		echo "Warning: tmpfs not set up at /tmp/docker-volumes. Volumes will use disk."; \
 	fi
