@@ -14,6 +14,7 @@ export const eventStreaming = [
   { name: 'Server-Sent Events Backend', url: `http://${HOST}:8888`, description: 'SSE API', healthPath: '/health' },
   { name: 'Server-Sent Events Frontend', url: `http://${HOST}:8889`, description: 'SSE UI', healthPath: '/health' },
   { name: 'Entity Change Producer', url: `http://${HOST}:8083`, healthPath: '/health', producerKey: 'entity_change', topic: 'entity_change' },
+  { name: 'Incremental RDF Producer', url: `http://${HOST}:8083`, healthPath: '/health', producerKey: 'incremental_rdf', topic: 'incremental_rdf_diff' },
   { name: 'User Change Producer', url: `http://${HOST}:8083`, healthPath: '/health', producerKey: 'user_change', topic: 'user_change' },
 ]
 
