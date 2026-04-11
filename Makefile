@@ -221,13 +221,6 @@ tmpfs-volumes:
 		sudo mount -t tmpfs -o size=1G,mode=1777 tmpfs /tmp/docker-volumes; \
 		echo "tmpfs mounted successfully"; \
 	fi
-	@echo "Setting permissions on volume directories..."; \
-	sudo mkdir -p /tmp/docker-volumes/redpanda-data; \
-	sudo chown -R 101:101 /tmp/docker-volumes/redpanda-data; \
-	sudo mkdir -p /tmp/docker-volumes/minio-data; \
-	sudo chown -R 1000:1000 /tmp/docker-volumes/minio-data; \
-	sudo mkdir -p /tmp/docker-volumes/meilisearch-data; \
-	sudo chown -R 100:100 /tmp/docker-volumes/meilisearch-data
 
 tmpfs-check:
 	@if df -T /tmp/docker-buildkit 2>/dev/null | grep -q tmpfs; then \
