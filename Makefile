@@ -165,6 +165,7 @@ remove: stop
 	docker rm $$(docker ps -aq) || true
 	docker network rm $$(docker network ls -q) || true
 	docker compose -f docker-compose.yml down -v --remove-orphans
+	docker volume prune -f
 
 run-core: check-setup
 	ID_WORKER_ENABLED=true docker compose -f docker-compose.yml --profile core up -d
@@ -197,7 +198,7 @@ tmpfs-setup:
 	else \
 		echo "Creating and mounting tmpfs at /tmp/docker-buildkit..."; \
 		sudo mkdir -p /tmp/docker-buildkit; \
-		sudo mount -t tmpfs -o size=4G,mode=1777 tmpfs /tmp/docker-buildkit; \
+		sudo mount -t tmpfs -o size=1G,mode=1777 tmpfs /tmp/docker-buildkit; \
 		echo "tmpfs mounted successfully"; \
 	fi
 
