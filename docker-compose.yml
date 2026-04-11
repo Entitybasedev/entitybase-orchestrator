@@ -823,7 +823,7 @@ services:
     container_name: incremental-rdf-worker
     image: entitybase-backend-incremental-rdf-worker:latest
     ports:
-      - "8009:8009"
+      - "8010:8010"
     environment:
       WORKER_ID: incremental_rdf_worker_1
       VITESS_HOST: mysql
@@ -839,18 +839,10 @@ services:
       KAFKA_ENTITYCHANGE_JSON_TOPIC: ${KAFKA_ENTITY_CHANGE_TOPIC:-entity_change}
       KAFKA_INCREMENTAL_RDF_TOPIC: ${KAFKA_INCREMENTAL_RDF_TOPIC:-incremental_rdf_diff}
     depends_on:
-      create-tables:
-        condition: service_completed_successfully
-      create-topics:
-        condition: service_completed_successfully
-      mysql:
-        condition: service_healthy
-      minio:
-        condition: service_healthy
-      redpanda:
+      entitybase-api:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:8009/health"]
+      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:8010/health"]
       interval: 30s
       timeout: 10s
       retries: 3
