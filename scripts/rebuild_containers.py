@@ -63,6 +63,11 @@ CONTAINER_MAP = {
         "dockerfile": "libs/entitybase-backend/docker/containers/Dockerfile.purge-worker",
         "context": "libs/entitybase-backend/",
     },
+    "incremental-rdf-worker": {
+        "image": "entitybase-backend-incremental-rdf-worker:latest",
+        "dockerfile": "libs/entitybase-backend/docker/containers/Dockerfile.incremental-rdf-worker",
+        "context": "libs/entitybase-backend/",
+    },
     "orchestrator-frontend": {
         "image": "entitybase-orchestrator-frontend:latest",
         "dockerfile": "frontend/Dockerfile",
