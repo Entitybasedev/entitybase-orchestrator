@@ -1,4 +1,4 @@
-.PHONY: build build-no-cache build-core-workers check check-deps check-diskspace check-setup clean-all clean-all-except-base-images clean-build-cache clean-build-run-all-with-elastic clean-build-run-core clean-build-run-core-purge clean-build-run-core-workers clean-build-run-core-workers-meilisearch clean-build-run-no-cache clean-build-run-with-elastic clean-build-run-with-meilisearch clean-build-run-workers clean-cache-volumes clean-local-images clone elastic help meilisearch pull reclaim release remove reset run-core run-core-purge run-core-workers run-core-workers-meilisearch run-with-elastic run-with-meilisearch settings setup show-images stop tmpfs-setup test-frontend
+.PHONY: build build-no-cache build-core-workers check check-deps check-diskspace check-setup tmpfs-check clean-all clean-all-except-base-images clean-build-cache clean-build-run-all-with-elastic clean-build-run-core clean-build-run-core-purge clean-build-run-core-workers clean-build-run-core-workers-meilisearch clean-build-run-no-cache clean-build-run-with-elastic clean-build-run-with-meilisearch clean-build-run-workers clean-cache-volumes clean-local-images clone elastic help meilisearch pull reclaim release remove reset run-core run-core-purge run-core-workers run-core-workers-meilisearch run-with-elastic run-with-meilisearch settings setup show-images stop tmpfs-setup tmpfs-check tmpfs-clean-build-run-core-workers-meilisearch test-frontend
 
 help:
 	@echo "Available targets:"
@@ -15,6 +15,7 @@ help:
 	@echo "  make clean-build-run-core    - Clean, build, and start core services"
 	@echo "  make clean-build-run-core-purge - Clean, build, and start core + workers + purge worker"
 	@echo "  make clean-build-run-core-workers-meilisearch - Clean, build, and start core + workers + meilisearch"
+	@echo "  make tmpfs-clean-build-run-core-workers-meilisearch - Setup tmpfs, clean, build, and start core + workers + meilisearch"
 	@echo "  make clean-build-run-no-cache - Clean, build without cache, and start core services"
 	@echo "  make clean-build-run-with-elastic - Clean, build, and start core + elasticsearch"
 	@echo "  make clean-build-run-with-meilisearch - Clean, build, and start core + meilisearch"
@@ -41,15 +42,16 @@ help:
 	@echo "  make stop                    - Stop all running containers"
 	@echo "  make test-frontend           - Run frontend tests (requires npm)"
 	@echo "  make tmpfs-setup             - Setup tmpfs for buildkit cache (requires sudo)"
+	@echo "  make tmpfs-check            - Check if tmpfs is set up, warn if not"
 	@echo "  make setup                   - Initialize environment (run once before first make run)"
 
 setup:
 	python3 ./scripts/setup.py
 
-build: check-deps
+build: check-deps tmpfs-check
 	@ID_WORKER_ENABLED=${ID_WORKER_ENABLED} JSON_WORKER_ENABLED=${JSON_WORKER_ENABLED} TTL_WORKER_ENABLED=${TTL_WORKER_ENABLED} STATS_WORKER_ENABLED=${STATS_WORKER_ENABLED} ELASTICSEARCH_ENABLED=${ELASTICSEARCH_ENABLED} MEILISEARCH_ENABLED=${MEILISEARCH_ENABLED} PURGE_WORKER_ENABLED=${PURGE_WORKER_ENABLED} ./scripts/build-images.sh
 
-build-no-cache: check-deps
+build-no-cache: check-deps tmpfs-check
 	@ID_WORKER_ENABLED=${ID_WORKER_ENABLED} JSON_WORKER_ENABLED=${JSON_WORKER_ENABLED} TTL_WORKER_ENABLED=${TTL_WORKER_ENABLED} STATS_WORKER_ENABLED=${STATS_WORKER_ENABLED} ELASTICSEARCH_ENABLED=${ELASTICSEARCH_ENABLED} MEILISEARCH_ENABLED=${MEILISEARCH_ENABLED} PURGE_WORKER_ENABLED=${PURGE_WORKER_ENABLED} ./scripts/build-images.sh --no-cache
 
 check:
@@ -112,44 +114,46 @@ clean-build-cache:
 	docker builder prune -af
 	@echo "Build cache cleared. Run 'docker system df' to check."
 
-clean-build-run-all-with-elastic: clean-all check-diskspace
-	ID_WORKER_ENABLED=true ELASTICSEARCH_ENABLED=true make build
-	docker compose -f docker-compose.yml --profile elastic up -d
+# clean-build-run-all-with-elastic: clean-all check-diskspace
+# 	ID_WORKER_ENABLED=true ELASTICSEARCH_ENABLED=true make build
+# 	docker compose -f docker-compose.yml --profile elastic up -d
 
-clean-build-run-core: check-deps check-diskspace clean-local-images
+clean-build-run-core: check-deps tmpfs-check check-diskspace clean-local-images
 	ID_WORKER_ENABLED=true make build
 	docker compose -f docker-compose.yml --profile core up -d
 
-clean-build-run-core-purge: check-deps check-diskspace clean-local-images
+clean-build-run-core-purge: check-deps tmpfs-check check-diskspace clean-local-images
 	ID_WORKER_ENABLED=true PURGE_WORKER_ENABLED=true make build
 	docker compose -f docker-compose.yml --profile core up -d
 	docker compose -f docker-compose.yml --profile workers up -d purge-worker
 
-clean-build-run-core-workers-meilisearch: check-deps check-diskspace clean-local-images
+clean-build-run-core-workers-meilisearch: check-deps tmpfs-check check-diskspace clean-local-images
 	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true MEILISEARCH_ENABLED=true PURGE_WORKER_ENABLED=true make build
 	docker compose -f docker-compose.yml --profile core --profile workers --profile meilisearch up -d
 
-clean-build-run-no-cache: clean-local-images
-	ID_WORKER_ENABLED=true make build-no-cache
-	docker compose -f docker-compose.yml --profile core up -d
+tmpfs-clean-build-run-core-workers-meilisearch: tmpfs-setup clean-build-run-core-workers-meilisearch
 
-clean-build-run-with-elastic: check-deps check-diskspace clean-local-images
-	ID_WORKER_ENABLED=true ELASTICSEARCH_ENABLED=true make build
-	docker compose -f docker-compose.yml --profile elastic up -d
+# clean-build-run-no-cache: clean-local-images
+# 	ID_WORKER_ENABLED=true make build-no-cache
+# 	docker compose -f docker-compose.yml --profile core up -d
 
-clean-build-run-with-meilisearch: check-deps check-diskspace clean-local-images
-	ID_WORKER_ENABLED=true MEILISEARCH_ENABLED=true make build
-	docker compose -f docker-compose.yml --profile meilisearch up -d
+# clean-build-run-with-elastic: check-deps check-diskspace clean-local-images
+# 	ID_WORKER_ENABLED=true ELASTICSEARCH_ENABLED=true make build
+# 	docker compose -f docker-compose.yml --profile elastic up -d
 
-clean-build-run-workers: check-deps check-diskspace clean-local-images
+# clean-build-run-with-meilisearch: check-deps check-diskspace clean-local-images
+# 	ID_WORKER_ENABLED=true MEILISEARCH_ENABLED=true make build
+# 	docker compose -f docker-compose.yml --profile meilisearch up -d
+
+clean-build-run-workers: check-deps tmpfs-check check-diskspace clean-local-images
 	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true PURGE_WORKER_ENABLED=true make build
 	docker compose -f docker-compose.yml --profile workers up -d
 
-build-core-workers: check-deps check-diskspace clean-local-images
+build-core-workers: check-deps tmpfs-check check-diskspace clean-local-images
 	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true PURGE_WORKER_ENABLED=true make build
 	docker compose -f docker-compose.yml --profile core --profile workers up -d
 
-clean-build-run-core-workers: check-deps check-diskspace clean-local-images
+clean-build-run-core-workers: check-deps tmpfs-check check-diskspace clean-local-images
 	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true PURGE_WORKER_ENABLED=true make build
 	docker compose -f docker-compose.yml --profile core --profile workers up -d
 
@@ -178,11 +182,11 @@ pull:
 	cd libs/kafka2sse-backend && git pull
 	cd libs/kafka2sse-frontend && git pull
 
-reclaim:
-	docker image prune -a -f
-	docker volume prune -f
-	docker builder prune -f
-	@echo "Disk space reclaimed. Run 'docker system df' to check."
+# reclaim:
+# 	docker image prune -a -f
+# 	docker volume prune -f
+# 	docker builder prune -f
+# 	@echo "Disk space reclaimed. Run 'docker system df' to check."
 
 release:
 	./scripts/run-release.sh
@@ -192,9 +196,6 @@ remove: stop
 	docker network rm $$(docker network ls -q) || true
 	docker compose -f docker-compose.yml down -v --remove-orphans
 
-reset:
-	./scripts/reset.sh
-
 run-core: check-setup
 	ID_WORKER_ENABLED=true docker compose -f docker-compose.yml --profile core up -d
 
@@ -203,13 +204,13 @@ run-core-purge: check-setup
 	docker compose -f docker-compose.yml --profile workers up -d purge-worker
 
 run-core-workers-meilisearch: check-setup
-	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true MEILISEARCH_ENABLED=true docker compose -f docker-compose.yml --profile core --profile workers --profile meilisearch up -d
+	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true MEILISEARCH_ENABLED=true PURGE_WORKER_ENABLED=true docker compose -f docker-compose.yml --profile core --profile workers --profile meilisearch up -d
 
-run-with-elastic: check-setup
-	ID_WORKER_ENABLED=true ELASTICSEARCH_ENABLED=true docker compose -f docker-compose.yml --profile elastic up -d
+# run-with-elastic: check-setup
+# 	ID_WORKER_ENABLED=true ELASTICSEARCH_ENABLED=true docker compose -f docker-compose.yml --profile elastic up -d
 
-run-with-meilisearch: check-setup
-	ID_WORKER_ENABLED=true MEILISEARCH_ENABLED=true docker compose -f docker-compose.yml --profile meilisearch up -d
+# run-with-meilisearch: check-setup
+# 	ID_WORKER_ENABLED=true MEILISEARCH_ENABLED=true docker compose -f docker-compose.yml --profile meilisearch up -d
 
 run-core-workers: check-setup
 	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true PURGE_WORKER_ENABLED=true docker compose -f docker-compose.yml --profile core --profile workers up -d
@@ -234,4 +235,16 @@ tmpfs-setup:
 		sudo mkdir -p /tmp/docker-buildkit; \
 		sudo mount -t tmpfs -o size=4G,mode=1777 tmpfs /tmp/docker-buildkit; \
 		echo "tmpfs mounted successfully"; \
+	fi
+
+tmpfs-check:
+	@if df -T /tmp/docker-buildkit 2>/dev/null | grep -q tmpfs; then \
+		exit 0; \
+	else \
+		echo "Warning: tmpfs not set up at /tmp/docker-buildkit. Build performance may be slower."; \
+		read -p "Continue building without tmpfs? (y/N) " ans; \
+		if [ "$$ans" != "y" ] && [ "$$ans" != "Y" ]; then \
+			echo "Aborted."; \
+			exit 1; \
+		fi \
 	fi
