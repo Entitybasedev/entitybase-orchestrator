@@ -170,10 +170,6 @@ remove: stop
 	docker network rm $$(docker network ls -q) || true
 	docker compose -f docker-compose.yml down -v --remove-orphans
 	docker volume prune -f
-	@if df -T /tmp/docker-volumes 2>/dev/null | grep -q tmpfs; then \
-		echo "Cleaning tmpfs volumes..."; \
-		sudo rm -rf /tmp/docker-volumes/*; \
-	fi
 
 run-core: check-setup
 	ID_WORKER_ENABLED=true docker compose -f docker-compose.yml --profile core up -d
