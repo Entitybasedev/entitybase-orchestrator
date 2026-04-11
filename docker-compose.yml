@@ -68,7 +68,7 @@ services:
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:-fakesecret}
       - MINIO_DEFAULT_BUCKETS=entitybase
     volumes:
-      - ${VOLUMES_PATH}/minio-data:/data
+      - ${VOLUMES_PATH}/minio-data:/data:uid=1000,gid=1000
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 10s
@@ -147,7 +147,7 @@ services:
     networks:
       - entitybase-network
     volumes:
-      - ${VOLUMES_PATH}/redpanda-data:/var/lib/redpanda/data
+      - ${VOLUMES_PATH}/redpanda-data:/var/lib/redpanda/data:uid=101,gid=101
     profiles:
       - core
       - workers
@@ -445,7 +445,7 @@ services:
     networks:
       - entitybase-network
     volumes:
-      - ${VOLUMES_PATH}/meilisearch-data:/meili_data
+      - ${VOLUMES_PATH}/meilisearch-data:/meili_data:uid=100,gid=100
     profiles:
       - meilisearch
 
