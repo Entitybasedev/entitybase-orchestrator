@@ -237,7 +237,6 @@ services:
     environment:
       KAFKA_BOOTSTRAP_SERVERS: redpanda:9092
       KAFKA_ENTITY_CHANGE_TOPIC: ${KAFKA_ENTITY_CHANGE_TOPIC:-entity_change}
-      KAFKA_ENTITY_DIFF_TOPIC: ${KAFKA_ENTITY_DIFF_TOPIC:-entity_diff}
       KAFKA_INCREMENTAL_RDF_TOPIC: ${KAFKA_INCREMENTAL_RDF_TOPIC:-incremental_rdf_diff}
     profiles:
       - core
