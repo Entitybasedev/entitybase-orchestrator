@@ -84,7 +84,7 @@ check-diskspace:
 
 check-setup:
 	@make tmpfs-setup
-	@make tmpfs-volumes-setup
+	@make tmpfs-volumes
 	@if [ -f .env ]; then \
 		SETUP=$$(grep "^SETUP_COMPLETED=" .env | cut -d'=' -f2); \
 		if [ "$$SETUP" != "true" ]; then \
