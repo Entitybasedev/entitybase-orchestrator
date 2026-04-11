@@ -1,4 +1,4 @@
-.PHONY: build build-core-workers build-no-cache check check-deps check-diskspace check-setup clean-all clean-all-except-base-images clean-build-cache clean-build-run-core clean-build-run-core-purge clean-build-run-core-workers clean-build-run-core-workers-meilisearch clean-build-run-workers clean-cache-volumes clean-local-images clone elastic help meilisearch pull release remove run-core run-core-purge run-core-workers run-core-workers-meilisearch settings setup show-images stop test-frontend tmpfs-check tmpfs-clean-build-run-core-workers-meilisearch tmpfs-setup tmpfs-volumes-setup
+.PHONY: build build-core-workers build-no-cache check check-deps check-diskspace check-setup clean-all clean-all-except-base-images clean-build-cache clean-build-run-core clean-build-run-core-purge clean-build-run-core-workers clean-build-run-core-workers-meilisearch clean-build-run-workers clean-cache-volumes clean-local-images clone elastic help meilisearch pull release remove run-core run-core-purge run-core-workers run-core-workers-meilisearch settings setup show-images stop test-frontend tmpfs-check tmpfs-clean-build-run-core-workers-meilisearch tmpfs-setup tmpfs-buildkit tmpfs-volumes
 
 help:
 	@echo "Available targets:"
@@ -35,8 +35,9 @@ help:
 	@echo "  make test-frontend           - Run frontend tests (requires npm)"
 	@echo "  make tmpfs-check            - Check if tmpfs is set up, warn if not"
 	@echo "  make tmpfs-clean-build-run-core-workers-meilisearch - Setup tmpfs, clean local images, build, and start core + workers + meilisearch"
-	@echo "  make tmpfs-setup             - Setup tmpfs for buildkit cache (requires sudo)"
-	@echo "  make tmpfs-volumes-setup     - Setup tmpfs for Docker volumes (requires sudo)"
+	@echo "  make tmpfs-setup             - Setup all tmpfs (buildkit + volumes)"
+	@echo "  make tmpfs-buildkit          - Setup tmpfs for buildkit cache"
+	@echo "  make tmpfs-volumes           - Setup tmpfs for Docker volumes"
 
 setup:
 	python3 ./scripts/setup.py
@@ -199,7 +200,9 @@ stop:
 test-frontend:
 	cd frontend && npm install && npm run lint && npm run test && npm run build
 
-tmpfs-setup:
+tmpfs-setup: tmpfs-buildkit tmpfs-volumes
+
+tmpfs-buildkit:
 	@if df -T /tmp/docker-buildkit 2>/dev/null | grep -q tmpfs; then \
 		echo "tmpfs at /tmp/docker-buildkit already mounted"; \
 	else \
@@ -209,7 +212,7 @@ tmpfs-setup:
 		echo "tmpfs mounted successfully"; \
 	fi
 
-tmpfs-volumes-setup:
+tmpfs-volumes:
 	@if df -T /tmp/docker-volumes 2>/dev/null | grep -q tmpfs; then \
 		echo "tmpfs at /tmp/docker-volumes already mounted"; \
 	else \
