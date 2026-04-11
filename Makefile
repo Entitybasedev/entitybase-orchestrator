@@ -1,49 +1,41 @@
-.PHONY: build build-no-cache build-core-workers check check-deps check-diskspace check-setup tmpfs-check clean-all clean-all-except-base-images clean-build-cache clean-build-run-all-with-elastic clean-build-run-core clean-build-run-core-purge clean-build-run-core-workers clean-build-run-core-workers-meilisearch clean-build-run-no-cache clean-build-run-with-elastic clean-build-run-with-meilisearch clean-build-run-workers clean-cache-volumes clean-local-images clone elastic help meilisearch pull reclaim release remove reset run-core run-core-purge run-core-workers run-core-workers-meilisearch run-with-elastic run-with-meilisearch settings setup show-images stop tmpfs-setup tmpfs-check tmpfs-clean-build-run-core-workers-meilisearch test-frontend
+.PHONY: build build-core-workers build-no-cache check check-deps check-diskspace check-setup clean-all clean-all-except-base-images clean-build-cache clean-build-run-core clean-build-run-core-purge clean-build-run-core-workers clean-build-run-core-workers-meilisearch clean-build-run-workers clean-cache-volumes clean-local-images clone elastic help meilisearch pull release remove run-core run-core-purge run-core-workers run-core-workers-meilisearch settings setup show-images stop test-frontend tmpfs-check tmpfs-clean-build-run-core-workers-meilisearch tmpfs-setup
 
 help:
 	@echo "Available targets:"
 	@echo "  make build                   - Build all Docker images for docker-compose"
-	@echo "  make build-no-cache          - Build all Docker images without using cache"
 	@echo "  make build-core-workers     - Clean, build, and start core + workers"
+	@echo "  make build-no-cache          - Build all Docker images without using cache"
 	@echo "  make check                   - Check service health status"
 	@echo "  make check-deps              - Check required dependencies (poetry, docker, python)"
 	@echo "  make check-diskspace         - Check available disk space (requires 2GB minimum)"
 	@echo "  make clean-all               - Remove all containers, images, volumes, and build cache"
 	@echo "  make clean-all-except-base-images - Remove containers and non-base images, keep base images"
 	@echo "  make clean-build-cache       - Clear only Docker build cache (keep images/containers)"
-	@echo "  make clean-build-run-all-with-elastic - Clean all, build, and start core + elasticsearch"
 	@echo "  make clean-build-run-core    - Clean, build, and start core services"
 	@echo "  make clean-build-run-core-purge - Clean, build, and start core + workers + purge worker"
-	@echo "  make clean-build-run-core-workers-meilisearch - Clean, build, and start core + workers + meilisearch"
-	@echo "  make tmpfs-clean-build-run-core-workers-meilisearch - Setup tmpfs, clean, build, and start core + workers + meilisearch"
-	@echo "  make clean-build-run-no-cache - Clean, build without cache, and start core services"
-	@echo "  make clean-build-run-with-elastic - Clean, build, and start core + elasticsearch"
-	@echo "  make clean-build-run-with-meilisearch - Clean, build, and start core + meilisearch"
-	@echo "  make clean-build-run-workers - Clean, build, and start all services (core + workers)"
 	@echo "  make clean-build-run-core-workers - Clean, build, and start core + workers"
+	@echo "  make clean-build-run-core-workers-meilisearch - Clean, build, and start core + workers + meilisearch"
+	@echo "  make clean-build-run-workers - Clean, build, and start all services (core + workers)"
 	@echo "  make clean-cache-volumes     - Stop services, remove containers, volumes, and build cache"
 	@echo "  make clean-local-images      - Remove locally built images only (keep base images)"
 	@echo "  make clone                   - Clone required repositories"
 	@echo "  make elastic                 - Start Elasticsearch and elasticsearch-indexer worker"
 	@echo "  make meilisearch              - Start Meilisearch and meilisearch-indexer worker"
 	@echo "  make pull                    - Pull latest changes in orchestrator and libs"
-	@echo "  make reclaim                 - Reclaim disk space (prune unused images, volumes, build cache)"
 	@echo "  make release                 - Create release: update version, commit, and tag (e.g., v2026.3.4)"
 	@echo "  make remove                  - Stop services and remove containers/volumes"
-	@echo "  make reset                   - Reset the environment (experimental)"
 	@echo "  make run-core                - Start core services (no build)"
 	@echo "  make run-core-purge          - Start core + workers + purge worker (no build)"
-	@echo "  make run-core-workers-meilisearch - Start core + workers + meilisearch (no build)"
-	@echo "  make run-with-elastic        - Start core + elasticsearch (no build)"
-	@echo "  make run-with-meilisearch    - Start core + meilisearch (no build)"
 	@echo "  make run-core-workers             - Start all services (core + workers, no build)"
+	@echo "  make run-core-workers-meilisearch - Start core + workers + meilisearch (no build)"
 	@echo "  make settings                - Query the /settings endpoint on localhost:8083"
+	@echo "  make setup                   - Initialize environment (run once before first make run)"
 	@echo "  make show-images             - Show all entitybase Docker images"
 	@echo "  make stop                    - Stop all running containers"
 	@echo "  make test-frontend           - Run frontend tests (requires npm)"
-	@echo "  make tmpfs-setup             - Setup tmpfs for buildkit cache (requires sudo)"
 	@echo "  make tmpfs-check            - Check if tmpfs is set up, warn if not"
-	@echo "  make setup                   - Initialize environment (run once before first make run)"
+	@echo "  make tmpfs-clean-build-run-core-workers-meilisearch - Setup tmpfs, clean, build, and start core + workers + meilisearch"
+	@echo "  make tmpfs-setup             - Setup tmpfs for buildkit cache (requires sudo)"
 
 setup:
 	python3 ./scripts/setup.py
@@ -114,10 +106,6 @@ clean-build-cache:
 	docker builder prune -af
 	@echo "Build cache cleared. Run 'docker system df' to check."
 
-# clean-build-run-all-with-elastic: clean-all check-diskspace
-# 	ID_WORKER_ENABLED=true ELASTICSEARCH_ENABLED=true make build
-# 	docker compose -f docker-compose.yml --profile elastic up -d
-
 clean-build-run-core: check-deps tmpfs-check check-diskspace clean-local-images
 	ID_WORKER_ENABLED=true make build
 	docker compose -f docker-compose.yml --profile core up -d
@@ -132,18 +120,6 @@ clean-build-run-core-workers-meilisearch: check-deps tmpfs-check check-diskspace
 	docker compose -f docker-compose.yml --profile core --profile workers --profile meilisearch up -d
 
 tmpfs-clean-build-run-core-workers-meilisearch: tmpfs-setup clean-build-run-core-workers-meilisearch
-
-# clean-build-run-no-cache: clean-local-images
-# 	ID_WORKER_ENABLED=true make build-no-cache
-# 	docker compose -f docker-compose.yml --profile core up -d
-
-# clean-build-run-with-elastic: check-deps check-diskspace clean-local-images
-# 	ID_WORKER_ENABLED=true ELASTICSEARCH_ENABLED=true make build
-# 	docker compose -f docker-compose.yml --profile elastic up -d
-
-# clean-build-run-with-meilisearch: check-deps check-diskspace clean-local-images
-# 	ID_WORKER_ENABLED=true MEILISEARCH_ENABLED=true make build
-# 	docker compose -f docker-compose.yml --profile meilisearch up -d
 
 clean-build-run-workers: check-deps tmpfs-check check-diskspace clean-local-images
 	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true PURGE_WORKER_ENABLED=true make build
@@ -182,12 +158,6 @@ pull:
 	cd libs/kafka2sse-backend && git pull
 	cd libs/kafka2sse-frontend && git pull
 
-# reclaim:
-# 	docker image prune -a -f
-# 	docker volume prune -f
-# 	docker builder prune -f
-# 	@echo "Disk space reclaimed. Run 'docker system df' to check."
-
 release:
 	./scripts/run-release.sh
 
@@ -205,12 +175,6 @@ run-core-purge: check-setup
 
 run-core-workers-meilisearch: check-setup
 	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true MEILISEARCH_ENABLED=true PURGE_WORKER_ENABLED=true docker compose -f docker-compose.yml --profile core --profile workers --profile meilisearch up -d
-
-# run-with-elastic: check-setup
-# 	ID_WORKER_ENABLED=true ELASTICSEARCH_ENABLED=true docker compose -f docker-compose.yml --profile elastic up -d
-
-# run-with-meilisearch: check-setup
-# 	ID_WORKER_ENABLED=true MEILISEARCH_ENABLED=true docker compose -f docker-compose.yml --profile meilisearch up -d
 
 run-core-workers: check-setup
 	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true PURGE_WORKER_ENABLED=true docker compose -f docker-compose.yml --profile core --profile workers up -d
