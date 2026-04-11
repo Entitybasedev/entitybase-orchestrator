@@ -43,10 +43,10 @@ setup:
 	python3 ./scripts/setup.py
 
 build: check-deps tmpfs-check
-	@ID_WORKER_ENABLED=${ID_WORKER_ENABLED} JSON_WORKER_ENABLED=${JSON_WORKER_ENABLED} TTL_WORKER_ENABLED=${TTL_WORKER_ENABLED} STATS_WORKER_ENABLED=${STATS_WORKER_ENABLED} ELASTICSEARCH_ENABLED=${ELASTICSEARCH_ENABLED} MEILISEARCH_ENABLED=${MEILISEARCH_ENABLED} PURGE_WORKER_ENABLED=${PURGE_WORKER_ENABLED} ./scripts/build-images.sh
+	@ID_WORKER_ENABLED=${ID_WORKER_ENABLED} JSON_WORKER_ENABLED=${JSON_WORKER_ENABLED} TTL_WORKER_ENABLED=${TTL_WORKER_ENABLED} STATS_WORKER_ENABLED=${STATS_WORKER_ENABLED} ELASTICSEARCH_ENABLED=${ELASTICSEARCH_ENABLED} MEILISEARCH_ENABLED=${MEILISEARCH_ENABLED} PURGE_WORKER_ENABLED=${PURGE_WORKER_ENABLED} INCREMENTAL_RDF_WORKER_ENABLED=${INCREMENTAL_RDF_WORKER_ENABLED} ./scripts/build-images.sh
 
 build-no-cache: check-deps tmpfs-check
-	@ID_WORKER_ENABLED=${ID_WORKER_ENABLED} JSON_WORKER_ENABLED=${JSON_WORKER_ENABLED} TTL_WORKER_ENABLED=${TTL_WORKER_ENABLED} STATS_WORKER_ENABLED=${STATS_WORKER_ENABLED} ELASTICSEARCH_ENABLED=${ELASTICSEARCH_ENABLED} MEILISEARCH_ENABLED=${MEILISEARCH_ENABLED} PURGE_WORKER_ENABLED=${PURGE_WORKER_ENABLED} ./scripts/build-images.sh --no-cache
+	@ID_WORKER_ENABLED=${ID_WORKER_ENABLED} JSON_WORKER_ENABLED=${JSON_WORKER_ENABLED} TTL_WORKER_ENABLED=${TTL_WORKER_ENABLED} STATS_WORKER_ENABLED=${STATS_WORKER_ENABLED} ELASTICSEARCH_ENABLED=${ELASTICSEARCH_ENABLED} MEILISEARCH_ENABLED=${MEILISEARCH_ENABLED} PURGE_WORKER_ENABLED=${PURGE_WORKER_ENABLED} INCREMENTAL_RDF_WORKER_ENABLED=${INCREMENTAL_RDF_WORKER_ENABLED} ./scripts/build-images.sh --no-cache
 
 check:
 	python3 ./scripts/check_services.py
@@ -120,21 +120,21 @@ clean-build-run-core-purge: check-deps tmpfs-check check-diskspace clean-local-i
 	docker compose -f docker-compose.yml --profile workers up -d purge-worker
 
 clean-build-run-core-workers-meilisearch: check-deps tmpfs-check check-diskspace clean-local-images
-	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true MEILISEARCH_ENABLED=true PURGE_WORKER_ENABLED=true make build
+	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true MEILISEARCH_ENABLED=true PURGE_WORKER_ENABLED=true INCREMENTAL_RDF_WORKER_ENABLED=true make build
 	docker compose -f docker-compose.yml --profile core --profile workers --profile meilisearch up -d
 
 tmpfs-clean-build-run-core-workers-meilisearch: tmpfs-setup clean-build-run-core-workers-meilisearch
 
 clean-build-run-workers: check-deps tmpfs-check check-diskspace clean-local-images
-	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true PURGE_WORKER_ENABLED=true make build
+	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true PURGE_WORKER_ENABLED=true INCREMENTAL_RDF_WORKER_ENABLED=true make build
 	docker compose -f docker-compose.yml --profile workers up -d
 
 build-core-workers: check-deps tmpfs-check check-diskspace clean-local-images
-	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true PURGE_WORKER_ENABLED=true make build
+	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true PURGE_WORKER_ENABLED=true INCREMENTAL_RDF_WORKER_ENABLED=true make build
 	docker compose -f docker-compose.yml --profile core --profile workers up -d
 
 clean-build-run-core-workers: check-deps tmpfs-check check-diskspace clean-local-images
-	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true PURGE_WORKER_ENABLED=true make build
+	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true PURGE_WORKER_ENABLED=true INCREMENTAL_RDF_WORKER_ENABLED=true make build
 	docker compose -f docker-compose.yml --profile core --profile workers up -d
 
 clean-cache-volumes: remove
