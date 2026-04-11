@@ -93,6 +93,19 @@ See [PORTS.md](PORTS.md) for complete port reference.
 
 ## Building Docker Images
 
+**Important**: Never run `make build` from this directory. Instead, always rebuild individual images using the rebuild script:
+
+```bash
+# Rebuild specific images
+python3 scripts/rebuild_containers.py kafka2sse-backend
+
+# Rebuild multiple images
+python3 scripts/rebuild_containers.py entitybase-api kafka2sse-backend
+
+# Rebuild all
+python3 scripts/rebuild_containers.py --all
+```
+
 ### Option A: Full build (recommended)
 ```bash
 make build           # Builds all images (calls export-requirements.sh automatically)
@@ -183,3 +196,47 @@ Key variables:
 - The `libs/` directory contains cloned git repositories - work within them as separate projects
 - The orchestrator only manages Docker Compose; it doesn't contain application code
 - Each sub-project has its own build process and tests
+
+## Troubleshooting
+
+### Querying kafka2sse-backend with offset
+
+Note: Always use `timeout` with curl for SSE endpoints to avoid hanging:
+
+```bash
+timeout 5 curl -N "http://localhost:8888/v1/streams/entity_change?offset=0"
+```
+
+The SSE endpoint supports offset parameter to read from specific Kafka offset:
+
+```bash
+# Stream from offset 0 (earliest)
+curl -N "http://localhost:8888/v1/streams/entity_change?offset=0"
+
+# Stream from specific offset
+curl -N "http://localhost:8888/v1/streams/entity_change?offset=40"
+
+# With limit
+curl -N "http://localhost:8888/v1/streams/entity_change?offset=0&limit=10"
+
+# By timestamp
+curl -N "http://localhost:8888/v1/streams/entity_change?since=2026-04-10T10:00:00Z"
+```
+
+Parameters:
+- `offset`: Start from specific Kafka offset (default: latest)
+- `limit`: Maximum events to send before closing connection
+- `since`: Start from timestamp (ISO8601 format)
+
+### Check Kafka topic state
+
+```bash
+# List topics
+docker compose exec -T redpanda rpk topic list
+
+# Consume messages from beginning
+docker compose exec -T redpanda rpk topic consume entity_change --offset 0 -n 5
+
+# Check latest message
+docker compose exec -T redpanda rpk topic consume entity_change --offset -1 -n 1
+```

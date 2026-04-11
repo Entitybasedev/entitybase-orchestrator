@@ -69,6 +69,18 @@ CONTAINER_MAP = {
         "context": "frontend/",
         "service": "orchestrator-frontend",
     },
+    "kafka2sse-backend": {
+        "image": "kafka2sse-backend:latest",
+        "dockerfile": "libs/kafka2sse-backend/Dockerfile",
+        "context": "libs/kafka2sse-backend/",
+        "service": "kafka2sse-backend",
+    },
+    "kafka2sse-frontend": {
+        "image": "kafka2sse-frontend:latest",
+        "dockerfile": "libs/kafka2sse-frontend/Dockerfile",
+        "context": "libs/kafka2sse-frontend/",
+        "service": "kafka2sse-frontend",
+    },
 }
 
 ALL_CONTAINERS = list(CONTAINER_MAP.keys())

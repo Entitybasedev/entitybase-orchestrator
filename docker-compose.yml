@@ -346,7 +346,7 @@ services:
     environment:
       - KAFKA_BROKERS=redpanda:9092
       - VALKEY_HOST=valkey
-      - LOG_LEVEL=debug
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
       - VERSION=${VERSION_KAFKA2SSE_BACKEND}
     depends_on:
       redpanda:
