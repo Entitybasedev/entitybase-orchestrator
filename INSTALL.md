@@ -56,8 +56,8 @@ Download from [docker.com](https://docker.com).
 | Variable | Default | Description |
 |----------|---------|-------------|
 | MYSQL_ROOT_PASSWORD | - | MySQL root |
-| MINIO_ROOT_USER | fakekey | S3 access key |
-| MINIO_ROOT_PASSWORD | fakesecret | S3 secret key |
+| RUSTFS_ROOT_USER | fakekey | S3 access key |
+| RUSTFS_ROOT_PASSWORD | fakesecret | S3 secret key |
 
 ## Cheatsheet
 

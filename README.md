@@ -8,7 +8,7 @@ Docker orchestration for Entitybase services.
 flowchart TB
     subgraph Infrastructure
         MySQL[(MySQL<br/>3306)]
-        Minio[MinIO<br/>9000/9001]
+        Rustfs[rustfs<br/>9000/9001]
         Redpanda[Redpanda<br/>9092]
     end
 
@@ -37,14 +37,14 @@ flowchart TB
     Orch --> API
 
     API --> MySQL
-    API --> Minio
+    API --> Rustfs
     API --> Redpanda
     API --> ID
 
     ID --> MySQL
 
     Workers --> MySQL
-    Workers --> Minio
+    Workers --> Rustfs
 
     SSE_BE --> Redpanda
     SSE_FE --> Redpanda
@@ -110,7 +110,7 @@ docker compose stop
 | Service | Port | Description |
 |---------|------|-------------|
 | mysql | 3306 | Database |
-| minio | 9000, 9001 | S3 storage (API + console) |
+| rustfs | 9000, 9001 | S3-compatible storage (API + console) |
 | redpanda | 9092, 9644 | Kafka broker |
 | redpanda-console | 8084 | Redpanda Console (Kafka UI) |
 | entitybase-backend | 8080 | REST API |

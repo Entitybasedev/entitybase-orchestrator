@@ -88,7 +88,7 @@ make show-images   # Show built Docker images
 | Service | Port | Description |
 |---------|------|-------------|
 | mysql | 3306 | MySQL 8.0 database |
-| minio | 9000, 9001 | S3 storage (API + console) |
+| rustfs | 9000, 9001 | S3-compatible storage (API + console) |
 | redpanda | 9092, 9644 | Kafka broker |
 | redpanda-console | 8084 | Kafka UI |
 | entitybase-backend | 8080 | REST API |
@@ -181,7 +181,7 @@ Each sub-project in `libs/` has its own AGENTS.md:
 
 - **Container**: Docker, Docker Compose
 - **Database**: MySQL 8.0
-- **Storage**: MinIO (S3-compatible)
+- **Storage**: rustfs (S3-compatible)
 - **Messaging**: Redpanda (Kafka-compatible)
 - **Backend**: Python, FastAPI, Pydantic v2
 - **SSE Gateway**: Python, Litestar
@@ -195,8 +195,8 @@ cp env.example .env
 
 Key variables:
 - `MYSQL_ROOT_PASSWORD` - MySQL root password
-- `MINIO_ROOT_USER` - MinIO access key (default: fakekey)
-- `MINIO_ROOT_PASSWORD` - MinIO secret key (default: fakesecret)
+- `RUSTFS_ROOT_USER` - rustfs access key (default: fakekey)
+- `RUSTFS_ROOT_PASSWORD` - rustfs secret key (default: fakesecret)
 
 ## Notes
 

@@ -1,7 +1,7 @@
 export const HOST = import.meta.env.VITE_HOST || 'localhost'
 
 export const infrastructure = [
-  { name: 'MinIO', url: `http://${HOST}:9001`, description: 'S3 storage + console', healthPath: '/minio/health/live', linkUrl: `http://${HOST}:9001` },
+  { name: 'rustfs', url: `http://${HOST}:9001`, description: 'S3-compatible storage', healthPath: '/', linkUrl: `http://${HOST}:9001` },
   { name: 'MySQL', url: `http://${HOST}:3307`, description: 'Database (no HTTP interface)', healthPath: '/' },
   { name: 'Redpanda', url: `http://${HOST}:9645`, description: 'Kafka messaging + console', healthPath: '/', linkUrl: `http://${HOST}:8084` },
   { name: 'Entitybase API', url: `http://${HOST}:8083`, description: 'Main API server', healthPath: '/health' },

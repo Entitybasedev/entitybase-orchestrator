@@ -11,8 +11,8 @@ Host Port → Container Port (Service Name)
 | Host Port | Container Port | Service | Description |
 |-----------|----------------|---------|-------------|
 | 3307 | 8080 | mysql-health | MySQL health proxy |
-| 9000 | 9000 | minio | S3 API |
-| 9001 | 9001 | minio | S3 Console |
+| 9000 | 9000 | rustfs | S3 API |
+| 9001 | 9001 | rustfs | S3 Console |
 | 6378 | 8080 | valkey-health | Valkey health proxy |
 | 9092 | 9092 | redpanda | Kafka broker |
 | 8084 | 8080 | redpanda-console | Kafka UI |
