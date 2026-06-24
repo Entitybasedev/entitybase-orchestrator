@@ -57,11 +57,18 @@ This ensures the frontend works with custom hostnames via `VITE_HOST` env variab
 
 ```bash
 # Clone all repositories (run once)
-make clone
+make git-clone-all
+
+# Initialize environment (run once before first build)
+make setup
+
+# (Optional) Mount tmpfs for faster builds
+make tmpfs-setup
 
 # Build and start services
-make run           # Core services only (default)
-make run_workers   # Core + workers
+make build
+make run-core      # Core services only
+make run-core-workers  # Core + workers
 
 # Build only
 make build         # Build all Docker images
@@ -147,7 +154,7 @@ python3 scripts/rebuild_containers.py create-tables create-buckets
 
 1. **Clone repositories first**:
    ```bash
-   make clone
+   make git-clone-all
    ```
 
 2. **Make changes in `libs/` sub-projects**:
@@ -162,7 +169,7 @@ python3 scripts/rebuild_containers.py create-tables create-buckets
 
 4. **Restart services**:
    ```bash
-   make run
+   make run-core
    ```
 
 ## Sub-project AGENTS.md Files

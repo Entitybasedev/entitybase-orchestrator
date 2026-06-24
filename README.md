@@ -53,11 +53,20 @@ flowchart TB
 ## Quick Start
 
 ```bash
-# Copy environment template
-cp .env.example .env
+# 1. Clone all sub-repositories (first time only)
+make git-clone-all
 
-# Build Docker images and start services
-make run
+# 2. Initialize environment (creates .env, prompts for HOST)
+make setup
+
+# 3. (Optional) Mount tmpfs for faster build performance
+make tmpfs-setup
+
+# 4. Build Docker images
+make build
+
+# 5. Start core services
+make run-core
 ```
 
 ## Dependencies
@@ -68,12 +77,17 @@ See [INSTALL.md](INSTALL.md) for installation instructions.
 
 | Command | Description |
 |---------|-------------|
+| `make git-clone-all` | Clone all sub-repositories (required before `make setup`) |
+| `make setup` | Initialize environment (creates .env, prompts for HOST) |
+| `make tmpfs-setup` | Mount tmpfs for build cache and volumes (recommended before build) |
 | `make build` | Build all Docker images |
-| `make run` | Build images and start all services |
+| `make run-core` | Start core services |
+| `make run-core-workers` | Start core + workers |
 | `make stop` | Stop all running services |
 | `make remove` | Stop services and remove containers/volumes |
-| `make clean` | Prune Docker system (containers, images, networks, build cache) |
-| `make reset` | Reset entitybase data (runs reset.sh) |
+| `make clean-all` | Remove locally built images, containers, volumes, and build cache |
+| `make check` | Check service health status |
+| `make show-images` | Show all entitybase Docker images |
 
 ## Manual Commands
 
