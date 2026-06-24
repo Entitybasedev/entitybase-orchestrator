@@ -368,25 +368,6 @@ services:
     profiles:
       - meilisearch
 
-  meilisearch-health:
-    image: python:3.13-alpine
-    container_name: meilisearch-health
-    volumes:
-      - ./scripts/health/meilisearch-health.sh:/meilisearch-health.sh:ro
-    command: ["/bin/sh", "/meilisearch-health.sh"]
-    ports:
-      - "7701:8080"
-    environment:
-      MEILISEARCH_HOST: meilisearch
-      MEILISEARCH_PORT: 7700
-    depends_on:
-      meilisearch:
-        condition: service_healthy
-    networks:
-      - entitybase-network
-    profiles:
-      - meilisearch
-
   # Workers (optional)
   json-dump-worker:
     container_name: json-dump-worker
