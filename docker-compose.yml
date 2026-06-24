@@ -56,23 +56,6 @@ services:
       - core
       - workers
 
-  valkey-health:
-    image: python:3.13-alpine
-    container_name: valkey-health
-    volumes:
-      - ./scripts/health/valkey-health.sh:/valkey-health.sh:ro
-    command: ["/bin/sh", "/valkey-health.sh"]
-    ports:
-      - "6378:8080"
-    depends_on:
-      valkey:
-        condition: service_healthy
-    networks:
-      - entitybase-network
-    profiles:
-      - core
-      - workers
-
   redpanda:
     image: redpandadata/redpanda:v25.3.6
     container_name: redpanda
@@ -96,7 +79,7 @@ services:
     #   - "9092:9092"
     #   - "9644:9644"
     healthcheck:
-      test: ["CMD-SHELL", "rpk cluster health && rpk topic list"]
+      test: ["CMD-SHELL", "rpk cluster health | grep -q 'Healthy:.*true'"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -120,24 +103,6 @@ services:
       KAFKA_BROKERS: redpanda:9092
     depends_on:
       - redpanda
-    networks:
-      - entitybase-network
-    profiles:
-      - core
-      - workers
-
-  redpanda-health:
-    image: python:3.13-alpine
-    container_name: redpanda-health
-    volumes:
-      - ./scripts/health/redpanda-health.sh:/redpanda-health.sh:ro
-      - /var/run/docker.sock:/var/run/docker.sock
-    command: ["/bin/sh", "/redpanda-health.sh"]
-    ports:
-      - "9645:8080"
-    depends_on:
-      redpanda:
-        condition: service_healthy
     networks:
       - entitybase-network
     profiles:
@@ -602,25 +567,6 @@ services:
       - entitybase-network
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data
-    profiles:
-      - elastic
-
-  elasticsearch-health:
-    image: python:3.13-alpine
-    container_name: elasticsearch-health
-    volumes:
-      - ./scripts/health/elasticsearch-health.sh:/elasticsearch-health.sh:ro
-    command: ["/bin/sh", "/elasticsearch-health.sh"]
-    ports:
-      - "9201:8080"
-    environment:
-      ELASTICSEARCH_HOST: elasticsearch
-      ELASTICSEARCH_PORT: 9200
-    depends_on:
-      elasticsearch:
-        condition: service_healthy
-    networks:
-      - entitybase-network
     profiles:
       - elastic
 
