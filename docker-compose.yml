@@ -82,6 +82,22 @@ services:
       - core
       - workers
 
+  valkey:
+    image: valkey/valkey:alpine
+    container_name: valkey
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - entitybase-network
+    ports:
+      - "6379:6379"
+    profiles:
+      - core
+      - workers
+
   valkey-health:
     image: python:3.13-alpine
     container_name: valkey-health
