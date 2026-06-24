@@ -153,7 +153,7 @@ clean-local-images: remove
 	docker images | grep -E "^entitybase-|^kafka2sse-" | awk '{print $$3}' | xargs -r docker rmi -f || true
 
 git-clone-all:
-	poetry run python ./scripts/clone-repos.sh
+	./scripts/clone-repos.sh
 
 git-status-all:
 	poetry run python ./scripts/git-all.py
