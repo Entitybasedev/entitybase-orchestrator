@@ -1,9 +1,9 @@
-.PHONY: build build-core-workers build-no-cache check check-deps check-diskspace check-setup clean-all clean-all-except-base-images clean-build-cache clean-build-run-core clean-build-run-core-purge clean-build-run-core-workers clean-build-run-core-workers-meilisearch clean-build-run-workers clean-cache-volumes clean-local-images gpla gpsa gsa git-clone-all git-push-all git-pull-all git-status-all elastic help meilisearch pull release remove run-core run-core-purge run-core-workers run-core-workers-meilisearch settings setup show-images stop test-frontend tmpfs-check tmpfs-clean-build-run-core-workers-meilisearch tmpfs-setup tmpfs-buildkit tmpfs-volumes
+.PHONY: build build-core-workers build-no-cache build-run-core build-run-core-purge build-run-core-workers build-run-core-workers-meilisearch build-run-workers check check-deps check-diskspace check-setup clean-all clean-all-except-base-images clean-build-cache clean-build-run-core clean-build-run-core-purge clean-build-run-core-workers clean-build-run-core-workers-meilisearch clean-build-run-workers clean-cache-volumes clean-local-images gpla gpsa gsa git-clone-all git-push-all git-pull-all git-status-all elastic help meilisearch pull release remove run-core run-core-purge run-core-workers run-core-workers-meilisearch settings setup show-images stop test-frontend tmpfs-check tmpfs-clean-build-run-core-workers-meilisearch tmpfs-setup tmpfs-buildkit tmpfs-volumes
 
 help:
 	@echo "Available targets:"
 	@echo "  make build                   - Build all Docker images for docker-compose"
-	@echo "  make build-core-workers     - Clean, build, and start core + workers"
+	@echo "  make build-core-workers     - Build and start core + workers"
 	@echo "  make build-no-cache          - Build all Docker images without using cache"
 	@echo "  make check                   - Check service health status"
 	@echo "  make check-deps              - Check required dependencies (poetry, docker, python)"
@@ -11,11 +11,11 @@ help:
 	@echo "  make clean-all               - Remove locally built images, containers, volumes, and build cache"
 	@echo "  make clean-all-except-base-images - Remove locally built images, containers, volumes, and build cache (keep base images)"
 	@echo "  make clean-build-cache       - Clear Docker build cache only (keeps images and containers)"
-	@echo "  make clean-build-run-core    - Local images, build, and start core services"
-	@echo "  make clean-build-run-core-purge - Local images, build, and start core + workers + purge worker"
-	@echo "  make clean-build-run-core-workers - Local images, build, and start core + workers"
-	@echo "  make clean-build-run-core-workers-meilisearch - Local images, build, and start core + workers + meilisearch"
-	@echo "  make clean-build-run-workers - Local images, build, and start all services (core + workers)"
+	@echo "  make build-run-core    - Build and start core services"
+	@echo "  make build-run-core-purge - Build and start core + workers + purge worker"
+	@echo "  make build-run-core-workers - Build and start core + workers"
+	@echo "  make build-run-core-workers-meilisearch - Build and start core + workers + meilisearch"
+	@echo "  make build-run-workers - Build and start all services (core + workers)"
 	@echo "  make clean-cache-volumes     - Remove containers, volumes, and build cache (keeps images)"
 	@echo "  make clean-local-images      - Remove locally built entitybase/kafka2sse images (keeps base images)"
 	@echo "  make git-clone-all          - Clone all repositories from LIBS.yml"
@@ -40,7 +40,7 @@ help:
 	@echo "  make stop                    - Stop all running containers"
 	@echo "  make test-frontend           - Run frontend tests (requires npm)"
 	@echo "  make tmpfs-check            - Check if tmpfs is set up, warn if not"
-	@echo "  make tmpfs-clean-build-run-core-workers-meilisearch - Setup tmpfs, clean local images, build, and start core + workers + meilisearch"
+	@echo "  make tmpfs-clean-build-run-core-workers-meilisearch - Setup tmpfs, build, and start core + workers + meilisearch"
 	@echo "  make tmpfs-setup             - Setup all tmpfs (buildkit + volumes)"
 	@echo "  make tmpfs-buildkit          - Setup tmpfs for buildkit cache"
 	@echo "  make tmpfs-volumes           - Setup tmpfs for Docker volumes"
@@ -116,30 +116,40 @@ clean-build-cache:
 	docker builder prune -af
 	@echo "Build cache cleared. Run 'docker system df' to check."
 
-clean-build-run-core: check-deps tmpfs-check check-diskspace clean-local-images
+build-run-core: check-deps tmpfs-check check-diskspace
 	ID_WORKER_ENABLED=true make build
 	docker compose -f docker-compose.yml --profile core up -d
 
-clean-build-run-core-purge: check-deps tmpfs-check check-diskspace clean-local-images
+clean-build-run-core: build-run-core
+
+build-run-core-purge: check-deps tmpfs-check check-diskspace
 	ID_WORKER_ENABLED=true PURGE_WORKER_ENABLED=true make build
 	docker compose -f docker-compose.yml --profile core up -d
 	docker compose -f docker-compose.yml --profile workers up -d purge-worker
 
-clean-build-run-core-workers-meilisearch: check-deps tmpfs-check check-diskspace clean-local-images
+clean-build-run-core-purge: build-run-core-purge
+
+build-run-core-workers-meilisearch: check-deps tmpfs-check check-diskspace
 	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true MEILISEARCH_ENABLED=true PURGE_WORKER_ENABLED=true INCREMENTAL_RDF_WORKER_ENABLED=true make build
 	docker compose -f docker-compose.yml --profile core --profile workers --profile meilisearch up -d
 
-tmpfs-clean-build-run-core-workers-meilisearch: tmpfs-setup clean-build-run-core-workers-meilisearch
+clean-build-run-core-workers-meilisearch: build-run-core-workers-meilisearch
 
-clean-build-run-workers: check-deps tmpfs-check check-diskspace clean-local-images
+tmpfs-clean-build-run-core-workers-meilisearch: tmpfs-setup build-run-core-workers-meilisearch
+
+build-run-workers: check-deps tmpfs-check check-diskspace
 	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true PURGE_WORKER_ENABLED=true INCREMENTAL_RDF_WORKER_ENABLED=true make build
 	docker compose -f docker-compose.yml --profile workers up -d
 
-build-core-workers: check-deps tmpfs-check check-diskspace clean-local-images
+clean-build-run-workers: build-run-workers
+
+build-core-workers: check-deps tmpfs-check check-diskspace
 	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true PURGE_WORKER_ENABLED=true INCREMENTAL_RDF_WORKER_ENABLED=true make build
 	docker compose -f docker-compose.yml --profile core --profile workers up -d
 
-clean-build-run-core-workers: check-deps tmpfs-check check-diskspace clean-local-images
+clean-build-run-core-workers: build-run-core-workers
+
+build-run-core-workers: check-deps tmpfs-check check-diskspace
 	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true PURGE_WORKER_ENABLED=true INCREMENTAL_RDF_WORKER_ENABLED=true make build
 	docker compose -f docker-compose.yml --profile core --profile workers up -d
 
