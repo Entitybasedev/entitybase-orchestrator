@@ -159,18 +159,13 @@ services:
     environment:
       WORKER_ID: id_worker_1
       WORKER_COUNT: 1
-    depends_on:
-      create-topics:
-        condition: service_completed_successfully
     healthcheck:
       test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:8001/health"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 30s
-    profiles:
-      - core
-      - workers
+    profiles: []
     mem_limit: 512m
     cpus: 0.5
     networks:
@@ -208,8 +203,6 @@ services:
       create-topics:
         condition: service_completed_successfully
       rustfs:
-        condition: service_healthy
-      idworker:
         condition: service_healthy
     command: python -m models.rest_api.main
     # Long start_period needed to initialize redpanda producers when STREAMING_ENABLED=true
