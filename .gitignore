@@ -3,3 +3,4 @@ libs/
 deprecated/
 .python-version
 debug.log
+.idea/
