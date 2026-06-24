@@ -29,12 +29,6 @@ if df -T /tmp/docker-buildkit 2>/dev/null | grep -q tmpfs; then
 fi
 
 echo "=========================================="
-echo "Generating requirements from pyproject.toml"
-echo "=========================================="
-ID_WORKER_ENABLED=${ID_WORKER_ENABLED:-false} JSON_WORKER_ENABLED=${JSON_WORKER_ENABLED:-false} TTL_WORKER_ENABLED=${TTL_WORKER_ENABLED:-false} STATS_WORKER_ENABLED=${STATS_WORKER_ENABLED:-false} ELASTICSEARCH_ENABLED=${ELASTICSEARCH_ENABLED:-false} MEILISEARCH_ENABLED=${MEILISEARCH_ENABLED:-false} PURGE_WORKER_ENABLED=${PURGE_WORKER_ENABLED:-false} INCREMENTAL_RDF_WORKER_ENABLED=${INCREMENTAL_RDF_WORKER_ENABLED:-false} ./libs/entitybase-backend/scripts/shell/export-requirements.sh
-
-echo ""
-echo "=========================================="
 echo "Building Docker images for Entitybase"
 echo "=========================================="
 
