@@ -110,38 +110,38 @@ clean-build-cache:
 	@echo "Build cache cleared. Run 'docker system df' to check."
 
 build-run-core: check-deps check-diskspace
-	ID_WORKER_ENABLED=true make build
+	ID_WORKER_ENABLED=false make build
 	docker compose -f docker-compose.yml --profile core up -d
 
 clean-build-run-core: build-run-core
 
 build-run-core-purge: check-deps check-diskspace
-	ID_WORKER_ENABLED=true PURGE_WORKER_ENABLED=true make build
+	ID_WORKER_ENABLED=false PURGE_WORKER_ENABLED=true make build
 	docker compose -f docker-compose.yml --profile core up -d
 	docker compose -f docker-compose.yml --profile workers up -d purge-worker
 
 clean-build-run-core-purge: build-run-core-purge
 
 build-run-core-workers-meilisearch: check-deps check-diskspace
-	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true MEILISEARCH_ENABLED=true PURGE_WORKER_ENABLED=true INCREMENTAL_RDF_WORKER_ENABLED=true make build
+	ID_WORKER_ENABLED=false JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true MEILISEARCH_ENABLED=true PURGE_WORKER_ENABLED=true INCREMENTAL_RDF_WORKER_ENABLED=true make build
 	docker compose -f docker-compose.yml --profile core --profile workers --profile meilisearch up -d
 
 clean-build-run-core-workers-meilisearch: build-run-core-workers-meilisearch
 
 build-run-workers: check-deps check-diskspace
-	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true PURGE_WORKER_ENABLED=true INCREMENTAL_RDF_WORKER_ENABLED=true make build
+	ID_WORKER_ENABLED=false JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true PURGE_WORKER_ENABLED=true INCREMENTAL_RDF_WORKER_ENABLED=true make build
 	docker compose -f docker-compose.yml --profile workers up -d
 
 clean-build-run-workers: build-run-workers
 
 build-core-workers: check-deps check-diskspace
-	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true PURGE_WORKER_ENABLED=true INCREMENTAL_RDF_WORKER_ENABLED=true make build
+	ID_WORKER_ENABLED=false JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true PURGE_WORKER_ENABLED=true INCREMENTAL_RDF_WORKER_ENABLED=true make build
 	docker compose -f docker-compose.yml --profile core --profile workers up -d
 
 clean-build-run-core-workers: build-run-core-workers
 
 build-run-core-workers: check-deps check-diskspace
-	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true PURGE_WORKER_ENABLED=true INCREMENTAL_RDF_WORKER_ENABLED=true make build
+	ID_WORKER_ENABLED=false JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true PURGE_WORKER_ENABLED=true INCREMENTAL_RDF_WORKER_ENABLED=true make build
 	docker compose -f docker-compose.yml --profile core --profile workers up -d
 
 clean-cache-volumes: remove
@@ -192,17 +192,17 @@ remove: stop
 	docker volume prune -f
 
 run-core: check-setup
-	ID_WORKER_ENABLED=true docker compose -f docker-compose.yml --profile core up -d
+	ID_WORKER_ENABLED=false docker compose -f docker-compose.yml --profile core up -d
 
 run-core-purge: check-setup
-	ID_WORKER_ENABLED=true PURGE_WORKER_ENABLED=true docker compose -f docker-compose.yml --profile core up -d
+	ID_WORKER_ENABLED=false PURGE_WORKER_ENABLED=true docker compose -f docker-compose.yml --profile core up -d
 	docker compose -f docker-compose.yml --profile workers up -d purge-worker
 
 run-core-workers-meilisearch: check-setup
-	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true MEILISEARCH_ENABLED=true PURGE_WORKER_ENABLED=true docker compose -f docker-compose.yml --profile core --profile workers --profile meilisearch up -d
+	ID_WORKER_ENABLED=false JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true MEILISEARCH_ENABLED=true PURGE_WORKER_ENABLED=true docker compose -f docker-compose.yml --profile core --profile workers --profile meilisearch up -d
 
 run-core-workers: check-setup
-	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true PURGE_WORKER_ENABLED=true docker compose -f docker-compose.yml --profile core --profile workers up -d
+	ID_WORKER_ENABLED=false JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true PURGE_WORKER_ENABLED=true docker compose -f docker-compose.yml --profile core --profile workers up -d
 
 settings:
 	curl -s http://localhost:8083/settings | python3 -m json.tool
