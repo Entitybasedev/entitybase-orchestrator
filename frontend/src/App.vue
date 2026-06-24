@@ -86,6 +86,7 @@ onMounted(async () => {
             :status="getStatus(item)"
             :is-producer="true"
             :topic="item.topic"
+            :link-url="item.linkUrl"
           />
         </template>
       </div>

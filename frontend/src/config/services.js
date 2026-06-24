@@ -11,10 +11,10 @@ export const infrastructure = [
 ]
 
 export const eventStreaming = [
-  { name: 'Server-Sent Events Backend', url: `http://${HOST}:8888`, description: 'Streaming backend SSE API', healthPath: '/health' },
-  { name: 'Server-Sent Events Frontend', url: `http://${HOST}:8889`, description: 'Frontend for all topics and events', healthPath: '/health' },
-  { name: 'Entity Change Producer', url: `http://${HOST}:8083`, healthPath: '/health', producerKey: 'entity_change', topic: 'entity_change', description: 'Topic with all changes to entities' },
-  { name: 'Incremental RDF Producer', url: `http://${HOST}:8083`, healthPath: '/health', producerKey: 'incremental_rdf', topic: 'incremental_rdf_diff', description: 'Topic with RDF diff of all changes to entities' },
+  { name: 'Server-Sent Events Backend', url: `http://${HOST}:8888`, description: 'Streaming backend SSE API', healthPath: '/health', linkUrl: `http://${HOST}:8889` },
+  { name: 'Server-Sent Events Frontend', url: `http://${HOST}:8889`, description: 'Frontend for all topics and events', healthPath: '/health', linkUrl: `http://${HOST}:8889` },
+  { name: 'Entity Change Producer', url: `http://${HOST}:8083`, healthPath: '/health', producerKey: 'entity_change', topic: 'entity_change', description: 'Topic with all changes to entities', linkUrl: `http://${HOST}:8889` },
+  { name: 'Incremental RDF Producer', url: `http://${HOST}:8083`, healthPath: '/health', producerKey: 'incremental_rdf', topic: 'incremental_rdf_diff', description: 'Topic with RDF diff of all changes to entities', linkUrl: `http://${HOST}:8889` },
 //  { name: 'User Change Producer', url: `http://${HOST}:8083`, healthPath: '/health', producerKey: 'user_change', topic: 'user_change' },
 ]
 
