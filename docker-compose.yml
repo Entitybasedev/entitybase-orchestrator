@@ -26,25 +26,14 @@ services:
     environment:
       - RUSTFS_ROOT_USER=${RUSTFS_ROOT_USER:-fakekey}
       - RUSTFS_ROOT_PASSWORD=${RUSTFS_ROOT_PASSWORD:-fakesecret}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:9000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     mem_limit: 512m
     cpus: 0.5
-    networks:
-      - entitybase-network
-    profiles:
-      - core
-      - workers
-
-  rustfs-health:
-    image: python:3.13-alpine
-    container_name: rustfs-health
-    volumes:
-      - ./scripts/health/rustfs-health.sh:/rustfs-health.sh:ro
-    command: ["/bin/sh", "/rustfs-health.sh"]
-    ports:
-      - "9002:8080"
-    depends_on:
-      rustfs:
-        condition: service_started
     networks:
       - entitybase-network
     profiles:
@@ -165,7 +154,7 @@ services:
       RUSTFS_SECRET_KEY: ${RUSTFS_ROOT_PASSWORD:-fakesecret}
     depends_on:
       rustfs:
-        condition: service_started
+        condition: service_healthy
     command: python -m models.workers.create buckets setup
     profiles:
       - core
