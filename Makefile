@@ -1,4 +1,4 @@
-.PHONY: build build-core-workers build-no-cache check check-deps check-diskspace check-setup clean-all clean-all-except-base-images clean-build-cache clean-build-run-core clean-build-run-core-purge clean-build-run-core-workers clean-build-run-core-workers-meilisearch clean-build-run-workers clean-cache-volumes clean-local-images clone elastic help meilisearch pull release remove run-core run-core-purge run-core-workers run-core-workers-meilisearch settings setup show-images stop test-frontend tmpfs-check tmpfs-clean-build-run-core-workers-meilisearch tmpfs-setup tmpfs-buildkit tmpfs-volumes
+.PHONY: build build-core-workers build-no-cache check check-deps check-diskspace check-setup clean-all clean-all-except-base-images clean-build-cache clean-build-run-core clean-build-run-core-purge clean-build-run-core-workers clean-build-run-core-workers-meilisearch clean-build-run-workers clean-cache-volumes clean-local-images gpla gpsa gsa git-clone-all git-push-all git-pull-all git-status-all elastic help meilisearch pull release remove run-core run-core-purge run-core-workers run-core-workers-meilisearch settings setup show-images stop test-frontend tmpfs-check tmpfs-clean-build-run-core-workers-meilisearch tmpfs-setup tmpfs-buildkit tmpfs-volumes
 
 help:
 	@echo "Available targets:"
@@ -18,7 +18,13 @@ help:
 	@echo "  make clean-build-run-workers - Clean local images, build, and start all services (core + workers)"
 	@echo "  make clean-cache-volumes     - Remove containers, volumes, and build cache (keeps images)"
 	@echo "  make clean-local-images      - Remove locally built entitybase/kafka2sse images (keeps base images)"
-	@echo "  make clone                   - Clone required repositories"
+	@echo "  make git-clone-all          - Clone all repositories from LIBS.yml"
+	@echo "  make git-push-all           - Push all repos in LIBS.yml (requires git remote)"
+	@echo "  make git-pull-all           - Pull all repos in LIBS.yml"
+	@echo "  make git-status-all         - Show git status of all repos in LIBS.yml"
+	@echo "  make gpla                   - Shortcut for git-pull-all"
+	@echo "  make gpsa                   - Shortcut for git-push-all"
+	@echo "  make gsa                    - Shortcut for git-status-all"
 	@echo "  make elastic                 - Start Elasticsearch and elasticsearch-indexer worker"
 	@echo "  make meilisearch              - Start Meilisearch and meilisearch-indexer worker"
 	@echo "  make pull                    - Pull latest changes in orchestrator and libs"
@@ -146,8 +152,21 @@ clean-local-images: remove
 	docker builder prune -f
 	docker images | grep -E "^entitybase-|^kafka2sse-" | awk '{print $$3}' | xargs -r docker rmi -f || true
 
-clone:
-	./scripts/clone-repos.sh
+git-clone-all:
+	poetry run python ./scripts/clone-repos.sh
+
+git-status-all:
+	poetry run python ./scripts/git-all.py
+
+git-push-all:
+	poetry run python ./scripts/git-all.py push
+
+git-pull-all:
+	poetry run python ./scripts/git-all.py pull
+
+gpla: git-pull-all
+gpsa: git-push-all
+gsa: git-status-all
 
 elastic: check-setup
 	ELASTICSEARCH_ENABLED=true docker compose -f docker-compose.yml --profile elastic up -d

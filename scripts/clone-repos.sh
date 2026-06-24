@@ -7,21 +7,24 @@ cd ..
 echo "Creating libs directory..."
 mkdir -p libs
 
-clone_repo() {
-    local repo_url=$1
-    local target_dir=$2
-    local description=$3
-    
-    if [ -d "$target_dir" ]; then
-        echo "$description already exists, skipping..."
-    else
-        echo "Cloning $description..."
-        git clone --depth 1 $repo_url "$target_dir"
-    fi
-}
+python3 - <<'PYTHON'
+import yaml
+import subprocess
+import os
 
-clone_repo "https://github.com/dpriskorn/entitybase-backend.git" "libs/entitybase-backend" "entitybase-backend"
-clone_repo "https://github.com/Entitybasedev/kafka2sse-backend.git" "libs/kafka2sse-backend" "kafka2sse-backend"
-clone_repo "https://github.com/Entitybasedev/kafka2sse-frontend.git" "libs/kafka2sse-frontend" "kafka2sse-frontend"
+with open("LIBS.yml", "r") as f:
+    config = yaml.safe_load(f)
 
-echo "Done! entitybase-frontend skipped (ignored)"
+for item in config.get("repos", []):
+    name = item["name"]
+    url = item["url"]
+    target_dir = os.path.join("libs", name)
+
+    if os.path.exists(target_dir):
+        pass
+    else:
+        print(f"Cloning {name}...")
+        subprocess.run(["git", "clone", "--depth", "1", url, target_dir], check=True)
+
+print("Done!")
+PYTHON
