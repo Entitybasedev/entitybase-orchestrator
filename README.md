@@ -59,10 +59,7 @@ make git-clone-all
 # 2. Initialize environment (creates .env, prompts for HOST)
 make setup
 
-# 3. (Optional) Mount tmpfs for faster build performance
-make tmpfs-setup
-
-# 4. Build Docker images
+# 3. Build Docker images
 make build
 
 # 5. Start core services
@@ -79,7 +76,6 @@ See [INSTALL.md](INSTALL.md) for installation instructions.
 |---------|-------------|
 | `make git-clone-all` | Clone all sub-repositories (required before `make setup`) |
 | `make setup` | Initialize environment (creates .env, prompts for HOST) |
-| `make tmpfs-setup` | Mount tmpfs for build cache and volumes (recommended before build) |
 | `make build` | Build all Docker images |
 | `make run-core` | Start core services |
 | `make run-core-workers` | Start core + workers |

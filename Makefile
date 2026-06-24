@@ -1,4 +1,4 @@
-.PHONY: build build-core-workers build-no-cache build-run-core build-run-core-purge build-run-core-workers build-run-core-workers-meilisearch build-run-workers check check-deps check-diskspace check-setup clean-all clean-all-except-base-images clean-build-cache clean-build-run-core clean-build-run-core-purge clean-build-run-core-workers clean-build-run-core-workers-meilisearch clean-build-run-workers clean-cache-volumes clean-local-images gpla gpsa gsa git-clone-all git-push-all git-pull-all git-status-all elastic help meilisearch pull release remove run-core run-core-purge run-core-workers run-core-workers-meilisearch settings setup show-images stop test-frontend tmpfs-check tmpfs-clean-build-run-core-workers-meilisearch tmpfs-setup tmpfs-buildkit tmpfs-volumes
+.PHONY: build build-core-workers build-no-cache build-run-core build-run-core-purge build-run-core-workers build-run-core-workers-meilisearch build-run-workers check check-deps check-diskspace check-setup clean-all clean-all-except-base-images clean-build-cache clean-build-run-core clean-build-run-core-purge clean-build-run-core-workers clean-build-run-core-workers-meilisearch clean-build-run-workers clean-cache-volumes clean-local-images gpla gpsa gsa git-clone-all git-push-all git-pull-all git-status-all elastic help meilisearch pull release remove run-core run-core-purge run-core-workers run-core-workers-meilisearch settings setup show-images stop test-frontend
 
 help:
 	@echo "Available targets:"
@@ -39,19 +39,14 @@ help:
 	@echo "  make show-images             - Show all entitybase Docker images"
 	@echo "  make stop                    - Stop all running containers"
 	@echo "  make test-frontend           - Run frontend tests (requires npm)"
-	@echo "  make tmpfs-check            - Check if tmpfs is set up, warn if not"
-	@echo "  make tmpfs-clean-build-run-core-workers-meilisearch - Setup tmpfs, build, and start core + workers + meilisearch"
-	@echo "  make tmpfs-setup             - Setup all tmpfs (buildkit + volumes)"
-	@echo "  make tmpfs-buildkit          - Setup tmpfs for buildkit cache"
-	@echo "  make tmpfs-volumes           - Setup tmpfs for Docker volumes"
 
 setup:
 	python3 ./scripts/setup.py
 
-build: check-deps tmpfs-check
+build: check-deps
 	@ID_WORKER_ENABLED=${ID_WORKER_ENABLED} JSON_WORKER_ENABLED=${JSON_WORKER_ENABLED} TTL_WORKER_ENABLED=${TTL_WORKER_ENABLED} STATS_WORKER_ENABLED=${STATS_WORKER_ENABLED} ELASTICSEARCH_ENABLED=${ELASTICSEARCH_ENABLED} MEILISEARCH_ENABLED=${MEILISEARCH_ENABLED} PURGE_WORKER_ENABLED=${PURGE_WORKER_ENABLED} INCREMENTAL_RDF_WORKER_ENABLED=${INCREMENTAL_RDF_WORKER_ENABLED} ./scripts/build-images.sh
 
-build-no-cache: check-deps tmpfs-check
+build-no-cache: check-deps
 	@ID_WORKER_ENABLED=${ID_WORKER_ENABLED} JSON_WORKER_ENABLED=${JSON_WORKER_ENABLED} TTL_WORKER_ENABLED=${TTL_WORKER_ENABLED} STATS_WORKER_ENABLED=${STATS_WORKER_ENABLED} ELASTICSEARCH_ENABLED=${ELASTICSEARCH_ENABLED} MEILISEARCH_ENABLED=${MEILISEARCH_ENABLED} PURGE_WORKER_ENABLED=${PURGE_WORKER_ENABLED} INCREMENTAL_RDF_WORKER_ENABLED=${INCREMENTAL_RDF_WORKER_ENABLED} ./scripts/build-images.sh --no-cache
 
 check:
@@ -89,8 +84,6 @@ check-diskspace:
 	exit 1
 
 check-setup:
-	@make tmpfs-setup
-	@make tmpfs-volumes
 	@if [ -f .env ]; then \
 		SETUP=$$(grep "^SETUP_COMPLETED=" .env | cut -d'=' -f2); \
 		if [ "$$SETUP" != "true" ]; then \
@@ -116,40 +109,38 @@ clean-build-cache:
 	docker builder prune -af
 	@echo "Build cache cleared. Run 'docker system df' to check."
 
-build-run-core: check-deps tmpfs-check check-diskspace
+build-run-core: check-deps check-diskspace
 	ID_WORKER_ENABLED=true make build
 	docker compose -f docker-compose.yml --profile core up -d
 
 clean-build-run-core: build-run-core
 
-build-run-core-purge: check-deps tmpfs-check check-diskspace
+build-run-core-purge: check-deps check-diskspace
 	ID_WORKER_ENABLED=true PURGE_WORKER_ENABLED=true make build
 	docker compose -f docker-compose.yml --profile core up -d
 	docker compose -f docker-compose.yml --profile workers up -d purge-worker
 
 clean-build-run-core-purge: build-run-core-purge
 
-build-run-core-workers-meilisearch: check-deps tmpfs-check check-diskspace
+build-run-core-workers-meilisearch: check-deps check-diskspace
 	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true MEILISEARCH_ENABLED=true PURGE_WORKER_ENABLED=true INCREMENTAL_RDF_WORKER_ENABLED=true make build
 	docker compose -f docker-compose.yml --profile core --profile workers --profile meilisearch up -d
 
 clean-build-run-core-workers-meilisearch: build-run-core-workers-meilisearch
 
-tmpfs-clean-build-run-core-workers-meilisearch: tmpfs-setup build-run-core-workers-meilisearch
-
-build-run-workers: check-deps tmpfs-check check-diskspace
+build-run-workers: check-deps check-diskspace
 	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true PURGE_WORKER_ENABLED=true INCREMENTAL_RDF_WORKER_ENABLED=true make build
 	docker compose -f docker-compose.yml --profile workers up -d
 
 clean-build-run-workers: build-run-workers
 
-build-core-workers: check-deps tmpfs-check check-diskspace
+build-core-workers: check-deps check-diskspace
 	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true PURGE_WORKER_ENABLED=true INCREMENTAL_RDF_WORKER_ENABLED=true make build
 	docker compose -f docker-compose.yml --profile core --profile workers up -d
 
 clean-build-run-core-workers: build-run-core-workers
 
-build-run-core-workers: check-deps tmpfs-check check-diskspace
+build-run-core-workers: check-deps check-diskspace
 	ID_WORKER_ENABLED=true JSON_WORKER_ENABLED=true TTL_WORKER_ENABLED=true STATS_WORKER_ENABLED=true PURGE_WORKER_ENABLED=true INCREMENTAL_RDF_WORKER_ENABLED=true make build
 	docker compose -f docker-compose.yml --profile core --profile workers up -d
 
@@ -224,41 +215,3 @@ stop:
 
 test-frontend:
 	cd frontend && npm install && npm run lint && npm run test && npm run build
-
-tmpfs-setup: tmpfs-buildkit tmpfs-volumes
-
-tmpfs-buildkit:
-	@if df -T /tmp/docker-buildkit 2>/dev/null | grep -q tmpfs; then \
-		echo "tmpfs at /tmp/docker-buildkit already mounted"; \
-	else \
-		echo "Creating and mounting tmpfs at /tmp/docker-buildkit..."; \
-		sudo mkdir -p /tmp/docker-buildkit; \
-		sudo mount -t tmpfs -o size=1G,mode=1777 tmpfs /tmp/docker-buildkit; \
-		echo "tmpfs mounted successfully"; \
-	fi
-
-tmpfs-volumes:
-	@if df -T /tmp/docker-volumes 2>/dev/null | grep -q tmpfs; then \
-		echo "tmpfs at /tmp/docker-volumes already mounted"; \
-	else \
-		echo "Creating and mounting tmpfs at /tmp/docker-volumes..."; \
-		sudo mkdir -p /tmp/docker-volumes; \
-		sudo mount -t tmpfs -o size=1G,mode=1777 tmpfs /tmp/docker-volumes; \
-		echo "tmpfs mounted successfully"; \
-	fi
-
-tmpfs-check:
-	@if df -T /tmp/docker-buildkit 2>/dev/null | grep -q tmpfs; then \
-		:; \
-	else \
-		echo "Warning: tmpfs not set up at /tmp/docker-buildkit. Build performance may be slower."; \
-		read -p "Continue building without tmpfs? (y/N) " ans; \
-		if [ "$$ans" != "y" ] && [ "$$ans" != "Y" ]; then \
-			exit 1; \
-		fi \
-	fi
-	@if df -T /tmp/docker-volumes 2>/dev/null | grep -q tmpfs; then \
-		:; \
-	else \
-		echo "Warning: tmpfs not set up at /tmp/docker-volumes. Volumes will use disk."; \
-	fi

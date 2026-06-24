@@ -62,9 +62,6 @@ make git-clone-all
 # Initialize environment (run once before first build)
 make setup
 
-# (Optional) Mount tmpfs for faster builds
-make tmpfs-setup
-
 # Build and start services
 make build
 make run-core      # Core services only
