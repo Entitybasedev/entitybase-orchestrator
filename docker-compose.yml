@@ -154,8 +154,6 @@ services:
   idworker:
     container_name: idworker
     image: entitybase-backend-idworker:latest
-    ports:
-      - "8001:8001"
     environment:
       WORKER_ID: id_worker_1
       WORKER_COUNT: 1
@@ -193,7 +191,7 @@ services:
       - KAFKA_THANKS_TOPIC=thanks
       - ELASTICSEARCH_ENABLED=${ELASTICSEARCH_ENABLED:-false}
       - MEILISEARCH_ENABLED=${MEILISEARCH_ENABLED:-false}
-      - ID_WORKER_ENABLED=${ID_WORKER_ENABLED:-true}
+      - ID_WORKER_ENABLED=${ID_WORKER_ENABLED:-false}
       - JSON_WORKER_ENABLED=${JSON_WORKER_ENABLED:-false}
       - TTL_WORKER_ENABLED=${TTL_WORKER_ENABLED:-false}
       - STATS_WORKER_ENABLED=${STATS_WORKER_ENABLED:-false}
@@ -286,8 +284,6 @@ services:
       rustfs:
         condition: service_healthy
       redpanda:
-        condition: service_healthy
-      idworker:
         condition: service_healthy
       entitybase-api:
         condition: service_started
