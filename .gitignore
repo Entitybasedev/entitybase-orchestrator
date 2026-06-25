@@ -5,3 +5,4 @@ deprecated/
 .python-version
 debug.log
 .idea/
+data/
