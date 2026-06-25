@@ -330,7 +330,7 @@ services:
     container_name: json-dump-worker
     image: entitybase-backend-json-worker:latest
     ports:
-      - "8002:8002"
+      - "8011:8002"
     environment:
       WORKER_ID: json_dump_worker_1
       S3_ENDPOINT: http://rustfs:9000
