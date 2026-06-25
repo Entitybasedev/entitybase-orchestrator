@@ -60,28 +60,37 @@ check-deps:
 	@echo "All dependencies satisfied."
 
 check-diskspace:
-	@if df -T /dev/mapper/arch >/dev/null 2>&1; then \
-		DEVICE="/dev/mapper/arch"; \
-	elif df -T /dev/sda1 >/dev/null 2>&1; then \
-		DEVICE="/dev/sda1"; \
+	@echo "Disk space:"
+	@df -h / | tail -1 | awk '{print "  /:              " $$4 " free (" $$3 " used / " $$2 " total)"}'
+	@if mountpoint -q /media/storage 2>/dev/null; then \
+		df -h /media/storage | tail -1 | awk '{print "  /media/storage: " $$4 " free (" $$3 " used / " $$2 " total)"}'; \
 	else \
-		echo "Disk check skipped: no known device found"; \
-		exit 0; \
-	fi; \
-	AVAILABLE=$$(df -h $$DEVICE | tail -1 | awk '{print $$4}'); \
-	echo "Available space: $$AVAILABLE"; \
-	case $$AVAILABLE in \
-		*[0-9]G) \
-	SIZE=$${AVAILABLE%G}; \
-			if [ "$$(echo "$$SIZE >= 1" | awk '{if ($$1 >= 1) print 1; else print 0}')" -eq 1 ]; then exit 0; fi \
-	;; \
-		*[0-9]M) \
-			echo "Error: Less than 1GB available"; \
-			exit 1; \
-	;; \
-	esac; \
-	echo "Error: Less than 1GB available"; \
-	exit 1
+		echo "  /media/storage: not mounted"; \
+	fi
+	@AVAILABLE_ROOT=$$(df -h / | tail -1 | awk '{print $$4}'); \
+	AVAILABLE_STORAGE=$$(df -h /media/storage 2>/dev/null | tail -1 | awk '{print $$4}'); \
+	check_available() { \
+		val="$$1"; \
+		name="$$2"; \
+		case "$$val" in \
+			*[0-9]G) \
+				SIZE=$${val%G}; \
+				if [ "$$(echo "$$SIZE >= 1" | awk '{if ($$1 >= 1) print 1; else print 0}')" -eq 1 ]; then \
+					return 0; \
+				fi \
+			;; \
+			*[0-9]M) \
+				echo "Error: Less than 1GB available on $$name"; \
+				exit 1; \
+			;; \
+		esac; \
+		echo "Error: Less than 1GB available on $$name"; \
+		exit 1; \
+	}; \
+	check_available "$$AVAILABLE_ROOT" "/"; \
+	if [ -n "$$AVAILABLE_STORAGE" ]; then \
+		check_available "$$AVAILABLE_STORAGE" "/media/storage"; \
+	fi
 
 check-setup:
 	@if [ -f .env ]; then \
