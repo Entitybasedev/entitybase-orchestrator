@@ -53,6 +53,18 @@ const url = `http://${HOST}:8083/...`
 
 This ensures the frontend works with custom hostnames via `VITE_HOST` env variable.
 
+### VITE_HOST flow
+
+`VITE_HOST` is a **build-time** Vite env var. It's baked into the static JS when the Docker image is built:
+
+1. Set in `/.env` (e.g., `VITE_HOST=vps-6d3fc437.vps.ovh.net`)
+2. Sourced by `scripts/build-images.sh` and passed as `--build-arg VITE_HOST` to `docker build`
+3. Read by `frontend/Dockerfile` as `ARG VITE_HOST` → `ENV VITE_HOST`
+4. Vite replaces `import.meta.env.VITE_HOST` at build time
+5. `frontend/src/config/services.js` uses it as `const HOST = import.meta.env.VITE_HOST || 'localhost'`
+
+The value must be a bare hostname (no `http://` prefix, no trailing `/`). The `setup.py` script sanitizes user input automatically.
+
 ## Key Commands
 
 ```bash
@@ -134,7 +146,7 @@ python3 scripts/rebuild_containers.py create-tables create-buckets
 - `make build` handles this automatically
 - `rebuild_containers.py` now calls export-requirements.sh automatically too
 
-### Image List (12 images)
+### Image List (13 images)
 - entitybase-api:latest
 - entitybase-backend-idworker:latest
 - entitybase-backend-stats-worker:latest
@@ -146,6 +158,7 @@ python3 scripts/rebuild_containers.py create-tables create-buckets
 - entitybase-backend-elasticsearch-worker:latest
 - kafka2sse-backend:latest
 - kafka2sse-frontend:latest
+- entitybase-orchestrator-frontend:latest
 
 ## Development Workflow
 
@@ -194,6 +207,7 @@ Key variables:
 - `MYSQL_ROOT_PASSWORD` - MySQL root password
 - `RUSTFS_ROOT_USER` - rustfs access key (default: fakekey)
 - `RUSTFS_ROOT_PASSWORD` - rustfs secret key (default: fakesecret)
+- `VITE_HOST` - Hostname for frontend health checks (bare hostname, no protocol)
 
 ## Notes
 

@@ -2,6 +2,7 @@
 """Rebuild Docker containers with their corresponding images and Dockerfiles."""
 
 import argparse
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -73,6 +74,9 @@ CONTAINER_MAP = {
         "dockerfile": "frontend/Dockerfile",
         "context": "frontend/",
         "service": "orchestrator-frontend",
+        "build_args": {
+            "VITE_HOST": os.environ.get("VITE_HOST", "localhost"),
+        },
     },
     "kafka2sse-backend": {
         "image": "kafka2sse-backend:latest",
@@ -123,7 +127,7 @@ def export_requirements():
         print(f"Warning: {export_script} not found, skipping requirements export")
 
 
-def build_image(image: str, dockerfile: str, context: str):
+def build_image(image: str, dockerfile: str, context: str, build_args: dict[str, str] | None = None):
     """Build a Docker image."""
     print(f"\n=== Building {image} ===")
     cmd = [
@@ -131,8 +135,11 @@ def build_image(image: str, dockerfile: str, context: str):
         "--no-cache",
         "-t", image,
         "-f", dockerfile,
-        context,
     ]
+    if build_args:
+        for key, value in build_args.items():
+            cmd.extend(["--build-arg", f"{key}={value}"])
+    cmd.append(context)
     run_command(cmd)
 
 
@@ -180,7 +187,7 @@ def main():
 
     for container in containers:
         config = CONTAINER_MAP[container]
-        build_image(config["image"], config["dockerfile"], config["context"])
+        build_image(config["image"], config["dockerfile"], config["context"], config.get("build_args"))
         recreate_container(container, config.get("service"))
 
     print("\n=== Done ===")

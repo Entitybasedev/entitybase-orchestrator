@@ -89,7 +89,7 @@ docker build $NO_CACHE -t kafka2sse-frontend:latest -f libs/kafka2sse-frontend/D
 
 echo ""
 echo "[orchestrator-frontend] Building entitybase-orchestrator-frontend:latest..."
-docker build $NO_CACHE --build-arg VITE_APP_VERSION=${VERSION_ORCHESTRATOR_FRONTEND} -t entitybase-orchestrator-frontend:latest -f frontend/Dockerfile frontend/
+docker build $NO_CACHE --build-arg VITE_APP_VERSION=${VERSION_ORCHESTRATOR_FRONTEND} --build-arg VITE_HOST=${VITE_HOST} -t entitybase-orchestrator-frontend:latest -f frontend/Dockerfile frontend/
 
 if [ "$PURGE_WORKER_ENABLED" = "true" ]; then
     echo ""

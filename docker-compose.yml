@@ -275,6 +275,12 @@ services:
   orchestrator-frontend:
     container_name: orchestrator-frontend
     image: entitybase-orchestrator-frontend:latest
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_HOST: ${VITE_HOST:-localhost}
+        VITE_APP_VERSION: ${VERSION_ORCHESTRATOR_FRONTEND:-latest}
     ports:
       - "8080:8083"
     profiles:

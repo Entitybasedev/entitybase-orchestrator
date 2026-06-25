@@ -42,11 +42,14 @@ def main():
     # Prompt for HOST
     default_host = env_vars.get(VITE_HOST_KEY, 'localhost')
     print(f"\nEnter the server HOST (IP or domain name).")
-    print(f"This is used by the frontend to connect to services.")
+    print(f"Use a bare hostname without protocol or port.")
     print(f"Examples: localhost, 192.168.1.100, example.com")
     host = input(f"HOST [{default_host}]: ").strip()
     if not host:
         host = default_host
+
+    # Sanitize: strip protocol and trailing slashes if user entered a URL
+    host = host.removeprefix("http://").removeprefix("https://").rstrip("/")
 
     # Update env vars
     env_vars[VITE_HOST_KEY] = host
