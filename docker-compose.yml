@@ -114,6 +114,8 @@ services:
       - LOG_LEVEL=${LOG_LEVEL}
       - ADMIN_NAME=${ADMIN_NAME}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - DATADIR=/data
+      - DB_TYPE=sqlite
     depends_on:
       rustfs:
         condition: service_healthy
@@ -128,6 +130,8 @@ services:
     cpus: 1.0
     networks:
       - entitybase-network
+    volumes:
+      - ./data/entitybase.db:/data/entitybase.db
 
   orchestrator-frontend:
     container_name: orchestrator-frontend
