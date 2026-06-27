@@ -7,7 +7,8 @@
 #   kafka2sse-be:  8888
 #   kafka2sse-fe:  8889
 #   orchestrator-fe: 8080
-#   backend: 8083
+#   backend:   8080
+#   entitybase-frontend: 8081
 #
 # Usage:
 #   docker compose up -d              # Core services only
@@ -628,6 +629,30 @@ services:
       - entitybase-network
     profiles:
       - workers
+
+  entitybase-frontend:
+    container_name: entitybase-frontend
+    build:
+      context: ./libs/entitybase-backend/frontend
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    profiles:
+      - core
+      - workers
+    depends_on:
+      entitybase-api:
+        condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8081/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    mem_limit: 256m
+    cpus: 0.25
+    networks:
+      - entitybase-network
 
 networks:
   entitybase-network:
