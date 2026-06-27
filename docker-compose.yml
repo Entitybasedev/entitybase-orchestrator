@@ -152,25 +152,6 @@ services:
     networks:
       - entitybase-network
 
-  idworker:
-    container_name: idworker
-    image: entitybase-backend-idworker:latest
-    environment:
-      WORKER_ID: id_worker_1
-      WORKER_COUNT: 1
-    healthcheck:
-      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:8001/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
-    profiles: []
-    mem_limit: 512m
-    cpus: 0.5
-    networks:
-      - entitybase-network
-
-
   entitybase-api:
     container_name: entitybase-api
     image: entitybase-api:latest
