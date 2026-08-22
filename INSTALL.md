@@ -18,6 +18,12 @@ Takes ~5 minutes first time.
 pipx inject poetry poetry-plugin-export
 ```
 
+**Docker: permission denied .../var/run/docker.sock**
+```bash
+sudo usermod -aG docker $USER
+newgrp docker   # apply group in current shell
+```
+
 **Docker: not enough space**
 ```bash
 df -h /           # Check disk
@@ -42,7 +48,13 @@ pipx ensurepath
 
 ### 3. Poetry + plugin
 
+Install poetry system-wide (required):
+
 ```bash
+# Arch Linux
+sudo pacman -S python-poetry
+
+# Or via pipx (per-user)
 pipx install poetry
 pipx inject poetry poetry-plugin-export
 poetry --version
@@ -51,6 +63,22 @@ poetry --version
 ### 4. Docker
 
 Download from [docker.com](https://docker.com).
+
+Start the daemon:
+
+```bash
+sudo systemctl start docker
+```
+
+After installing, add your user to the `docker` group:
+
+```bash
+sudo usermod -aG docker $USER
+newgrp docker   # apply group in current shell
+groups          # verify "docker" is listed
+```
+
+Note: this grants root-equivalent access on the machine.
 
 ## Environment Variables
 
