@@ -3,9 +3,10 @@
 ## Quick Start
 
 ```bash
-make clone          # 1. Clone repos
-cp .env.example .env # 2. Create config
-make run           # 3. Build & start
+just clone          # 1. Clone repos  (or: just git-clone-all)
+cp env.example .env # 2. Create config
+just setup          #    Initialize environment
+just build-run-core # 3. Build & start
 ```
 
 Takes ~5 minutes first time.
@@ -20,7 +21,7 @@ pipx inject poetry poetry-plugin-export
 **Docker: not enough space**
 ```bash
 df -h /           # Check disk
-make check-diskspace # Run check
+just check-diskspace # Run check
 ```
 
 ## Detailed Guide
@@ -62,10 +63,10 @@ Download from [docker.com](https://docker.com).
 ## Cheatsheet
 
 ```bash
-make run    # Start
-make stop   # Stop
-make build # Build only
-make clean # Cleanup
+just run-core    # Start (no build)
+just stop   # Stop
+just build # Build only
+just clean-all # Cleanup
 ```
 
 ## Help?

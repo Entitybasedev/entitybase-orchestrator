@@ -54,36 +54,38 @@ flowchart TB
 
 ```bash
 # 1. Clone all sub-repositories (first time only)
-make git-clone-all
+just git-clone-all
 
 # 2. Initialize environment (creates .env, prompts for HOST)
-make setup
+just setup
 
 # 3. Build Docker images
-make build
+just build
 
 # 5. Start core services
-make run-core
+just run-core
 ```
 
 ## Dependencies
 
 See [INSTALL.md](INSTALL.md) for installation instructions.
 
-## Makefile Commands
+## Commands
 
 | Command | Description |
 |---------|-------------|
-| `make git-clone-all` | Clone all sub-repositories (required before `make setup`) |
-| `make setup` | Initialize environment (creates .env, prompts for HOST) |
-| `make build` | Build all Docker images |
-| `make run-core` | Start core services |
-| `make run-core-workers` | Start core + workers |
-| `make stop` | Stop all running services |
-| `make remove` | Stop services and remove containers/volumes |
-| `make clean-all` | Remove locally built images, containers, volumes, and build cache |
-| `make check` | Check service health status |
-| `make show-images` | Show all entitybase Docker images |
+| `just git-clone-all` | Clone all sub-repositories (required before `just setup`) |
+| `just setup` | Initialize environment (creates .env, prompts for HOST) |
+| `just build` | Build all Docker images |
+| `just run-core` | Start core services |
+| `just run-core-workers` | Start core + workers |
+| `just stop` | Stop all running services |
+| `just remove` | Stop services and remove containers/volumes |
+| `just clean-all` | Remove locally built images, containers, volumes, and build cache |
+| `just check` | Check service health status |
+| `just show-images` | Show all entitybase Docker images |
+
+Run `just` (or `just --list`) to see all available recipes.
 
 ## Manual Commands
 

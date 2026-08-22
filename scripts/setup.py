@@ -63,7 +63,7 @@ def main():
     print(f"\nSetup completed!")
     print(f"  VITE_HOST={host}")
     print(f"  SETUP_COMPLETED=true")
-    print(f"\nYou can now run 'make run-core'.")
+    print(f"\nYou can now run 'just run-core'.")
 
 if __name__ == "__main__":
     main()
