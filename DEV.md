@@ -2,11 +2,12 @@
 
 Local development on Arch Linux using native services via systemd. No Docker.
 
-| Service | Port(s)   | Purpose                    |
-|---------|-----------|----------------------------|
-| MariaDB | 3306      | Database                   |
-| rustfs  | 9000/9001 | S3-compatible storage + UI |
-| Valkey  | 6379      | Cache                      |
+| Service     | Port(s)   | Purpose                    |
+|-------------|-----------|----------------------------|
+| MariaDB     | 3306      | Database                   |
+| rustfs      | 9000/9001 | S3-compatible storage + UI |
+| Valkey      | 6379      | Cache                      |
+| Meilisearch | 7700      | Full-text search           |
 
 Note: `redpanda-bin` provides the `rpk` CLI, but the broker binary is not packaged
 for Arch yet, so change streaming is disabled locally (`STREAMING_ENABLED=false`).
@@ -15,7 +16,7 @@ for Arch yet, so change streaming is disabled locally (`STREAMING_ENABLED=false`
 
 ```bash
 sudo pacman -S --needed mariadb valkey
-yay -S --needed rustfs-bin redpanda-bin
+yay -S --needed rustfs-bin redpanda-bin meilisearch-bin
 ```
 
 ## 2. One-time setup per service
@@ -65,13 +66,34 @@ Zero config needed for development:
 sudo systemctl enable --now valkey
 ```
 
+### Meilisearch
+
+Install via AUR:
+
+```bash
+yay -S --needed meilisearch-bin
+```
+
+Start the service:
+
+```bash
+sudo systemctl enable --now meilisearch
+```
+
+By default it runs on port 7700 with no master key. To configure, create `/etc/default/meilisearch`:
+
+```bash
+MEILI_ENV=development
+MEILI_MASTER_KEY=
+```
+
 ## 3. Daily use
 
 ```bash
-just dev-up       # start all three
-just dev-stop     # stop all three
+just dev-up       # start all four
+just dev-stop     # stop all four
 just dev-status   # show status
-just dev-check    # health-check all three
+just dev-check    # health-check all four
 ```
 
 ## 4. Run the backend API
@@ -87,6 +109,8 @@ export VITESS_HOST=127.0.0.1 VITESS_PORT=3306
 export VITESS_DATABASE=entitybase VITESS_USER=entitybase VITESS_PASSWORD=entitybase
 export S3_ENDPOINT=http://localhost:9000
 export STREAMING_ENABLED=false
+export MEILISEARCH_HOST=127.0.0.1
+export MEILISEARCH_PORT=7700
 
 poetry run uvicorn models.rest_api.main:app --port 8000 --reload
 ```
@@ -101,13 +125,17 @@ API docs: <http://localhost:8000/docs>
 | rustfs (S3 API) | `http://localhost:9000` | `fakekey`/`fakesecret` |
 | rustfs console  | `http://localhost:9001` | `fakekey`/`fakesecret` |
 | Valkey          | `localhost:6379`        | none                   |
+| Meilisearch     | `http://localhost:7700` | none                   |
 
 ## Resetting data
 
 ```bash
-# Wipe MySQL
-sudo systemctl stop mariadb && sudo rm -rf /var/lib/mysql/*   # then redo step 2
+# Reset MySQL
+sudo mariadb -e 'DROP DATABASE IF EXISTS entitybase;'  # then redo step 2
 
 # Wipe rustfs
 sudo systemctl stop rustfs && sudo rm -rf /data/rustfs0/*
+
+# Wipe Meilisearch
+sudo systemctl stop meilisearch && sudo rm -rf /var/lib/meilisearch/*
 ```
