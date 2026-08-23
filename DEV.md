@@ -111,8 +111,8 @@ poetry install --with dev
 
 export PYTHONPATH=src
 export DB_TYPE=vitess
-export VITESS_HOST=127.0.0.1 VITESS_PORT=3306
-export VITESS_DATABASE=entitybase VITESS_USER=entitybase VITESS_PASSWORD=entitybase
+export DB_HOST=127.0.0.1 DB_PORT=3306
+export DB_DATABASE=entitybase DB_USER=entitybase DB_PASSWORD=entitybase
 export S3_ENDPOINT=http://localhost:9000
 export STREAMING_ENABLED=false
 export MEILISEARCH_HOST=127.0.0.1
