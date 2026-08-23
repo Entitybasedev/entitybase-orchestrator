@@ -45,9 +45,6 @@ jobs:
           cd libs/entitybase-backend
           mkdir -p var
           poetry export -f requirements.txt --output var/requirements-api.txt --without-hashes --only=api
-          poetry export -f requirements.txt --output var/requirements-create-buckets.txt --without-hashes --only=create-buckets
-          poetry export -f requirements.txt --output var/requirements-create-tables.txt --without-hashes --only=create-tables
-          poetry export -f requirements.txt --output var/requirements-create-topics.txt --without-hashes --only=create-topics
 
       - name: Build Docker images
         run: |
@@ -71,15 +68,6 @@ jobs:
           timeout 60 bash -c 'until docker exec redpanda rpk cluster health; do sleep 2; done'
           echo "Waiting for API..."
           timeout 60 bash -c 'until curl -sf http://localhost:8000/health; do sleep 2; done'
-
-      - name: Wait for setup services
-        run: |
-          echo "Waiting for create-buckets..."
-          timeout 60 bash -c 'until [ "$(docker inspect -f {{.State.Status}} create-buckets 2>/dev/null)" = "exited" ]; do sleep 2; done'
-          echo "Waiting for create-tables..."
-          timeout 60 bash -c 'until [ "$(docker inspect -f {{.State.Status}} create-tables 2>/dev/null)" = "exited" ]; do sleep 2; done'
-          echo "Waiting for create-topics..."
-          timeout 60 bash -c 'until [ "$(docker inspect -f {{.State.Status}} create-topics 2>/dev/null)" = "exited" ]; do sleep 2; done'
 
       - name: Run Meilisearch integration tests
         run: |

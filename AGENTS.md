@@ -137,7 +137,7 @@ cd libs/entitybase-backend
 # Then rebuild specific containers
 cd ../..
 python3 scripts/rebuild_containers.py --all
-python3 scripts/rebuild_containers.py create-tables create-buckets
+python3 scripts/rebuild_containers.py idworker json-worker
 ```
 
 ### Important: Requirements Files
@@ -146,15 +146,12 @@ python3 scripts/rebuild_containers.py create-tables create-buckets
 - `just build` handles this automatically
 - `rebuild_containers.py` now calls export-requirements.sh automatically too
 
-### Image List (13 images)
+### Image List (10 images)
 - entitybase-api:latest
 - entitybase-backend-idworker:latest
 - entitybase-backend-stats-worker:latest
 - entitybase-backend-json-worker:latest
 - entitybase-backend-ttl-worker:latest
-- entitybase-backend-create-buckets:latest
-- entitybase-backend-create-tables:latest
-- entitybase-backend-create-topics:latest
 - entitybase-backend-elasticsearch-worker:latest
 - kafka2sse-backend:latest
 - kafka2sse-frontend:latest

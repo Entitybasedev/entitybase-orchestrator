@@ -55,18 +55,6 @@ if [ "$TTL_WORKER_ENABLED" = "true" ]; then
     docker build $NO_CACHE -t entitybase-backend-ttl-worker:latest -f libs/entitybase-backend/docker/containers/Dockerfile.ttl-worker libs/entitybase-backend/
 fi
 
-echo ""
-echo "[create-buckets] Building entitybase-backend-create-buckets:latest..."
-docker build $NO_CACHE -t entitybase-backend-create-buckets:latest -f libs/entitybase-backend/docker/containers/Dockerfile.create-buckets libs/entitybase-backend/
-
-echo ""
-echo "[create-tables] Building entitybase-backend-create-tables:latest..."
-docker build $NO_CACHE -t entitybase-backend-create-tables:latest -f libs/entitybase-backend/docker/containers/Dockerfile.create-tables libs/entitybase-backend/
-
-echo ""
-echo "[create-topics] Building entitybase-backend-create-topics:latest..."
-docker build $NO_CACHE -t entitybase-backend-create-topics:latest -f libs/entitybase-backend/docker/containers/Dockerfile.create-topics libs/entitybase-backend/
-
 if [ "$ELASTICSEARCH_ENABLED" = "true" ]; then
     echo ""
     echo "[elasticsearch-worker] Building entitybase-backend-elasticsearch-worker:latest..."

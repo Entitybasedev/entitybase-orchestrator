@@ -6,3 +6,4 @@ deprecated/
 debug.log
 .idea/
 data/
+__pycache__/

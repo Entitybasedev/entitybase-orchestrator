@@ -35,11 +35,6 @@ def get_container_health(container: str) -> str:
     return run_docker_inspect(container, "{{.State.Health.Status}}")
 
 
-def get_container_exit_code(container: str) -> str:
-    """Get container exit code."""
-    return run_docker_inspect(container, "{{.State.ExitCode}}")
-
-
 def check_running_service(container: str) -> bool:
     """Check a running service container."""
     global overall_status
@@ -64,26 +59,6 @@ def check_running_service(container: str) -> bool:
         return True
     else:
         print(f"{RED}❌ {container} - {health}{NC}")
-        return False
-
-
-def check_completed_job(container: str) -> bool:
-    """Check a completed job container."""
-    global overall_status
-    
-    state = get_container_state(container)
-    
-    if not state:
-        print(f"{YELLOW}⚠️  {container} - not found{NC}")
-        return True
-    
-    exit_code = get_container_exit_code(container)
-    
-    if state == "exited" and exit_code == "0":
-        print(f"{GREEN}✅ {container} - completed successfully{NC}")
-        return True
-    else:
-        print(f"{RED}❌ {container} - state: {state}, exit code: {exit_code}{NC}")
         return False
 
 
@@ -138,11 +113,6 @@ def main():
     if not check_running_service("redpanda-health"): overall_status = 1
     if not check_running_service("valkey"): overall_status = 1
     if not check_running_service("valkey-health"): overall_status = 1
-    
-    print("\n=== Setup Jobs ===")
-    if not check_completed_job("create-buckets"): overall_status = 1
-    if not check_completed_job("create-tables"): overall_status = 1
-    if not check_completed_job("create-topics"): overall_status = 1
     
     print("\n=== Core Services ===")
     if not check_running_service("entitybase-api"): overall_status = 1
