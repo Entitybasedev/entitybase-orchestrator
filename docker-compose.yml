@@ -12,7 +12,7 @@
 
 services:
   rustfs:
-    image: rustfs/rustfs:1.0.0-beta.8
+    image: rustfs/rustfs:1.0.0-rc.3
     container_name: rustfs
     restart: unless-stopped
     user: "1000:1000"
