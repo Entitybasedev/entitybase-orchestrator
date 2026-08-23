@@ -123,6 +123,42 @@ poetry run uvicorn models.rest_api.main:app --port 8000 --reload
 
 API docs: <http://localhost:8000/docs>
 
+## 5. Running tests
+
+```bash
+cd libs/entitybase-backend
+
+# Unit tests (no Docker needed, all dependencies mocked)
+just test-unit
+
+# Individual unit test groups
+just test-unit-01   # config, data, services, validation, json_parser
+just test-unit-02   # internal_representation, workers
+just test-unit-03   # infrastructure, rdf_builder
+just test-unit-04   # rest_api
+
+# E2E tests (needs running services: just dev-up)
+just test-e2e
+
+# Integration tests (needs running API)
+just test-integration
+
+# Contract tests
+just test-contract
+
+# All tests
+just tests
+
+# Fast tests (unit + e2e + contract, no integration)
+just test-fast
+
+# Linting
+just lint
+
+# Lint + all tests
+just lint-test-all
+```
+
 ## Connection reference
 
 | Service         | Address                 | Credentials            |
