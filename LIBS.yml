@@ -9,7 +9,7 @@ repos:
     url: https://github.com/Entitybasedev/kafka2sse-backend.git
   - name: kafka2sse-frontend
     url: https://github.com/Entitybasedev/kafka2sse-frontend.git
-  - name: meilisearch
-    url: https://github.com/meilisearch/meilisearch.git
+  # - name: meilisearch
+  #   url: https://github.com/meilisearch/meilisearch.git
   - name: wikibase-integrator
     url: https://github.com/dpriskorn/WikibaseIntegrator.git
