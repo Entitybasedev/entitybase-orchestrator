@@ -116,6 +116,7 @@ services:
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
       - DATADIR=/data
       - DB_TYPE=sqlite
+      - DB_BULK_IMPORT_MODE=${DB_BULK_IMPORT_MODE:-false}
     depends_on:
       rustfs:
         condition: service_healthy
