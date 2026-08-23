@@ -198,3 +198,21 @@ logs service:
 
 restart service:
     {{compose}} restart {{service}}
+
+# Native local dev services (systemd, no Docker) - see DEV.md
+dev-up:
+    sudo systemctl enable --now mariadb rustfs valkey
+
+dev-stop:
+    sudo systemctl stop mariadb rustfs valkey
+
+dev-status:
+    systemctl status mariadb rustfs valkey --no-pager || true
+
+dev-check:
+    #!/usr/bin/env bash
+    fail=0
+    if sudo mariadb -e "SELECT 1" >/dev/null 2>&1; then echo "mysql : OK"; else echo "mysql : FAIL"; fail=1; fi
+    if curl -sf http://localhost:9000/health >/dev/null 2>&1; then echo "rustfs: OK"; else echo "rustfs: FAIL"; fail=1; fi
+    if valkey-cli ping 2>/dev/null | grep -q PONG; then echo "valkey: OK"; else echo "valkey: FAIL"; fail=1; fi
+    exit $fail
