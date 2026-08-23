@@ -46,7 +46,7 @@ Set credentials in `/etc/default/rustfs`:
 ```bash
 RUSTFS_ACCESS_KEY=fakekey
 RUSTFS_SECRET_KEY=fakesecret
-RUSTFS_VOLUMES="/data/rustfs0"
+RUSTFS_VOLUMES="/var/lib/rustfs"
 RUSTFS_ADDRESS=":9000"
 RUSTFS_CONSOLE_ENABLE=true
 RUSTFS_CONSOLE_ADDRESS=":9001"
@@ -134,8 +134,11 @@ API docs: <http://localhost:8000/docs>
 sudo mariadb -e 'DROP DATABASE IF EXISTS entitybase;'  # then redo step 2
 
 # Wipe rustfs
-sudo systemctl stop rustfs && sudo rm -rf /data/rustfs0/*
+sudo systemctl stop rustfs && sudo rm -rf /var/lib/rustfs/*
 
 # Wipe Meilisearch
 sudo systemctl stop meilisearch && sudo rm -rf /var/lib/meilisearch/*
+
+# Flush Valkey
+valkey-cli FLUSHALL
 ```
