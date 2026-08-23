@@ -41,15 +41,21 @@ SQL
 
 ### rustfs
 
-Set credentials in `/etc/default/rustfs`:
+Create directories and set config in `/etc/default/rustfs`:
 
 ```bash
+sudo mkdir -p /var/lib/rustfs /var/log/rustfs
+
+sudo tee /etc/default/rustfs > /dev/null <<'EOF'
 RUSTFS_ACCESS_KEY=fakekey
 RUSTFS_SECRET_KEY=fakesecret
 RUSTFS_VOLUMES="/var/lib/rustfs"
 RUSTFS_ADDRESS=":9000"
 RUSTFS_CONSOLE_ENABLE=true
 RUSTFS_CONSOLE_ADDRESS=":9001"
+RUSTFS_OBS_LOGGER_LEVEL=error
+RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/"
+EOF
 ```
 
 Then start it:
