@@ -118,10 +118,10 @@ export STREAMING_ENABLED=false
 export MEILISEARCH_HOST=127.0.0.1
 export MEILISEARCH_PORT=7700
 
-poetry run uvicorn models.rest_api.main:app --port 8000 --reload
+poetry run uvicorn models.rest_api.main:app --port 8081 --reload
 ```
 
-API docs: <http://localhost:8000/docs>
+API docs: <http://localhost:8081/docs>
 
 ## 5. Running tests
 
@@ -159,10 +159,85 @@ just lint
 just lint-test-all
 ```
 
+## 6. Load Balancer with HAProxy
+
+Run 4 backend instances (one per CPU) behind HAProxy on port 8080.
+
+### Install HAProxy
+
+```bash
+sudo pacman -S haproxy
+```
+
+### HAProxy config
+
+Create `/etc/haproxy/haproxy.cfg`:
+
+```cfg
+global
+    log stdout format raw local0
+    maxconn 4096
+
+defaults
+    log     global
+    mode    http
+    option  httplog
+    timeout connect 5s
+    timeout client  30s
+    timeout server  30s
+
+frontend http_front
+    bind *:8080
+    default_backend entitybase_back
+
+backend entitybase_back
+    balance roundrobin
+    server api1 127.0.0.1:8081 check
+    server api2 127.0.0.1:8082 check
+    server api3 127.0.0.1:8083 check
+    server api4 127.0.0.1:8084 check
+```
+
+### Start backends + HAProxy
+
+```bash
+cd libs/entitybase-backend
+export PYTHONPATH=src
+export DB_TYPE=vitess
+export DB_HOST=127.0.0.1 DB_PORT=3306
+export DB_DATABASE=entitybase DB_USER=entitybase DB_PASSWORD=entitybase
+export S3_ENDPOINT=http://localhost:9000
+export STREAMING_ENABLED=false
+export MEILISEARCH_HOST=127.0.0.1
+export MEILISEARCH_PORT=7700
+
+# Start 4 backend instances (one per CPU)
+for port in 8081 8082 8083 8084; do
+  poetry run uvicorn models.rest_api.main:app --port $port --workers 1 &
+done
+
+# Start HAProxy
+sudo systemctl start haproxy
+```
+
+### Stop
+
+```bash
+# Kill backends
+kill $(pgrep -f "uvicorn models.rest_api.main") 2>/dev/null
+
+# Stop HAProxy
+sudo systemctl stop haproxy
+```
+
+API docs: <http://localhost:8080/docs>
+
 ## Connection reference
 
 | Service         | Address                 | Credentials            |
 |-----------------|-------------------------|------------------------|
+| HAProxy (LB)    | `http://localhost:8080` | —                      |
+| Backend (×4)    | `127.0.0.1:8081–8084`  | —                      |
 | MySQL           | `127.0.0.1:3306`        | `entitybase`/`entitybase`, db `entitybase` |
 | rustfs (S3 API) | `http://localhost:9000` | `fakekey`/`fakesecret` |
 | rustfs console  | `http://localhost:9001` | `fakekey`/`fakesecret` |
