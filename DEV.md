@@ -118,10 +118,12 @@ export STREAMING_ENABLED=false
 export MEILISEARCH_HOST=127.0.0.1
 export MEILISEARCH_PORT=7700
 
-poetry run uvicorn models.rest_api.main:app --port 8081 --reload
+poetry run uvicorn models.rest_api.main:app --port 8081 --workers 4
 ```
 
 API docs: <http://localhost:8081/docs>
+
+> Use 1 worker per CPU core. For local dev with `--reload`, uvicorn uses a single worker by default. For production-like load, see section 6 (HAProxy with 4 instances).
 
 ## 5. Running tests
 
